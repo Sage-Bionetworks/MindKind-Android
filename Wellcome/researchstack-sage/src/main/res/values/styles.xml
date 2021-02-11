@@ -1,0 +1,82 @@
+<resources>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="Widget.MP.SubmitBar" parent="@style/Widget.Backbone.SubmitBar">
+        <item name="positiveActionTitle">@string/rsb_BUTTON_NEXT</item>
+        <item name="positiveActionColor">@color/white</item>
+        <item name="negativeActionColor">@color/black</item>
+    </style>
+
+    <style name="Base.Widget.MP.Toolbar" parent="@style/Widget.AppCompat.Toolbar">
+        <item name="android:background">?attr/colorPrimary</item>
+        <item name="android:minHeight">56dp</item>
+        <item name="titleTextAppearance">@style/TextAppearance.Widget.MP.Toolbar.Title</item>
+    </style>
+
+    <style name="Widget.MP.Toolbar" parent="@style/Base.Widget.MP.Toolbar">
+        <item name="android:foreground">?android:windowContentOverlay</item>
+    </style>
+
+    <style name="Widget.BP.Toolbar.Transparent" parent="@style/Base.Widget.MP.Toolbar">
+        <item name="titleTextAppearance">
+            @style/MpToolbarTitleTransparent
+        </item>
+    </style>
+
+    <style name="MpToolbarTitleTransparent">
+        <item name="android:textColor">@color/rsb_warm_gray</item>
+    </style>
+
+    <style name="TextAppearance.Widget.MP.Toolbar.Title" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="MP"/>
+    <style name="MP.CheckBox" parent="Widget.AppCompat.CompoundButton.CheckBox">
+        <item name="android:button">@drawable/mp_checkbox_royal500</item>
+        <item name="android:textColor">@color/appTextDark</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">@font/lato_regular</item>
+        <item name="android:paddingLeft">@dimen/rsb_padding_medium</item>
+    </style>
+    <style name="MP.Divider">
+        <item name="android:height">1dp</item>
+        <item name="android:background">@color/appVeryLightGray</item>
+    </style>
+
+    <style name="TextAppearance"/>
+    <style name="TextAppearance.MP"/>
+    <style name="TextAppearance.MP.Body">
+        <item name="android:textSize">17sp</item>
+        <item name="android:fontFamily">@font/lato</item>
+        <item name="android:textColor">@color/appTextDark</item>
+    </style>
+    <style name="TextAppearance.MP.Body.Bold">
+        <item name="android:fontFamily">@font/lato_bold</item>
+        <item name="android:textColor">@color/appTextDark</item>
+    </style>
+    <style name="TextAppearance.MP.Header">
+        <item name="android:textSize">25sp</item>
+        <item name="android:fontFamily">@font/lato_bold</item>
+        <item name="android:textColor">@color/appTextDark</item>
+    </style>
+    <style name="TextAppearance.MP.SubHeader">
+        <item name="android:textSize">22sp</item>
+        <item name="android:fontFamily">@font/lato_bold</item>
+        <item name="android:textColor">@color/appTextDark</item>
+    </style>
+
+    <style name="TextAppearance.MP.InstructionCustomButtonText">
+        <item name="android:textSize">12sp</item>
+        <item name="android:fontFamily">@font/lato_light</item>
+    </style>
+
+    <style name="TextAppearance.MP.TaskStepProgress">
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">@font/lato</item>
+    </style>
+</resources>
