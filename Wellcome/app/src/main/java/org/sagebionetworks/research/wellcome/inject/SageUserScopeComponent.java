@@ -43,7 +43,7 @@ import dagger.Component;
 
 @Component(modules = {}, dependencies = BridgeStudyComponent.class)
 @BridgeStudyParticipantScope
-public interface MPowerUserScopeComponent extends BridgeManagerProvider {
+public interface SageUserScopeComponent extends BridgeManagerProvider {
     @Component.Builder
     interface Builder extends BridgeManagerProvider.Builder {
         @BindsInstance
@@ -54,6 +54,6 @@ public interface MPowerUserScopeComponent extends BridgeManagerProvider {
         Builder bridgeStudyComponent(BridgeStudyComponent bridgeStudyComponent);
 
         @Override
-        MPowerUserScopeComponent build();
+        SageUserScopeComponent build();
     }
 }

@@ -42,7 +42,7 @@ import dagger.Provides;
 import org.sagebionetworks.research.wellcome.history.SageHistoryItemManager;
 
 @Module
-public class MPowerHistoryModule {
+public class SageHistoryModule {
 
     @Provides
     @BridgeApplicationScope

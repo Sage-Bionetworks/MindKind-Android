@@ -38,13 +38,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.SOURCE)
-@StringDef({MpIdentifier.TRIGGERS, MpIdentifier.SYMPTOMS, MpIdentifier.MEDICATION,
-        MpIdentifier.STUDY_BURST_COMPLETED, MpIdentifier.STUDY_BURST_COMPLETED_UPLOAD,
-        MpIdentifier.TAPPING, MpIdentifier.WALK_AND_BALANCE, MpIdentifier.TREMOR, MpIdentifier.DEMOGRAPHICS,
-        MpIdentifier.BACKGROUND, MpIdentifier.ENGAGEMENT, MpIdentifier.MOTIVATION, MpIdentifier.STUDY_BURST_REMINDER,
-        MpIdentifier.MEASURING, MpIdentifier.TRACKING, MpIdentifier.HEALTH_SURVEYS, MpIdentifier.AUTHENTICATE,
-        MpIdentifier.PASSIVE_DATA_PERMISSION, MpIdentifier.PASSIVE_GAIT})
-public @interface MpIdentifier {
+@StringDef({SageTaskIdentifier.TRIGGERS, SageTaskIdentifier.SYMPTOMS, SageTaskIdentifier.MEDICATION,
+        SageTaskIdentifier.STUDY_BURST_COMPLETED, SageTaskIdentifier.STUDY_BURST_COMPLETED_UPLOAD,
+        SageTaskIdentifier.TAPPING, SageTaskIdentifier.WALK_AND_BALANCE, SageTaskIdentifier.TREMOR, SageTaskIdentifier.DEMOGRAPHICS,
+        SageTaskIdentifier.BACKGROUND, SageTaskIdentifier.ENGAGEMENT, SageTaskIdentifier.MOTIVATION, SageTaskIdentifier.STUDY_BURST_REMINDER,
+        SageTaskIdentifier.MEASURING, SageTaskIdentifier.TRACKING, SageTaskIdentifier.HEALTH_SURVEYS, SageTaskIdentifier.AUTHENTICATE,
+        SageTaskIdentifier.PASSIVE_DATA_PERMISSION, SageTaskIdentifier.PASSIVE_GAIT})
+public @interface SageTaskIdentifier {
     String TRIGGERS = "Triggers";
     String SYMPTOMS = "Symptoms";
     String MEDICATION = "Medication";

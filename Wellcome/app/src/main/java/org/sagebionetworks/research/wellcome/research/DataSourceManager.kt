@@ -32,18 +32,18 @@
 
 package org.sagebionetworks.research.wellcome.research
 
-import org.sagebionetworks.research.wellcome.research.MpIdentifier.BACKGROUND
-import org.sagebionetworks.research.wellcome.research.MpIdentifier.DEMOGRAPHICS
-import org.sagebionetworks.research.wellcome.research.MpIdentifier.ENGAGEMENT
-import org.sagebionetworks.research.wellcome.research.MpIdentifier.MEDICATION
-import org.sagebionetworks.research.wellcome.research.MpIdentifier.MOTIVATION
-import org.sagebionetworks.research.wellcome.research.MpIdentifier.STUDY_BURST_COMPLETED
-import org.sagebionetworks.research.wellcome.research.MpIdentifier.STUDY_BURST_REMINDER
-import org.sagebionetworks.research.wellcome.research.MpIdentifier.SYMPTOMS
-import org.sagebionetworks.research.wellcome.research.MpIdentifier.TAPPING
-import org.sagebionetworks.research.wellcome.research.MpIdentifier.TREMOR
-import org.sagebionetworks.research.wellcome.research.MpIdentifier.TRIGGERS
-import org.sagebionetworks.research.wellcome.research.MpIdentifier.WALK_AND_BALANCE
+import org.sagebionetworks.research.wellcome.research.SageTaskIdentifier.BACKGROUND
+import org.sagebionetworks.research.wellcome.research.SageTaskIdentifier.DEMOGRAPHICS
+import org.sagebionetworks.research.wellcome.research.SageTaskIdentifier.ENGAGEMENT
+import org.sagebionetworks.research.wellcome.research.SageTaskIdentifier.MEDICATION
+import org.sagebionetworks.research.wellcome.research.SageTaskIdentifier.MOTIVATION
+import org.sagebionetworks.research.wellcome.research.SageTaskIdentifier.STUDY_BURST_COMPLETED
+import org.sagebionetworks.research.wellcome.research.SageTaskIdentifier.STUDY_BURST_REMINDER
+import org.sagebionetworks.research.wellcome.research.SageTaskIdentifier.SYMPTOMS
+import org.sagebionetworks.research.wellcome.research.SageTaskIdentifier.TAPPING
+import org.sagebionetworks.research.wellcome.research.SageTaskIdentifier.TREMOR
+import org.sagebionetworks.research.wellcome.research.SageTaskIdentifier.TRIGGERS
+import org.sagebionetworks.research.wellcome.research.SageTaskIdentifier.WALK_AND_BALANCE
 import org.sagebionetworks.research.wellcome.research.MpTaskInfo.Tapping
 import org.sagebionetworks.research.wellcome.research.MpTaskInfo.Tremor
 import org.sagebionetworks.research.wellcome.research.MpTaskInfo.WalkAndBalance
@@ -140,7 +140,7 @@ data class StudyBurstConfiguration(
         /**
          * @property identifier of the task.
          */
-        val identifier: String = MpIdentifier.STUDY_BURST_COMPLETED,
+        val identifier: String = SageTaskIdentifier.STUDY_BURST_COMPLETED,
         /**
          * @property numberOfDays in the study burst.
          */
@@ -160,11 +160,11 @@ data class StudyBurstConfiguration(
         /**
          * @property taskGroupIdentifier used to mark the active tasks included in the study burst.
          */
-        val taskGroupIdentifier: String = MpIdentifier.MEASURING,
+        val taskGroupIdentifier: String = SageTaskIdentifier.MEASURING,
         /**
          * @property motivationIdentifier The identifier for the initial engagement survey.
          */
-        val motivationIdentifier: String = MpIdentifier.MOTIVATION,
+        val motivationIdentifier: String = SageTaskIdentifier.MOTIVATION,
         /**
          * @property completionTasks for each day of the study burst.
          */

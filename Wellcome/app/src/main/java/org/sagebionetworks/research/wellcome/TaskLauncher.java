@@ -54,7 +54,7 @@ import org.sagebionetworks.research.arcvalidation.sageresearch.SageResearchTaskL
 import org.sagebionetworks.research.domain.repository.TaskRepository;
 import org.sagebionetworks.research.domain.result.interfaces.TaskResult;
 import org.sagebionetworks.research.wellcome.TaskLauncher.TaskLaunchState.Type;
-import org.sagebionetworks.research.wellcome.research.MpIdentifier;
+import org.sagebionetworks.research.wellcome.research.SageTaskIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,12 +98,12 @@ public class TaskLauncher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskLauncher.class);
 
-    private static final ImmutableSet<String> RS_TASKS = ImmutableSet.of(MpIdentifier.AUTHENTICATE);
+    private static final ImmutableSet<String> RS_TASKS = ImmutableSet.of(SageTaskIdentifier.AUTHENTICATE);
 
     private static final ImmutableSet<String> SR_TASKS = ImmutableSet
-            .of(MpIdentifier.TAPPING, MpIdentifier.WALK_AND_BALANCE, MpIdentifier.TRIGGERS, MpIdentifier.TREMOR, MpIdentifier.SYMPTOMS, MpIdentifier.MEDICATION);
+            .of(SageTaskIdentifier.TAPPING, SageTaskIdentifier.WALK_AND_BALANCE, SageTaskIdentifier.TRIGGERS, SageTaskIdentifier.TREMOR, SageTaskIdentifier.SYMPTOMS, SageTaskIdentifier.MEDICATION);
     private static final ImmutableSet<String> SR_TASKS_REQUIRING_RESULT = ImmutableSet.of(
-            MpIdentifier.WALK_AND_BALANCE);
+            SageTaskIdentifier.WALK_AND_BALANCE);
 
     private final SageResearchStackTaskLauncher researchStackTaskLauncher;
     private final SageResearchTaskLauncher sageResearchTaskLauncher;

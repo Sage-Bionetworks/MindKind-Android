@@ -35,7 +35,7 @@ package org.sagebionetworks.research.wellcome.inject;
 import dagger.Module;
 
 @Module()
-public abstract class MPowerAppModule {
+public abstract class SageAppModule {
 //    @ContributesAndroidInjector
 //    abstract ArcPhoneAuthActivity contributeMpMainActivityInjector();
 }

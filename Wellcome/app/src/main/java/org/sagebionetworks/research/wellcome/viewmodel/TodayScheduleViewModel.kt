@@ -40,7 +40,7 @@ import android.content.Context
 import androidx.annotation.VisibleForTesting
 import com.google.common.base.Preconditions.checkArgument
 import org.sagebionetworks.researchstack.backbone.utils.ResUtils
-import org.sagebionetworks.research.wellcome.research.MpIdentifier.STUDY_BURST_COMPLETED
+import org.sagebionetworks.research.wellcome.research.SageTaskIdentifier.STUDY_BURST_COMPLETED
 import org.sagebionetworks.research.wellcome.viewmodel.ItemType.ACTIVITIES
 import org.sagebionetworks.research.sageresearch.dao.room.ScheduleRepository
 import org.sagebionetworks.research.sageresearch.dao.room.ScheduledActivityEntity
@@ -49,7 +49,7 @@ import org.sagebionetworks.research.sageresearch.extensions.filterByActivityId
 import org.sagebionetworks.research.sageresearch.extensions.startOfDay
 import org.sagebionetworks.research.sageresearch.extensions.startOfNextDay
 import org.sagebionetworks.research.sageresearch.viewmodel.ScheduleViewModel
-import org.sagebionetworks.research.wellcome.research.MpIdentifier
+import org.sagebionetworks.research.wellcome.research.SageTaskIdentifier
 import org.threeten.bp.Instant
 import org.threeten.bp.ZonedDateTime
 import javax.inject.Inject
@@ -162,9 +162,9 @@ interface StringEnum {
 }
 
 enum class ItemType(val identifier: String) {
-    TRIGGERS(MpIdentifier.TRIGGERS),
-    SYMPTOMS(MpIdentifier.SYMPTOMS),
-    MEDICATION(MpIdentifier.MEDICATION),
+    TRIGGERS(SageTaskIdentifier.TRIGGERS),
+    SYMPTOMS(SageTaskIdentifier.SYMPTOMS),
+    MEDICATION(SageTaskIdentifier.MEDICATION),
     ACTIVITIES("activities")
 }
 

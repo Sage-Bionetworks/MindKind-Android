@@ -34,15 +34,20 @@ package org.sagebionetworks.research.wellcome
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.VisibleForTesting
 import androidx.core.app.ActivityCompat.OnRequestPermissionsResultCallback
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.common.base.Supplier
 import com.google.common.collect.ImmutableMap
 import dagger.android.support.DaggerFragment
+import io.reactivex.Completable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import org.sagebionetworks.research.wellcome.tasklist.TaskListFragment
 import kotlinx.android.synthetic.main.fragment_main.navigation
 import org.sagebionetworks.research.sageresearch.dao.room.AppConfigRepository
@@ -57,7 +62,12 @@ import javax.inject.Inject
  *
  */
 class MainFragment : DaggerFragment(), OnRequestPermissionsResultCallback {
-    private val LOGGER = LoggerFactory.getLogger(MainFragment::class.java)
+
+    companion object {
+        val LOG_TAG = MainFragment::class.java.canonicalName
+    }
+
+    protected val compositeDispose = CompositeDisposable()
 
     // tag for identifying an instance of a fragment
     private val TAG_FRAGMENT_TASK_LIST = "tracking"
@@ -106,6 +116,16 @@ class MainFragment : DaggerFragment(), OnRequestPermissionsResultCallback {
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
 
         profileManager = ProfileManager(reportRepo, appConfigRepo)
+
+        // Example on how to get app config, should eventually be
+        // TODO: mdephillips 2/11/21 moved to its own view model
+        compositeDispose.add(appConfigRepo.appConfig
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    Log.d(LOG_TAG, "Successfully retrieved app config with client data ${it.clientData}")
+                }, {
+                    Log.e(LOG_TAG, it.localizedMessage ?: "")
+                }))
     }
 
     /**
@@ -116,7 +136,7 @@ class MainFragment : DaggerFragment(), OnRequestPermissionsResultCallback {
      */
     fun showFragment(fragmentTag: String?) {
         if (fragmentTag == null) {
-            LOGGER.warn("could not show fragment with null tag")
+            Log.w(LOG_TAG, "could not show fragment with null tag")
         }
 
         val fragmentTransaction = childFragmentManager.beginTransaction()
@@ -124,18 +144,18 @@ class MainFragment : DaggerFragment(), OnRequestPermissionsResultCallback {
         val previousFragment = childFragmentManager
                 .findFragmentById(R.id.fragment_container)
         if (previousFragment != null) {
-            LOGGER.debug("detaching fragment with tag: {}", previousFragment.tag)
+            Log.d(LOG_TAG, "detaching fragment with tag: ${previousFragment.tag}")
             fragmentTransaction.detach(previousFragment)
         }
 
         var nextFragment = childFragmentManager.findFragmentByTag(fragmentTag)
         if (nextFragment == null) {
-            LOGGER.debug("no fragment found for tag: {}, creating a new one ", fragmentTag)
+            Log.d(LOG_TAG, "no fragment found for tag: $fragmentTag, creating a new one ")
             val fragmentSupplier: Supplier<androidx.fragment.app.Fragment>? = FRAGMENT_TAG_TO_CREATOR[fragmentTag]
                     ?: FRAGMENT_TAG_TO_CREATOR[TAG_FRAGMENT_TASK_LIST]
 
             if (fragmentSupplier == null) {
-                LOGGER.warn("no supplier found for fragment with tag: {}", fragmentTag)
+                Log.w(LOG_TAG, "no supplier found for fragment with tag: $fragmentTag")
                 return
             }
             nextFragment = fragmentSupplier.get()
@@ -143,7 +163,7 @@ class MainFragment : DaggerFragment(), OnRequestPermissionsResultCallback {
             fragmentTransaction
                     .add(R.id.fragment_container, nextFragment, fragmentTag)
         } else {
-            LOGGER.debug("reattaching fragment with tag: {}", nextFragment.tag)
+            Log.d(LOG_TAG, "reattaching fragment with tag: ${nextFragment.tag}")
             fragmentTransaction.attach(nextFragment)
         }
         fragmentTransaction.commit()
@@ -154,18 +174,18 @@ class MainFragment : DaggerFragment(), OnRequestPermissionsResultCallback {
         // Due to a behavior issue in nested child fragments
         // We must call the onActivityResult on all the children
         for (fragment in childFragmentManager.fragments) {
-            LOGGER.info("Calling onActivityResult for fragment " + fragment.id)
+            Log.i(LOG_TAG, "Calling onActivityResult for fragment " + fragment.id)
             fragment.onActivityResult(requestCode, resultCode, data)
         }
     }
 
     override fun onResume() {
-        LOGGER.debug("MainFragment onResume")
+        Log.d(LOG_TAG, "MainFragment onResume")
         super.onResume()
     }
 
     override fun onPause() {
-        LOGGER.debug("MainFragment onPause")
+        Log.d(LOG_TAG, "MainFragment onPause")
         // profileManager.profileDataLoader().removeObserver(passiveDataAllowedObserver)
         // NOTE: Do not disable passive gait tracking here.  This commented code is left here to allow
         // developers to disable for local testing.

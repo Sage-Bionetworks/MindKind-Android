@@ -46,10 +46,10 @@ import org.sagebionetworks.research.arcvalidation.researchstack.framework.step.b
 import org.sagebionetworks.research.arcvalidation.researchstack.framework.step.body.SageIntegerAnswerFormat
 import org.sagebionetworks.research.arcvalidation.researchstack.framework.step.body.SageTextQuestionBody
 import org.sagebionetworks.research.sageresearch.viewmodel.ResearchStackUploadArchiveFactory
-import org.sagebionetworks.research.wellcome.research.MpIdentifier
+import org.sagebionetworks.research.wellcome.research.SageTaskIdentifier
 import org.slf4j.LoggerFactory
 
-open class MpResearchStackArchiveFactory: ResearchStackUploadArchiveFactory() {
+open class SageResearchStackArchiveFactory: ResearchStackUploadArchiveFactory() {
 
     companion object {
         const val studyBurstArchiveFileName = "tasks"
@@ -59,7 +59,7 @@ open class MpResearchStackArchiveFactory: ResearchStackUploadArchiveFactory() {
         val resultExclusionList = listOf<String>()
     }
 
-    private val logger = LoggerFactory.getLogger(MpResearchStackArchiveFactory::class.java)
+    private val logger = LoggerFactory.getLogger(SageResearchStackArchiveFactory::class.java)
 
     /**
      * Can be overridden by sub-class for custom data archiving
@@ -71,11 +71,11 @@ open class MpResearchStackArchiveFactory: ResearchStackUploadArchiveFactory() {
             flattenedResultList: List<org.sagebionetworks.researchstack.backbone.result.Result>?,
             taskIdentifier: String) {
 
-        if (MpIdentifier.STUDY_BURST_COMPLETED_UPLOAD == taskIdentifier) {
+        if (SageTaskIdentifier.STUDY_BURST_COMPLETED_UPLOAD == taskIdentifier) {
             // Study burst completed marker has custom upload archive names "tasks"
             // and all results are consolidated into that file with their result identifiers
             archiveBuilder.addDataFile(fromResultList(studyBurstArchiveFileName, flattenedResultList))
-        } else if (MpIdentifier.STUDY_BURST_REMINDER == taskIdentifier) {
+        } else if (SageTaskIdentifier.STUDY_BURST_REMINDER == taskIdentifier) {
             // Study burst completed marker has custom upload archive names "answers"
             // and all results are consolidated into that file with their result identifiers
             archiveBuilder.addDataFile(fromResultList(answersFilename, flattenedResultList))

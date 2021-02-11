@@ -37,9 +37,9 @@ import android.app.Service;
 import androidx.annotation.VisibleForTesting;
 import androidx.fragment.app.Fragment;
 
-import org.sagebionetworks.research.wellcome.inject.DaggerMPowerApplicationComponent;
-import org.sagebionetworks.research.wellcome.inject.DaggerMPowerUserScopeComponent;
-import org.sagebionetworks.research.wellcome.inject.MPowerUserScopeComponent;
+import org.sagebionetworks.research.wellcome.inject.DaggerSageApplicationComponent;
+import org.sagebionetworks.research.wellcome.inject.DaggerSageUserScopeComponent;
+import org.sagebionetworks.research.wellcome.inject.SageUserScopeComponent;
 import org.sagebionetworks.researchstack.backbone.ResearchStack;
 import org.sagebionetworks.bridge.android.di.BridgeStudyComponent;
 
@@ -72,16 +72,16 @@ public class WellcomeApplication extends BridgeSageResearchApp implements HasSup
     @VisibleForTesting
     @Override
     protected AndroidInjector<? extends DaggerApplication> applicationInjector() {
-        return DaggerMPowerApplicationComponent
+        return DaggerSageApplicationComponent
                 .builder()
-                .mPowerUserScopeComponent((MPowerUserScopeComponent) getOrInitBridgeManagerProvider())
+                .mPowerUserScopeComponent((SageUserScopeComponent) getOrInitBridgeManagerProvider())
                 .application(this)
                 .build();
     }
 
     @Override
-    protected MPowerUserScopeComponent initBridgeManagerScopedComponent(BridgeStudyComponent bridgeStudyComponent) {
-        MPowerUserScopeComponent bridgeManagerProvider = DaggerMPowerUserScopeComponent.builder()
+    protected SageUserScopeComponent initBridgeManagerScopedComponent(BridgeStudyComponent bridgeStudyComponent) {
+        SageUserScopeComponent bridgeManagerProvider = DaggerSageUserScopeComponent.builder()
                 .applicationContext(this.getApplicationContext())
                 .bridgeStudyComponent(bridgeStudyComponent)
                 .build();

@@ -58,7 +58,7 @@ import org.sagebionetworks.research.wellcome.authentication.ExternalIdSignInActi
 import org.sagebionetworks.research.wellcome.tasklist.TaskListFragment;
 
 @Module(includes = {})
-public abstract class MPowerUserModule {
+public abstract class SageUserModule {
     @ContributesAndroidInjector
     abstract ExternalIdSignInActivity contributeExternalIdSignInActivityInjector();
 

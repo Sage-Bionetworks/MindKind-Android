@@ -54,9 +54,9 @@ import dagger.android.support.AndroidSupportInjectionModule;
 @BridgeApplicationScope
 @Component(modules = {PerformTaskModule.class, SageResearchAppSDKModule.class, TaskModule.class,
         SageResearchStackModule.class, AppDataModule.class, AndroidSupportInjectionModule.class,
-        MPowerAppModule.class, MPowerUserModule.class, MPowerHistoryModule.class},
-        dependencies = {MPowerUserScopeComponent.class})
-public interface MPowerApplicationComponent extends AndroidInjector<WellcomeApplication> {
+        SageAppModule.class, SageUserModule.class, SageHistoryModule.class},
+        dependencies = {SageUserScopeComponent.class})
+public interface SageApplicationComponent extends AndroidInjector<WellcomeApplication> {
 
 
     void inject(ReportRepository instance);
@@ -72,8 +72,8 @@ public interface MPowerApplicationComponent extends AndroidInjector<WellcomeAppl
         @BindsInstance
         Builder application(Application application);
 
-        Builder mPowerUserScopeComponent(MPowerUserScopeComponent mPowerUserScopeComponent);
+        Builder mPowerUserScopeComponent(SageUserScopeComponent mPowerUserScopeComponent);
 
-        MPowerApplicationComponent build();
+        SageApplicationComponent build();
     }
 }
