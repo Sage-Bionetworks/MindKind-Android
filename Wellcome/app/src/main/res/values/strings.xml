@@ -1,0 +1,99 @@
+<!--
+  ~ BSD 3-Clause License
+  ~
+  ~ Copyright 2018  Sage Bionetworks. All rights reserved.
+  ~
+  ~ Redistribution and use in source and binary forms, with or without modification,
+  ~ are permitted provided that the following conditions are met:
+  ~
+  ~ 1.  Redistributions of source code must retain the above copyright notice, this
+  ~ list of conditions and the following disclaimer.
+  ~
+  ~ 2.  Redistributions in binary form must reproduce the above copyright notice,
+  ~ this list of conditions and the following disclaimer in the documentation and/or
+  ~ other materials provided with the distribution.
+  ~
+  ~ 3.  Neither the name of the copyright holder(s) nor the names of any contributors
+  ~ may be used to endorse or promote products derived from this software without
+  ~ specific prior written permission. No license is granted to the trademarks of
+  ~ the copyright holders even if such marks are included in this software.
+  ~
+  ~ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  ~ AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  ~ IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+  ~ ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+  ~ FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+  ~ DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+  ~ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+  ~ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+  ~ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+  ~ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  -->
+
+<resources>
+    <string name="osb_study_id" translatable="false">wellcome</string>
+    <string name="osb_study_name" translatable="false">Wellcome</string>
+
+    <string name="app_name">Wellcome</string>
+    <string name="button_submit">Submit</string>
+    <string name="button_save">Save</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="title_task_list">Task List</string>
+    <string name="title_history">History</string>
+    <string name="title_profile">Profile</string>
+    <string name="title_activity_external_id_sign_in">Sign in</string>
+
+    <string name="set_reminder">Set reminder</string>
+    <string name="do_not_send_me_reminders">Do not send me reminders</string>
+    <string name="reminder_message">Let\'s set a Reminder for your Study Bursts</string>
+    <string name="do_not_remind_me"><u>Do not remind me</u></string>
+    <string name="when_do_you_want_a_reminder">When do you want a reminder?</string>
+    <string name="remind_me_in_2_hours">Remind me in 2 hours</string>
+    <string name="remind_me_in_1_hour">Remind me in 1 hour</string>
+    <string name="remind_me_in_15_minutes">Remind me in 15 minutes</string>
+    <string name="reminder_title_run_task">Time to complete the %s task</string>
+    <string name="reminder_title_study_burst">Time to complete your study burst</string>
+
+    <!-- Notification Channel Strings -->
+    <string name="reminder_notification_channel_id">mPower Channel</string>
+    <string name="reminder_notification_channel_title">mPower Reminders</string>
+    <string name="reminder_notification_channel_desc">mPower reminders help you remember to log your data</string>
+
+    <string name="foreground_channel_id">mPower Alerts</string>
+    <string name="foreground_channel_title">mPower Informational Alerts</string>
+    <string name="foreground_channel_desc">mPower low importance informational alerts</string>
+
+    <string-array name="days_of_the_week">
+        <item>Sunday</item>
+        <item>Monday</item>
+        <item>Tuesday</item>
+        <item>Wednesday</item>
+        <item>Thursday</item>
+        <item>Friday</item>
+        <item>Saturday</item>
+    </string-array>
+
+    <string-array name="days_of_the_week_short">
+        <item>Sun</item>
+        <item>Mon</item>
+        <item>Tue</item>
+        <item>Wed</item>
+        <item>Thu</item>
+        <item>Fri</item>
+        <item>Sat</item>
+    </string-array>
+
+    <string name="time_picker_ok_button">Ok</string>
+    <string name="time_picker_cancel_button">Cancel</string>
+
+    <string name="button_record">Record</string>
+    <string name="button_recorded">Recorded</string>
+    <string name="button_undo">Undo</string>
+    <string name="button_edit">Edit</string>
+    <string name="button_add_details">Add details</string>
+
+    <!-- Withdraw -->
+    <string name="withdraw_title">Hi %1$s,\n You have been enrolled in the mPower2 Study since %2$s</string>
+    <string name="withdraw_details">You can withdraw from the study if you no longer want to be involved. Please note that you will be logged out of your account and no further data will be collected.</string>
+
+</resources>
