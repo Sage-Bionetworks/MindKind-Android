@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.sagebionetworks.research.wellcome">
+    package="org.sagebionetworks.research.mindkind">
 
     <meta-data
         android:name="firebase_crash_collection_enabled"
