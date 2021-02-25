@@ -1,8 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.sagebionetworks.research.arcvalidation.sageresearch">
+    package="org.sagebionetworks.research.mindkind.sageresearch">
     <application>
         <activity
-            android:name="org.sagebionetworks.research.arcvalidation.sageresearch.PerformTaskWithResultActivity"
+            android:name="org.sagebionetworks.research.mindkind.sageresearch.PerformTaskWithResultActivity"
             android:screenOrientation="portrait" />
 
     </application>

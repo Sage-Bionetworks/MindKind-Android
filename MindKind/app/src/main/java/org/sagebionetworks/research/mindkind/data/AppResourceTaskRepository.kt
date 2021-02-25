@@ -38,7 +38,9 @@ import io.reactivex.Single
 import org.sagebionetworks.bridge.android.manager.AuthenticationManager
 import org.sagebionetworks.research.data.ResourceTaskRepository
 import org.sagebionetworks.research.domain.task.Task
+import org.sagebionetworks.research.domain.task.TaskInfoView
 import org.sagebionetworks.research.sageresearch.dao.room.AppConfigRepository
+import org.threeten.bp.Duration
 import javax.inject.Inject
 
 class AppResourceTaskRepository
@@ -51,14 +53,28 @@ class AppResourceTaskRepository
 //        const val medicationTimingTaskIdentifier = "ActivityTracking"
 //    }
 
-    override fun getTask(taskIdentifier: String?): Single<Task> {
+    override fun getTaskInfo(taskIdentifier: String?): Single<TaskInfoView> {
 
+        // I'm not sure why this is required, but all we need to return
+        // for this to proceed and call getTask below is the task identifier
+        val taskInfo = AppConfigTaskInfoView(
+                taskIdentifier ?: "",
+                null,
+                taskIdentifier,
+                null,
+                null,
+                null)
+
+        return Single.just(taskInfo)
+    }
+
+    override fun getTask(taskIdentifier: String?): Single<Task> {
         // Also check the app config for tasks
-        return appConfigRepo.appConfig.firstOrError().map {
-            // return@map it.configElements.
-            val task = gson.fromJson(getJsonTaskAsset(taskIdentifier), Task::class.java)
-            return@map task
-        }
+//        return appConfigRepo.appConfig.firstOrError().map {
+//            // return@map it.configElements.
+//            val task = gson.fromJson(getJsonTaskAsset(taskIdentifier), Task::class.java)
+//            return@map task
+//        }
 
         return super.getTask(taskIdentifier)
 //        val taskId = taskIdentifier ?: run {
@@ -94,4 +110,22 @@ class AppResourceTaskRepository
 //                it.copyWithSteps(allSteps)
 //            }
 //    }
+
+
+}
+
+data class AppConfigTaskInfoView(
+        val id: String,
+        val duration: Duration?,
+        val titleInfo: String?,
+        val subtitleInfo: String?,
+        val detailInfo: String?,
+        val copyrightInfo: String?
+): TaskInfoView {
+    override fun getIdentifier() = id
+    override fun getEstimatedDuration() = duration
+    override fun getTitle() = titleInfo
+    override fun getSubtitle() = subtitleInfo
+    override fun getDetail() = detailInfo
+    override fun getCopyright() = copyrightInfo
 }

@@ -43,7 +43,7 @@ import java.lang.annotation.RetentionPolicy;
         SageTaskIdentifier.TAPPING, SageTaskIdentifier.WALK_AND_BALANCE, SageTaskIdentifier.TREMOR, SageTaskIdentifier.DEMOGRAPHICS,
         SageTaskIdentifier.BACKGROUND, SageTaskIdentifier.ENGAGEMENT, SageTaskIdentifier.MOTIVATION, SageTaskIdentifier.STUDY_BURST_REMINDER,
         SageTaskIdentifier.MEASURING, SageTaskIdentifier.TRACKING, SageTaskIdentifier.HEALTH_SURVEYS, SageTaskIdentifier.AUTHENTICATE,
-        SageTaskIdentifier.PASSIVE_DATA_PERMISSION, SageTaskIdentifier.PASSIVE_GAIT})
+        SageTaskIdentifier.PASSIVE_DATA_PERMISSION, SageTaskIdentifier.PASSIVE_GAIT, SageTaskIdentifier.SLEEP_SURVEY, SageTaskIdentifier.foo_test_survey})
 public @interface SageTaskIdentifier {
     String TRIGGERS = "Triggers";
     String SYMPTOMS = "Symptoms";
@@ -64,4 +64,6 @@ public @interface SageTaskIdentifier {
     String AUTHENTICATE = "Signup";
     String PASSIVE_DATA_PERMISSION = "PassiveDataPermission";
     String PASSIVE_GAIT = "PassiveGait";
+    String SLEEP_SURVEY = "SleepSurvey";
+    String foo_test_survey = "foo";
 }

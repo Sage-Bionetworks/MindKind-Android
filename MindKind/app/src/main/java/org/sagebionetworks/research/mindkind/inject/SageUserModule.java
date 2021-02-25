@@ -35,7 +35,7 @@ package org.sagebionetworks.research.mindkind.inject;
 import com.google.common.collect.ImmutableList;
 
 import org.sagebionetworks.bridge.android.di.BridgeApplicationScope;
-import org.sagebionetworks.research.arcvalidation.sageresearch.archive.TappingResultArchiveFactory;
+import org.sagebionetworks.research.mindkind.sageresearch.archive.TappingResultArchiveFactory;
 import org.sagebionetworks.research.mobile_ui.inject.PerformTaskFragmentScope;
 import org.sagebionetworks.research.mobile_ui.inject.ShowStepFragmentModule;
 import org.sagebionetworks.research.mobile_ui.perform_task.PerformTaskFragment;

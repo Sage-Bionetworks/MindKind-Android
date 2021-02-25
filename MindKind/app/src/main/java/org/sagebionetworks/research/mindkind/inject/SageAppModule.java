@@ -32,10 +32,16 @@
 
 package org.sagebionetworks.research.mindkind.inject;
 
+import org.sagebionetworks.research.mobile_ui.perform_task.PerformTaskActivity;
+
 import dagger.Module;
+import dagger.android.ContributesAndroidInjector;
 
 @Module()
 public abstract class SageAppModule {
 //    @ContributesAndroidInjector
 //    abstract ArcPhoneAuthActivity contributeMpMainActivityInjector();
+
+    @ContributesAndroidInjector
+    abstract PerformTaskActivity contributePerformTaskActivityInjector();
 }

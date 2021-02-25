@@ -40,11 +40,11 @@ import org.sagebionetworks.bridge.data.Archive
 import org.sagebionetworks.bridge.data.ArchiveFile
 import org.sagebionetworks.bridge.data.JsonArchiveFile
 import org.sagebionetworks.bridge.researchstack.survey.SurveyAnswer
-import org.sagebionetworks.research.arcvalidation.researchstack.framework.SageTaskHelper
-import org.sagebionetworks.research.arcvalidation.researchstack.framework.step.body.SageBooleanAnswerFormat
-import org.sagebionetworks.research.arcvalidation.researchstack.framework.step.body.SageChoiceAnswerFormat
-import org.sagebionetworks.research.arcvalidation.researchstack.framework.step.body.SageIntegerAnswerFormat
-import org.sagebionetworks.research.arcvalidation.researchstack.framework.step.body.SageTextQuestionBody
+import org.sagebionetworks.research.mindkind.researchstack.framework.SageTaskHelper
+import org.sagebionetworks.research.mindkind.researchstack.framework.step.body.SageBooleanAnswerFormat
+import org.sagebionetworks.research.mindkind.researchstack.framework.step.body.SageChoiceAnswerFormat
+import org.sagebionetworks.research.mindkind.researchstack.framework.step.body.SageIntegerAnswerFormat
+import org.sagebionetworks.research.mindkind.researchstack.framework.step.body.SageTextQuestionBody
 import org.sagebionetworks.research.sageresearch.viewmodel.ResearchStackUploadArchiveFactory
 import org.sagebionetworks.research.mindkind.research.SageTaskIdentifier
 import org.slf4j.LoggerFactory

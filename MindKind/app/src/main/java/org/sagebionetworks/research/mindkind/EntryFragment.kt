@@ -40,7 +40,6 @@ import android.view.ViewGroup
 import org.sagebionetworks.research.mindkind.authentication.ExternalIdSignInActivity
 import org.sagebionetworks.bridge.android.access.BridgeAccessFragment
 import org.sagebionetworks.bridge.android.manager.AuthenticationManager
-import org.sagebionetworks.research.arcvalidation.WebConsentFragment
 import org.slf4j.LoggerFactory
 import javax.inject.Inject
 

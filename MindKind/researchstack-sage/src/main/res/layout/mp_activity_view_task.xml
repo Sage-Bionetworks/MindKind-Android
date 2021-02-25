@@ -36,7 +36,7 @@
         android:layout_alignParentTop="true"
         android:orientation="vertical">
 
-        <org.sagebionetworks.research.arcvalidation.researchstack.framework.step.toolbar.SageTaskToolbar
+        <org.sagebionetworks.research.mindkind.researchstack.framework.step.toolbar.SageTaskToolbar
             style="@style/Widget.BP.Toolbar.Transparent"
             android:id="@+id/bp_task_toolbar"
             android:layout_width="match_parent"

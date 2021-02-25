@@ -8,7 +8,7 @@ android {
     compileSdkVersion 29
     buildToolsVersion "28.0.3"
     defaultConfig {
-        applicationId "org.sagebionetworks.research.wellcome"
+        applicationId "org.sagebionetworks.research.mindkind"
         minSdkVersion 21
         targetSdkVersion 29
         // this is not the final version code, product flavors add to it

@@ -32,9 +32,9 @@
 
 <resources>
     <string name="osb_study_id" translatable="false">wellcome</string>
-    <string name="osb_study_name" translatable="false">Wellcome</string>
+    <string name="osb_study_name" translatable="false">MindKind</string>
 
-    <string name="app_name">Wellcome</string>
+    <string name="app_name">MindKind</string>
     <string name="button_submit">Submit</string>
     <string name="button_save">Save</string>
     <string name="title_activity_main">MainActivity</string>

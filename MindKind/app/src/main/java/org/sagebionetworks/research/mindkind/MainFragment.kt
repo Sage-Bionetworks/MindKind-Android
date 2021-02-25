@@ -48,6 +48,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import org.sagebionetworks.research.mindkind.tasklist.TaskListFragment
 import kotlinx.android.synthetic.main.fragment_main.navigation
+import org.sagebionetworks.research.mindkind.research.SageTaskIdentifier
 import org.sagebionetworks.research.sageresearch.dao.room.AppConfigRepository
 import org.sagebionetworks.research.sageresearch.dao.room.ReportRepository
 import org.sagebionetworks.research.sageresearch.profile.ProfileDataLoader
@@ -113,6 +114,8 @@ class MainFragment : DaggerFragment(), OnRequestPermissionsResultCallback {
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
 
         profileManager = ProfileManager(reportRepo, appConfigRepo)
+
+//        taskLauncher.launchTask(requireContext(), SageTaskIdentifier.foo_test_survey, null)
 
         // Example on how to get app config, should eventually be
         // TODO: mdephillips 2/11/21 moved to its own view model

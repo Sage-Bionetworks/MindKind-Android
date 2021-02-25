@@ -49,8 +49,8 @@ import androidx.annotation.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 
-import org.sagebionetworks.research.arcvalidation.researchstack.SageResearchStackTaskLauncher;
-import org.sagebionetworks.research.arcvalidation.sageresearch.SageResearchTaskLauncher;
+import org.sagebionetworks.research.mindkind.researchstack.SageResearchStackTaskLauncher;
+import org.sagebionetworks.research.mindkind.sageresearch.SageResearchTaskLauncher;
 import org.sagebionetworks.research.domain.repository.TaskRepository;
 import org.sagebionetworks.research.domain.result.interfaces.TaskResult;
 import org.sagebionetworks.research.mindkind.TaskLauncher.TaskLaunchState.Type;
@@ -101,7 +101,7 @@ public class TaskLauncher {
     private static final ImmutableSet<String> RS_TASKS = ImmutableSet.of(SageTaskIdentifier.AUTHENTICATE);
 
     private static final ImmutableSet<String> SR_TASKS = ImmutableSet
-            .of(SageTaskIdentifier.TAPPING, SageTaskIdentifier.WALK_AND_BALANCE, SageTaskIdentifier.TRIGGERS, SageTaskIdentifier.TREMOR, SageTaskIdentifier.SYMPTOMS, SageTaskIdentifier.MEDICATION);
+            .of(SageTaskIdentifier.SLEEP_SURVEY, SageTaskIdentifier.foo_test_survey);
     private static final ImmutableSet<String> SR_TASKS_REQUIRING_RESULT = ImmutableSet.of(
             SageTaskIdentifier.WALK_AND_BALANCE);
 

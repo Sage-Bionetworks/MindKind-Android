@@ -37,18 +37,20 @@ import android.content.Context;
 import com.google.gson.Gson;
 
 import org.sagebionetworks.bridge.android.di.BridgeApplicationScope;
+import org.sagebionetworks.bridge.android.manager.AppConfigManager;
 import org.sagebionetworks.bridge.android.manager.AuthenticationManager;
 import org.sagebionetworks.research.domain.repository.TaskRepository;
 
 import dagger.Module;
 import dagger.Provides;
 import org.sagebionetworks.research.mindkind.data.AppResourceTaskRepository;
+import org.sagebionetworks.research.sageresearch.dao.room.AppConfigRepository;
 
 @Module
 public class AppDataModule {
     @Provides
     @BridgeApplicationScope
-    TaskRepository provideTaskRepository(Context context, Gson gson, AuthenticationManager authManager) {
-        return new AppResourceTaskRepository(context, gson, authManager);
+    TaskRepository provideTaskRepository(Context context, Gson gson, AuthenticationManager authManager, AppConfigRepository appConfigRepo) {
+        return new AppResourceTaskRepository(context, gson, authManager, appConfigRepo);
     }
 }

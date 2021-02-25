@@ -1,11 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="org.sagebionetworks.research.arcvalidation.researchstack">
+    package="org.sagebionetworks.research.mindkind.researchstack">
 
     <application android:allowBackup="true">
         <activity
             android:name="org.sagebionetworks.researchstack.backbone.ui.ActiveTaskActivity"
-            android:parentActivityName="org.sagebionetworks.research.arcvalidation.MpPhoneAuthActivity"
+            android:parentActivityName="org.sagebionetworks.research.mindkind.MpPhoneAuthActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Base.Theme.Backbone" />
     </application>

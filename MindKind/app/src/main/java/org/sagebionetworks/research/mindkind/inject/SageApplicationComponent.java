@@ -37,7 +37,7 @@ import android.app.Application;
 import org.sagebionetworks.bridge.android.di.BridgeApplicationScope;
 import org.sagebionetworks.research.mindkind.MindKindApplication;
 
-import org.sagebionetworks.research.arcvalidation.researchstack.inject.SageResearchStackModule;
+import org.sagebionetworks.research.mindkind.researchstack.inject.SageResearchStackModule;
 import org.sagebionetworks.research.domain.inject.TaskModule;
 import org.sagebionetworks.research.mobile_ui.inject.PerformTaskModule;
 import org.sagebionetworks.research.sageresearch.dao.room.AppConfigRepository;

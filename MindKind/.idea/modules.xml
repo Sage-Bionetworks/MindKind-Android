@@ -2,10 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Wellcome.iml" filepath="$PROJECT_DIR$/.idea/modules/Wellcome.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Wellcome.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Wellcome.app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/researchstack-sage/Wellcome.researchstack-sage.iml" filepath="$PROJECT_DIR$/.idea/modules/researchstack-sage/Wellcome.researchstack-sage.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/sageresearch-sage/Wellcome.sageresearch-sage.iml" filepath="$PROJECT_DIR$/.idea/modules/sageresearch-sage/Wellcome.sageresearch-sage.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/MindKind.iml" filepath="$PROJECT_DIR$/.idea/modules/MindKind.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/MindKind.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/MindKind.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/researchstack-sage/MindKind.researchstack-sage.iml" filepath="$PROJECT_DIR$/.idea/modules/researchstack-sage/MindKind.researchstack-sage.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/sageresearch-sage/MindKind.sageresearch-sage.iml" filepath="$PROJECT_DIR$/.idea/modules/sageresearch-sage/MindKind.sageresearch-sage.iml" />
     </modules>
   </component>
 </project>
