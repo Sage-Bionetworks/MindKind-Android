@@ -1,23 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/fragment_profile"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:background="@color/white"
+    android:orientation="vertical"
+    android:padding="@dimen/margin_medium">
 
-    <TextView
-        android:id="@+id/textViewValidation"
+    <Button
+        android:id="@+id/buttonPhq9"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="@dimen/text_margin"
         tools:ignore="HardcodedText"
-        android:text="Task list will go here"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        android:text="PHQ9"
+        android:textSize="@dimen/rsb_text_size_title"
+        android:layout_marginBottom="@dimen/margin_medium"
+        android:layout_above="@+id/buttonGad7"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <Button
+        android:id="@id/buttonGad7"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:ignore="HardcodedText"
+        android:text="GAD-7"
+        android:textSize="@dimen/rsb_text_size_title"
+        android:layout_margin="@dimen/margin_medium"
+        android:layout_alignParentBottom="true"/>
+
+</RelativeLayout>

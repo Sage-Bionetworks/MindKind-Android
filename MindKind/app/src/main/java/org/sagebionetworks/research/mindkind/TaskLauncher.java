@@ -98,12 +98,10 @@ public class TaskLauncher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskLauncher.class);
 
-    private static final ImmutableSet<String> RS_TASKS = ImmutableSet.of(SageTaskIdentifier.AUTHENTICATE);
+    private static final ImmutableSet<String> RS_TASKS = ImmutableSet.of();
 
-    private static final ImmutableSet<String> SR_TASKS = ImmutableSet
-            .of(SageTaskIdentifier.SLEEP_SURVEY, SageTaskIdentifier.foo_test_survey);
-    private static final ImmutableSet<String> SR_TASKS_REQUIRING_RESULT = ImmutableSet.of(
-            SageTaskIdentifier.WALK_AND_BALANCE);
+    private static final ImmutableSet<String> SR_TASKS = ImmutableSet.of();
+    private static final ImmutableSet<String> SR_TASKS_REQUIRING_RESULT = ImmutableSet.of();
 
     private final SageResearchStackTaskLauncher researchStackTaskLauncher;
     private final SageResearchTaskLauncher sageResearchTaskLauncher;

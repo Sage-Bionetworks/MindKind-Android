@@ -46,7 +46,7 @@ import org.sagebionetworks.research.sageresearch_app_sdk.archive.FileResultArchi
 import org.sagebionetworks.research.sageresearch_app_sdk.archive.TaskResultAnswerMapResultArchiveFactory;
 import org.sagebionetworks.research.sageresearch_app_sdk.archive.TaskResultArchiveFactory;
 import org.sagebionetworks.research.mindkind.authentication.ExternalIdSignInActivity;
-import org.sagebionetworks.research.mindkind.tasklist.TaskListFragment;
+import org.sagebionetworks.research.mindkind.TaskListFragment;
 
 import dagger.Module;
 import dagger.Provides;

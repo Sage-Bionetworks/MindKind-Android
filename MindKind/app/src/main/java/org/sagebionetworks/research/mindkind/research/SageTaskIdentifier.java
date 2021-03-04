@@ -38,32 +38,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.SOURCE)
-@StringDef({SageTaskIdentifier.TRIGGERS, SageTaskIdentifier.SYMPTOMS, SageTaskIdentifier.MEDICATION,
-        SageTaskIdentifier.STUDY_BURST_COMPLETED, SageTaskIdentifier.STUDY_BURST_COMPLETED_UPLOAD,
-        SageTaskIdentifier.TAPPING, SageTaskIdentifier.WALK_AND_BALANCE, SageTaskIdentifier.TREMOR, SageTaskIdentifier.DEMOGRAPHICS,
-        SageTaskIdentifier.BACKGROUND, SageTaskIdentifier.ENGAGEMENT, SageTaskIdentifier.MOTIVATION, SageTaskIdentifier.STUDY_BURST_REMINDER,
-        SageTaskIdentifier.MEASURING, SageTaskIdentifier.TRACKING, SageTaskIdentifier.HEALTH_SURVEYS, SageTaskIdentifier.AUTHENTICATE,
-        SageTaskIdentifier.PASSIVE_DATA_PERMISSION, SageTaskIdentifier.PASSIVE_GAIT, SageTaskIdentifier.SLEEP_SURVEY, SageTaskIdentifier.foo_test_survey})
+@StringDef({SageTaskIdentifier.PHQ9})
 public @interface SageTaskIdentifier {
-    String TRIGGERS = "Triggers";
-    String SYMPTOMS = "Symptoms";
-    String MEDICATION = "Medication";
-    String STUDY_BURST_COMPLETED = "study-burst-task";
-    String STUDY_BURST_COMPLETED_UPLOAD = "StudyBurst"; // upload identifier differs from schedule task identifier
-    String TAPPING = "Tapping";
-    String WALK_AND_BALANCE = "WalkAndBalance";
-    String TREMOR = "Tremor";
-    String DEMOGRAPHICS = "Demographics";
-    String BACKGROUND = "Background";
-    String ENGAGEMENT = "Engagement";
-    String MOTIVATION = "Motivation";
-    String STUDY_BURST_REMINDER = "StudyBurstReminder";
-    String MEASURING = "Measuring";
-    String TRACKING = "Tracking";
-    String HEALTH_SURVEYS = "Health Surveys";
-    String AUTHENTICATE = "Signup";
-    String PASSIVE_DATA_PERMISSION = "PassiveDataPermission";
-    String PASSIVE_GAIT = "PassiveGait";
-    String SLEEP_SURVEY = "SleepSurvey";
-    String foo_test_survey = "foo";
+    String PHQ9 = "PHQ9";
 }

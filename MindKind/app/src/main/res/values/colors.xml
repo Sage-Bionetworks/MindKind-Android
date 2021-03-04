@@ -33,6 +33,7 @@
 <resources>
 
     <!-- MindKind Colors -->
+    <color name="denim">#343F56</color>
     <color name="splash">#162752</color>
     <color name="ic_launcher_background">#FDFDFD</color>
     <color name="ic_launcher_round_background">#172752</color>

@@ -71,17 +71,17 @@ open class SageResearchStackArchiveFactory: ResearchStackUploadArchiveFactory() 
             flattenedResultList: List<org.sagebionetworks.researchstack.backbone.result.Result>?,
             taskIdentifier: String) {
 
-        if (SageTaskIdentifier.STUDY_BURST_COMPLETED_UPLOAD == taskIdentifier) {
-            // Study burst completed marker has custom upload archive names "tasks"
-            // and all results are consolidated into that file with their result identifiers
-            archiveBuilder.addDataFile(fromResultList(studyBurstArchiveFileName, flattenedResultList))
-        } else if (SageTaskIdentifier.STUDY_BURST_REMINDER == taskIdentifier) {
-            // Study burst completed marker has custom upload archive names "answers"
-            // and all results are consolidated into that file with their result identifiers
-            archiveBuilder.addDataFile(fromResultList(answersFilename, flattenedResultList))
-        } else {
+//        if (SageTaskIdentifier.STUDY_BURST_COMPLETED_UPLOAD == taskIdentifier) {
+//            // Study burst completed marker has custom upload archive names "tasks"
+//            // and all results are consolidated into that file with their result identifiers
+//            archiveBuilder.addDataFile(fromResultList(studyBurstArchiveFileName, flattenedResultList))
+//        } else if (SageTaskIdentifier.STUDY_BURST_REMINDER == taskIdentifier) {
+//            // Study burst completed marker has custom upload archive names "answers"
+//            // and all results are consolidated into that file with their result identifiers
+//            archiveBuilder.addDataFile(fromResultList(answersFilename, flattenedResultList))
+//        } else {
             super.addFiles(archiveBuilder, flattenedResultList, taskIdentifier)
-        }
+//        }
     }
 
     /**

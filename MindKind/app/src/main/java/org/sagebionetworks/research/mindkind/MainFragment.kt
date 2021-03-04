@@ -46,7 +46,6 @@ import com.google.common.collect.ImmutableMap
 import dagger.android.support.DaggerFragment
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import org.sagebionetworks.research.mindkind.tasklist.TaskListFragment
 import kotlinx.android.synthetic.main.fragment_main.navigation
 import org.sagebionetworks.research.mindkind.research.SageTaskIdentifier
 import org.sagebionetworks.research.sageresearch.dao.room.AppConfigRepository
@@ -68,7 +67,7 @@ class MainFragment : DaggerFragment(), OnRequestPermissionsResultCallback {
     protected val compositeDispose = CompositeDisposable()
 
     // tag for identifying an instance of a fragment
-    private val TAG_FRAGMENT_TASK_LIST = "tracking"
+    private val TAG_FRAGMENT_TASK_LIST = "task_list"
     private val TAG_FRAGMENT_PROFILE = "profile"
 
     // Mapping of a tag to a creation method for a fragment
@@ -115,7 +114,7 @@ class MainFragment : DaggerFragment(), OnRequestPermissionsResultCallback {
 
         profileManager = ProfileManager(reportRepo, appConfigRepo)
 
-//        taskLauncher.launchTask(requireContext(), SageTaskIdentifier.foo_test_survey, null)
+        taskLauncher.launchTask(requireContext(), SageTaskIdentifier.PHQ9, null)
 
         // Example on how to get app config, should eventually be
         // TODO: mdephillips 2/11/21 moved to its own view model

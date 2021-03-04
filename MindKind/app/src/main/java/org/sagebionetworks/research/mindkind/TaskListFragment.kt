@@ -30,30 +30,32 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.sagebionetworks.research.mindkind.tasklist
+package org.sagebionetworks.research.mindkind
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import androidx.core.app.ActivityCompat.OnRequestPermissionsResultCallback
 import androidx.fragment.app.Fragment
 import dagger.android.support.DaggerFragment
+import org.sagebionetworks.research.mindkind.conversation.ConversationSurveyActivity
 import org.sagebionetworks.research.sageresearch.dao.room.AppConfigRepository
 import org.sagebionetworks.research.sageresearch.dao.room.ReportRepository
-import org.sagebionetworks.research.mindkind.R
-import org.sagebionetworks.research.mindkind.TaskLauncher
-import org.slf4j.LoggerFactory
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.nio.charset.StandardCharsets
 import javax.inject.Inject
 
 /**
  * A simple [Fragment] subclass that shows a list of the available surveys and tasks for the app
  */
 class TaskListFragment : DaggerFragment(), OnRequestPermissionsResultCallback {
-    private val LOGGER = LoggerFactory.getLogger(TaskListFragment::class.java)
-
-    @Inject
-    lateinit var taskLauncher: TaskLauncher
+    companion object {
+        val logTag = TaskListFragment::class.simpleName
+    }
 
     @Inject
     lateinit var reportRepo: ReportRepository
@@ -68,5 +70,37 @@ class TaskListFragment : DaggerFragment(), OnRequestPermissionsResultCallback {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        view.findViewById<Button>(R.id.buttonPhq9).setOnClickListener {
+            launchPhq9()
+        }
+
+        view.findViewById<Button>(R.id.buttonGad7).setOnClickListener {
+            launchGad7()
+        }
+    }
+
+    fun launchPhq9() {
+        val json = stringFromJsonAsset("PHQ9") ?: run { return }
+        val ctx = context ?: run { return }
+        ConversationSurveyActivity.start(ctx, json)
+    }
+
+    fun launchGad7() {
+        val json = stringFromJsonAsset("GAD7") ?: run { return }
+        val ctx = context ?: run { return }
+        ConversationSurveyActivity.start(ctx, json)
+    }
+
+    fun stringFromJsonAsset(fileName: String): String? {
+        val contextUnwrapped = context ?: run { return null }
+        val assetPath = "task/$fileName.json"
+        val inputStream = InputStreamReader(contextUnwrapped.assets.open(assetPath), StandardCharsets.UTF_8)
+        val r = BufferedReader(inputStream)
+        val total = StringBuilder()
+        var line: String? = null
+        while (r.readLine().also({ line = it }) != null) {
+            total.append(line).append('\n')
+        }
+        return total.toString()
     }
 }

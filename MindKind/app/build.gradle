@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlinx-serialization'
 apply plugin: 'com.jakewharton.butterknife'
 
 android {
@@ -26,6 +27,14 @@ android {
             }
         }
     }
+
+    android {
+        packagingOptions {
+            exclude 'META-INF/DEPENDENCIES'
+            exclude 'META-INF/*.kotlin_module'
+        }
+    }
+
     buildTypes {
         debug {
             minifyEnabled false
@@ -60,9 +69,11 @@ android {
     }
 
     kotlinOptions {
-        // Should target '1.8', but there is currently a bug on Android SDK < 24 that was crashing login
-        // See https://stackoverflow.com/questions/45935788/nosuchmethoderror-java-lang-long-hashcode
-        jvmTarget = '1.6'
+        jvmTarget = "1.8"
+    }
+
+    kapt {
+        correctErrorTypes = true
     }
 }
 androidExtensions {
@@ -97,7 +108,7 @@ dependencies {
     testImplementation 'org.slf4j:slf4j-simple:1.7.21'
 
     // Gson
-    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'com.ryanharter.auto.value:auto-value-parcel-adapter:0.2.6'
     implementation "com.ryanharter.auto.value:auto-value-gson-annotations:$auto_value_gson_version"
     kapt "com.google.auto.value:auto-value:$auto_value_version"
@@ -111,6 +122,10 @@ dependencies {
     kapt "com.google.dagger:dagger-android-processor:$dagger_version"
     kapt "com.google.dagger:dagger-compiler:$dagger_version"
     kaptTest "com.google.dagger:dagger-compiler:$dagger_version"
+
+    // Kotlin
+    implementation "androidx.work:work-runtime-ktx:2.5.0"
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0")
 
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"

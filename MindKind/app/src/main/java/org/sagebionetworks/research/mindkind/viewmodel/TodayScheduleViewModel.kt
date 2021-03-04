@@ -40,7 +40,6 @@ import android.content.Context
 import androidx.annotation.VisibleForTesting
 import com.google.common.base.Preconditions.checkArgument
 import org.sagebionetworks.researchstack.backbone.utils.ResUtils
-import org.sagebionetworks.research.mindkind.research.SageTaskIdentifier.STUDY_BURST_COMPLETED
 import org.sagebionetworks.research.mindkind.viewmodel.ItemType.ACTIVITIES
 import org.sagebionetworks.research.sageresearch.dao.room.ScheduleRepository
 import org.sagebionetworks.research.sageresearch.dao.room.ScheduledActivityEntity
@@ -103,7 +102,7 @@ open class TodayScheduleViewModel(scheduleDao: ScheduledActivityEntityDao,
         }
     }
 
-    private val excludeIds = setOf(STUDY_BURST_COMPLETED)
+    private val excludeIds: Set<String> = setOf()
     private val excludeTaskGroup = excludeIds.toSet()
 
     // TODO: mdephillips 9/4/18 what happens if clock ticks past midnight during this ViewModel's lifetime?
@@ -144,11 +143,6 @@ open class TodayScheduleViewModel(scheduleDao: ScheduledActivityEntityDao,
             }}.invoke()
 
             val count = { when (it) {
-                ItemType.SYMPTOMS, ItemType.TRIGGERS, ItemType.MEDICATION -> {
-                    // TODO: mdephillips 9/3/18 implement counting the study report items on this day
-                    // TODO: mdephillips 9/3/18 instead of simply returning the schedules count
-                    filteredSchedules.count()
-                }
                 else -> filteredSchedules.count()
             }}.invoke()
 
@@ -162,9 +156,6 @@ interface StringEnum {
 }
 
 enum class ItemType(val identifier: String) {
-    TRIGGERS(SageTaskIdentifier.TRIGGERS),
-    SYMPTOMS(SageTaskIdentifier.SYMPTOMS),
-    MEDICATION(SageTaskIdentifier.MEDICATION),
     ACTIVITIES("activities")
 }
 
