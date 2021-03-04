@@ -1,6 +1,5 @@
 package org.sagebionetworks.research.mindkind.conversation
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -10,7 +9,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.RecyclerView
 import org.sagebionetworks.research.mindkind.R
@@ -57,11 +55,11 @@ open class ConversationSurveyActivity: AppCompatActivity() {
 
             // Setup the view model and start the conversation
             viewModel.initConversation(conversation)
-            startConversation(conversation)
+            startConversation()
         }
     }
 
-    open fun startConversation(conversation: ConversationSurvey) {
+    open fun startConversation() {
         // TODO: mdephillips 3/3/2021 show first row of recycler view conversation
         val conversation = viewModel.getConversationSurvey().value ?: run { return }
         val titles = conversation.steps.map { it.title }
@@ -75,7 +73,7 @@ open class ConversationSurveyViewModel : ViewModel() {
     }
 
     fun initConversation(conversation: ConversationSurvey) {
-        conversationSurvey.postValue(conversation)
+        conversationSurvey.value = conversation
     }
 
     fun getConversationSurvey(): LiveData<ConversationSurvey> {
