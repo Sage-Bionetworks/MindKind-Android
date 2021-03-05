@@ -57,19 +57,19 @@ class IntegerConversationInputFieldChoice(
 abstract class ConversationStep {
     abstract val identifier: String
     abstract val type: String
-    abstract val title: String?
+    abstract val title: String
 }
 
 data class ConversationInfoStep(
     override val identifier: String,
     override val type: String,
-    override val title: String?
+    override val title: String
 ): ConversationStep()
 
 data class ConversationFormStep(
     override val identifier: String,
     override val type: String,
-    override val title: String?,
+    override val title: String,
     val inputFieldId: String
 ): ConversationStep() {
 

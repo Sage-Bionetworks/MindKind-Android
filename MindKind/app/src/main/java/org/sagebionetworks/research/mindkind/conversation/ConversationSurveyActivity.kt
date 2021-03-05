@@ -65,6 +65,8 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         val titles = conversation.steps.map { it.title }
         logInfo(titles.joinToString("\n", "\n", "\n"))
     }
+
+
 }
 
 open class ConversationSurveyViewModel : ViewModel() {
@@ -78,5 +80,23 @@ open class ConversationSurveyViewModel : ViewModel() {
 
     fun getConversationSurvey(): LiveData<ConversationSurvey> {
         return conversationSurvey
+    }
+
+    /**
+     * @param step the step within the conversation to look for an input field
+     * @return the input field for input field step
+     */
+    fun conversationTitles(): List<String>? {
+        val conversation = conversationSurvey.value ?: run { return null }
+        return conversation.steps.map { it.title }
+    }
+
+    /**
+     * @param step the step within the conversation to look for an input field
+     * @return the input field for input field step
+     */
+    fun inputFieldFor(step: ConversationStep): ConversationInputField? {
+        val conversation = conversationSurvey.value ?: run { return null }
+        return (step as? ConversationFormStep)?.inputField(conversation.inputFields)
     }
 }
