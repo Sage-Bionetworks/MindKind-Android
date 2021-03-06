@@ -64,4 +64,8 @@
     <color name="severity_selected_text">@color/appDarkGrey</color>
     <color name="severity_unselected_text">@color/appLightGray</color>
 
+    <color name="conversation_background">#F9BF92</color>
+    <color name="reply_background">#A1CEF6</color>
+    <color name="reply_background_fade">#B3FFFFFF</color>
+
 </resources>
