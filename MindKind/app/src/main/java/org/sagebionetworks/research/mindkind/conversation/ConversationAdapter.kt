@@ -4,6 +4,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import org.sagebionetworks.research.mindkind.R
@@ -17,12 +18,10 @@ class ConversationAdapter(private val dataSet: ArrayList<ConversationItem>) :
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val textView: TextView
         val container: View
-        val fadeView: View
 
         init {
             textView = view.findViewById(R.id.textView)
             container = view.findViewById(R.id.container)
-            fadeView = view.findViewById(R.id.fade_view)
         }
     }
 
@@ -43,12 +42,17 @@ class ConversationAdapter(private val dataSet: ArrayList<ConversationItem>) :
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
         Log.i(LOG_TAG, "onBindViewHolder(): $position")
         viewHolder.textView.text = dataSet[position].text
-        //viewHolder.fadeView.layoutParams.height = viewHolder.container.height
+        var type = getItemViewType(position)
 
-        if(position == (dataSet.size-1)) {
-            viewHolder.fadeView.visibility = View.GONE
-        } else {
-            viewHolder.fadeView.visibility = View.VISIBLE
+        // handle fade
+        if(position != (dataSet.size-1)) {
+            var resources = viewHolder.container.resources
+            viewHolder.textView.setTextColor(resources.getColor(R.color.black_overlay))
+            if(type == 0) {
+                viewHolder.container.setBackgroundResource(R.drawable.reply_background_fade)
+            } else {
+                viewHolder.container.setBackgroundResource(R.drawable.question_background_fade)
+            }
         }
     }
 
