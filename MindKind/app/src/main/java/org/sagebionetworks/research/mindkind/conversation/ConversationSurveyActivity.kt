@@ -2,15 +2,24 @@ package org.sagebionetworks.research.mindkind.conversation
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Rect
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
+import android.widget.LinearLayout
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.ItemDecoration
+import org.sagebionetworks.research.domain.step.interfaces.FormUIStep
 import org.sagebionetworks.research.mindkind.R
 
 open class ConversationSurveyActivity: AppCompatActivity() {
@@ -30,6 +39,10 @@ open class ConversationSurveyActivity: AppCompatActivity() {
     }
 
     var recyclerView: RecyclerView? = null
+    var questionButton: Button? = null
+    var answerButton: Button? = null
+    var buttonContainer: ViewGroup? = null
+    var handler: Handler? = null
 
     // Create a ViewModel the first time the system calls an activity's onCreate() method.
     // Re-created activities receive the same ConversationSurveyViewModel
@@ -38,16 +51,27 @@ open class ConversationSurveyActivity: AppCompatActivity() {
     // from the activity-ktx artifact
     val viewModel: ConversationSurveyViewModel by viewModels()
 
+    var itemCount: Int = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_conversation_survey)
 
+        handler = Handler()
+
         findViewById<View>(R.id.back_button).setOnClickListener {
             finish()
         }
 
+        questionButton = findViewById(R.id.add_question)
+
         recyclerView = findViewById(R.id.recycler_view_conversation)
+        var llm = LinearLayoutManager(this)
+        llm.orientation = LinearLayoutManager.VERTICAL
+        recyclerView?.layoutManager = llm
+
+        recyclerView?.addItemDecoration(SpacesItemDecoration(resources.getDimensionPixelSize(R.dimen.converation_recycler_spacing)))
 
         intent.extras?.getString(extraConversationId)?.let {
             val conversation = ConversationGsonHelper.createGson()
@@ -57,15 +81,114 @@ open class ConversationSurveyActivity: AppCompatActivity() {
             viewModel.initConversation(conversation)
             startConversation()
         }
+
+        buttonContainer = findViewById(R.id.button_container)
+
+        questionButton?.setOnClickListener {
+            addQuestion()
+        }
+
     }
 
     open fun startConversation() {
+        logInfo("startConversation()")
         // TODO: mdephillips 3/3/2021 show first row of recycler view conversation
         val conversation = viewModel.getConversationSurvey().value ?: run { return }
-        val titles = conversation.steps.map { it.title }
-        logInfo(titles.joinToString("\n", "\n", "\n"))
+
+        val list = arrayListOf<ConversationItem>()
+
+        // TODO: this text should come from json
+        list.add( ConversationItem("Hello, just a few questions to get your day started.", true))
+        recyclerView?.adapter = ConversationAdapter(list)
     }
 
+    private fun addQuestion() {
+        val conversation = viewModel.getConversationSurvey().value ?: run { return }
+        val steps = conversation.steps
+
+        var count = steps.size
+        logInfo("Count: $itemCount - $count")
+        if(itemCount >= (steps.size-1)) {
+            finish()
+            return
+        }
+
+        val step = steps[itemCount]
+
+        var hasQuestions = false
+        if(step.type == "form") {
+            hasQuestions = true
+            var s = step as ConversationFormStep
+            addButtons(findChoices(s.inputFieldId, conversation.inputFields))
+        }
+
+        val adapter = recyclerView?.adapter as ConversationAdapter
+        adapter.addItem(step.title, true)
+        itemCount++
+        recyclerView?.smoothScrollToPosition(adapter.itemCount)
+
+        if(!hasQuestions) {
+            addQuestion()
+        }
+    }
+
+    private fun addAnswer(text: String) {
+        val adapter = recyclerView?.adapter as ConversationAdapter
+        adapter.addItem(text, false)
+        recyclerView?.smoothScrollToPosition(adapter.itemCount)
+
+        handler?.postDelayed({
+            addQuestion()
+        }, 1000)
+
+    }
+
+    private fun addButtons(choices: List<ConversationInputFieldChoice>?) {
+        buttonContainer?.removeAllViews()
+
+        if (choices != null) {
+            for(c in choices) {
+                var button = Button(this)
+                button.text = c.text
+
+                button.setOnClickListener {
+                    addAnswer(c.text)
+                }
+
+                var llp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT)
+                llp.bottomMargin = resources.getDimensionPixelSize(R.dimen.conversation_button_margin)
+                buttonContainer?.addView(button, llp)
+            }
+        }
+
+    }
+
+    private fun findChoices(id: String, fields: List<ConversationInputField>): List<ConversationInputFieldChoice>? {
+        var choices: List<ConversationInputFieldChoice>? = null
+        for(i in fields) {
+            if(i.identifier.equals(id)) {
+                choices = i.choices
+                break
+            }
+        }
+
+        return choices
+    }
+}
+
+class SpacesItemDecoration(private val space: Int) : ItemDecoration() {
+
+    override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
+        outRect.left = space
+        outRect.right = space
+        outRect.bottom = space
+
+        // Add top margin only for the first item to avoid double space between items
+        if (parent.getChildAdapterPosition(view!!) == 0) {
+            outRect.top = space
+        }
+    }
 
 }
 
