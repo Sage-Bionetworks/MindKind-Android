@@ -11,6 +11,26 @@
     android:padding="@dimen/margin_medium">
 
     <Button
+        android:id="@+id/buttonBackgroundData"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:ignore="HardcodedText"
+        android:text="Start passive data"
+        android:textSize="@dimen/rsb_text_size_title"
+        android:layout_marginBottom="@dimen/margin_medium"
+        android:layout_above="@+id/buttonUploadData"/>
+
+    <Button
+        android:id="@+id/buttonUploadData"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:ignore="HardcodedText"
+        android:text="Upload to Bridge"
+        android:textSize="@dimen/rsb_text_size_title"
+        android:layout_marginBottom="@dimen/margin_medium"
+        android:layout_above="@+id/buttonPhq9"/>
+
+    <Button
         android:id="@+id/buttonPhq9"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
