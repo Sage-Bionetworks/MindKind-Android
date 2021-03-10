@@ -26,6 +26,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
 
     companion object {
         const val extraConversationId = "EXTRA_CONVERSATION_SURVEY"
+        const val DELAY = 1000L
 
         fun logInfo(msg: String) {
             Log.i(ConversationSurveyActivity::class.simpleName, msg)
@@ -129,7 +130,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         if(!hasQuestions && itemCount < steps.size) {
             handler?.postDelayed({
                 addQuestion()
-            }, 1000)
+            }, DELAY)
         }
     }
 
@@ -140,7 +141,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
 
         handler?.postDelayed({
             addQuestion()
-        }, 1000)
+        }, DELAY)
 
     }
 
