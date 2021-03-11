@@ -10,6 +10,29 @@
     android:background="@color/white"
     android:orientation="vertical">
 
+    <Button
+        android:id="@+id/buttonBackgroundData"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:ignore="HardcodedText"
+        android:text="Start passive data"
+        android:textSize="@dimen/rsb_text_size_title"
+        android:layout_marginBottom="@dimen/margin_medium"
+        android:visibility="gone"
+        android:layout_above="@+id/buttonUploadData"/>
+
+    <Button
+        android:id="@+id/buttonUploadData"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:ignore="HardcodedText"
+        android:text="Upload to Bridge"
+        android:textSize="@dimen/rsb_text_size_title"
+        android:layout_marginBottom="@dimen/margin_medium"
+        android:visibility="gone"
+        android:layout_above="@+id/buttonPhq9"/>
+
+
     <RelativeLayout
         android:id="@+id/task_list_header"
         android:layout_width="match_parent"

@@ -10,6 +10,8 @@ import androidx.recyclerview.widget.RecyclerView
 import org.sagebionetworks.research.mindkind.R
 import java.util.*
 
+data class ConversationItem(val text: String, val isQuestion: Boolean)
+
 class ConversationAdapter(private val dataSet: ArrayList<ConversationItem>) :
         RecyclerView.Adapter<ConversationAdapter.ViewHolder>() {
 
@@ -45,13 +47,20 @@ class ConversationAdapter(private val dataSet: ArrayList<ConversationItem>) :
         var type = getItemViewType(position)
 
         // handle fade
+        var resources = viewHolder.container.resources
         if(position != (dataSet.size-1)) {
-            var resources = viewHolder.container.resources
             viewHolder.textView.setTextColor(resources.getColor(R.color.black_overlay))
             if(type == 0) {
                 viewHolder.container.setBackgroundResource(R.drawable.reply_background_fade)
             } else {
                 viewHolder.container.setBackgroundResource(R.drawable.question_background_fade)
+            }
+        } else {
+            viewHolder.textView.setTextColor(resources.getColor(R.color.black))
+            if(type == 0) {
+                viewHolder.container.setBackgroundResource(R.drawable.reply_background)
+            } else {
+                viewHolder.container.setBackgroundResource(R.drawable.question_background)
             }
         }
     }

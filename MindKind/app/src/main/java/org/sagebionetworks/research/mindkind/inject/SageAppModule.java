@@ -32,6 +32,7 @@
 
 package org.sagebionetworks.research.mindkind.inject;
 
+import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService;
 import org.sagebionetworks.research.mobile_ui.perform_task.PerformTaskActivity;
 
 import dagger.Module;
@@ -44,4 +45,7 @@ public abstract class SageAppModule {
 
     @ContributesAndroidInjector
     abstract PerformTaskActivity contributePerformTaskActivityInjector();
+
+    @ContributesAndroidInjector
+    abstract BackgroundDataService contributeBackgroundDataService();
 }

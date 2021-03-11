@@ -26,6 +26,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
 
     companion object {
         const val extraConversationId = "EXTRA_CONVERSATION_SURVEY"
+        const val DELAY = 1000L
 
         fun logInfo(msg: String) {
             Log.i(ConversationSurveyActivity::class.simpleName, msg)
@@ -108,7 +109,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
 
         var count = steps.size
         logInfo("Count: $itemCount - $count")
-        if(itemCount >= (steps.size-1)) {
+        if(itemCount > (steps.size-1)) {
             finish()
             return
         }
@@ -116,19 +117,20 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         val step = steps[itemCount]
 
         var hasQuestions = false
-        if(step.type == "form") {
+        (step as? ConversationFormStep)?.let {
             hasQuestions = true
-            var s = step as ConversationFormStep
-            addButtons(findChoices(s.inputFieldId, conversation.inputFields))
-        }
+            addButtons(findChoices(it.inputFieldId, conversation.inputFields))
+        } ?: buttonContainer?.removeAllViews()
 
         val adapter = recyclerView?.adapter as ConversationAdapter
         adapter.addItem(step.title, true)
         itemCount++
         recyclerView?.smoothScrollToPosition(adapter.itemCount)
 
-        if(!hasQuestions) {
-            addQuestion()
+        if(!hasQuestions && itemCount < steps.size) {
+            handler?.postDelayed({
+                addQuestion()
+            }, DELAY)
         }
     }
 
@@ -139,41 +141,39 @@ open class ConversationSurveyActivity: AppCompatActivity() {
 
         handler?.postDelayed({
             addQuestion()
-        }, 1000)
+        }, DELAY)
 
     }
 
     private fun addButtons(choices: List<ConversationInputFieldChoice>?) {
         buttonContainer?.removeAllViews()
 
-        if (choices != null) {
-            for(c in choices) {
-                var button = Button(this)
-                button.text = c.text
+        choices?.forEach { c ->
+            val button = Button(this)
+            button.text = c.text
 
-                button.setOnClickListener {
-                    addAnswer(c.text)
-                }
-
-                var llp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT)
-                llp.bottomMargin = resources.getDimensionPixelSize(R.dimen.conversation_button_margin)
-                buttonContainer?.addView(button, llp)
+            button.setOnClickListener {
+                addAnswer(c.text)
+                disableAllButtons()
             }
+
+            val llp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT)
+            llp.bottomMargin = resources.getDimensionPixelSize(R.dimen.conversation_button_margin)
+            buttonContainer?.addView(button, llp)
         }
 
     }
 
-    private fun findChoices(id: String, fields: List<ConversationInputField>): List<ConversationInputFieldChoice>? {
-        var choices: List<ConversationInputFieldChoice>? = null
-        for(i in fields) {
-            if(i.identifier.equals(id)) {
-                choices = i.choices
-                break
-            }
+    private fun disableAllButtons() {
+        val count = buttonContainer!!.childCount
+        repeat(count) {
+            buttonContainer?.getChildAt(it)?.isEnabled = false
         }
+    }
 
-        return choices
+    private fun findChoices(id: String, fields: List<ConversationInputField>): List<ConversationInputFieldChoice>? {
+        return fields.firstOrNull { it.identifier == id }?.choices
     }
 }
 

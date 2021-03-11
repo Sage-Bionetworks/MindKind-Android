@@ -38,7 +38,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.SOURCE)
-@StringDef({SageTaskIdentifier.PHQ9})
+@StringDef({
+        SageTaskIdentifier.PHQ9,
+        SageTaskIdentifier.GAD7,
+        SageTaskIdentifier.BACKGROUND_DATA })
+
 public @interface SageTaskIdentifier {
     String PHQ9 = "PHQ9";
+    String GAD7 = "GAD7";
+    String BACKGROUND_DATA = "BackgroundData";
 }

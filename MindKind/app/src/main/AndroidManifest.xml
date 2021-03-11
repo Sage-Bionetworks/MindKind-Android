@@ -3,6 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="org.sagebionetworks.research.mindkind">
 
+    <!-- Needed for BackgroundDataService.kt to show a foreground notification -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
     <application
         android:name="org.sagebionetworks.research.mindkind.MindKindApplication"
         android:allowBackup="false"
@@ -20,6 +23,11 @@
             android:multiprocess="true"
             tools:node="remove"
             tools:targetApi="n" />
+
+        <service
+            android:name=".backgrounddata.BackgroundDataService"
+            android:exported="false"
+            android:label="Background Data Service"/>
 
         <activity
             android:name=".EntryActivity"
