@@ -32,7 +32,9 @@
 
 package org.sagebionetworks.research.mindkind
 
+import android.annotation.SuppressLint
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -40,7 +42,9 @@ import android.view.ViewGroup
 import android.widget.Button
 import androidx.core.app.ActivityCompat.OnRequestPermissionsResultCallback
 import androidx.fragment.app.Fragment
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import dagger.android.support.DaggerFragment
+import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService
 import org.sagebionetworks.research.mindkind.conversation.ConversationSurveyActivity
 import org.sagebionetworks.research.sageresearch.dao.room.AppConfigRepository
 import org.sagebionetworks.research.sageresearch.dao.room.ReportRepository
@@ -77,6 +81,29 @@ class TaskListFragment : DaggerFragment(), OnRequestPermissionsResultCallback {
         view.findViewById<Button>(R.id.buttonGad7).setOnClickListener {
             launchGad7()
         }
+
+        view.findViewById<Button>(R.id.buttonUploadData).setOnClickListener {
+            uploadBackgroundData()
+        }
+
+        view.findViewById<Button>(R.id.buttonBackgroundData).setOnClickListener {
+            val button = it as? Button ?: run { return@setOnClickListener }
+            if (button.text == "Start background data") {
+                startBackgroundData(button)
+            } else {
+                stopBackgroundData(button)
+            }
+        }
+
+        refreshServiceButtonState()
+    }
+
+    fun refreshServiceButtonState() {
+        if (BackgroundDataService.isServiceRunning) {
+            view?.findViewById<Button>(R.id.buttonBackgroundData)?.text = "Stop background data"
+        } else {
+            view?.findViewById<Button>(R.id.buttonBackgroundData)?.text = "Start background data"
+        }
     }
 
     fun launchPhq9() {
@@ -89,6 +116,30 @@ class TaskListFragment : DaggerFragment(), OnRequestPermissionsResultCallback {
         val json = stringFromJsonAsset("GAD7") ?: run { return }
         val ctx = context ?: run { return }
         ConversationSurveyActivity.start(ctx, json)
+    }
+
+    fun uploadBackgroundData() {
+        // Notifies the server that it should upload the background data to bridge
+        LocalBroadcastManager.getInstance(requireContext())
+                .sendBroadcast(Intent(BackgroundDataService.UPLOAD_DATA_ACTION))
+    }
+
+    fun startBackgroundData(button: Button) {
+        @SuppressLint("SetTextI18n")
+        button.text = "Stop background data"
+        val ctx = activity ?: run { return }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            ctx.startForegroundService(Intent(ctx, BackgroundDataService::class.java))
+        } else {
+            ctx.startService(Intent(ctx, BackgroundDataService::class.java))
+        }
+    }
+
+    fun stopBackgroundData(button: Button) {
+        @SuppressLint("SetTextI18n")
+        button.text = "Start background data"
+        val ctx = activity ?: run { return }
+        ctx.stopService(Intent(ctx, BackgroundDataService::class.java))
     }
 
     fun stringFromJsonAsset(fileName: String): String? {

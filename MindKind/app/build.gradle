@@ -145,10 +145,14 @@ dependencies {
     implementation 'androidx.paging:paging-runtime-ktx:2.1.0'
 
     // room db functionality
-    implementation 'androidx.room:room-runtime:2.0.0'
-    kapt 'androidx.room:room-compiler:2.0.0'
-    androidTestImplementation 'androidx.room:room-testing:2.0.0'
-    androidTestImplementation 'androidx.arch.core:core-testing:2.0.0'
+    implementation 'androidx.room:room-runtime:2.2.2'
+    implementation 'androidx.room:room-rxjava2:2.2.2'
+    kapt 'androidx.room:room-compiler:2.2.2'
+    kaptAndroidTest 'androidx.room:room-compiler:2.2.2'
+    androidTestImplementation 'androidx.room:room-testing:2.2.2'
+    implementation 'androidx.room:room-rxjava2:2.2.2'
+    androidTestImplementation 'androidx.arch.core:core-testing:2.1.0'
+    implementation 'androidx.paging:paging-runtime-ktx:2.1.0'
 
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
 

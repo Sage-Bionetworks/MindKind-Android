@@ -59,9 +59,9 @@
     <string name="reminder_notification_channel_title">mPower Reminders</string>
     <string name="reminder_notification_channel_desc">mPower reminders help you remember to log your data</string>
 
-    <string name="foreground_channel_id">mPower Alerts</string>
-    <string name="foreground_channel_title">mPower Informational Alerts</string>
-    <string name="foreground_channel_desc">mPower low importance informational alerts</string>
+    <string name="foreground_channel_id">MindKind Passive Data</string>
+    <string name="foreground_channel_title">MindKind Passive Data Collection</string>
+    <string name="foreground_channel_desc">The MindKind Study needs a foreground notification to allow our study app to be notified when your data changes.</string>
 
     <string-array name="days_of_the_week">
         <item>Sunday</item>
