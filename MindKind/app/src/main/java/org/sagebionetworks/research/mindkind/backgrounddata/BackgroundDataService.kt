@@ -85,8 +85,6 @@ class BackgroundDataService : DaggerService() {
         public const val BACKGROUND_DATA_DB_FILENAME =
                 "org.sagebionetworks.research.MindKind.BackgroundData"
 
-        public const val PREFS_NAME = "MindKind.BackgroundDataService"
-
         private const val TASK_IDENTIFIER = SageTaskIdentifier.BACKGROUND_DATA
         private const val FOREGROUND_NOTIFICATION_ID = 100
         private const val JSON_MIME_CONTENT_TYPE = "application/json"
@@ -101,11 +99,11 @@ class BackgroundDataService : DaggerService() {
 
     lateinit var database: MindKindDatabase
 
-    // Injected from BridgeAndroidSdk, this class package
+    // Injected from BridgeAndroidSdk, this controls uploading a TaskResult
     @Inject
     lateinit var taskResultUploader: TaskResultUploader
 
-    // Injected from BridgeAndroidSdk, it controls uploading
+    // Injected from BridgeAndroidSdk, it controls uploading past failed uploads
     @Inject
     lateinit var uploadManager: UploadManager
 
@@ -138,11 +136,6 @@ class BackgroundDataService : DaggerService() {
 
     // Battery changed broadcast receiver is very noisy, so rate limit it every 1 minute
     private val batterChangedLimiter = createMinuteRateLimit(1)
-
-    // Defailt shared prefs
-    private val prefs: SharedPreferences by lazy {
-        getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-    }
 
     override fun onCreate() {
         Log.d(TAG, "onCreate")
