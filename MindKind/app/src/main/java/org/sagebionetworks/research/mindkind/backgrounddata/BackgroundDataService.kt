@@ -47,10 +47,12 @@ import androidx.core.app.NotificationCompat.Builder
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.room.Room
 import dagger.android.DaggerService
+import hu.akarnokd.rxjava.interop.RxJavaInterop
 import io.reactivex.Completable
 import io.reactivex.Scheduler
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import org.sagebionetworks.bridge.android.manager.UploadManager
 import org.sagebionetworks.research.domain.Schema
 import org.sagebionetworks.research.domain.result.implementations.FileResultBase
 import org.sagebionetworks.research.domain.result.implementations.TaskResultBase
@@ -99,8 +101,13 @@ class BackgroundDataService : DaggerService() {
 
     lateinit var database: MindKindDatabase
 
+    // Injected from BridgeAndroidSdk, this class package
     @Inject
     lateinit var taskResultUploader: TaskResultUploader
+
+    // Injected from BridgeAndroidSdk, it controls uploading
+    @Inject
+    lateinit var uploadManager: UploadManager
 
     private val compositeDisposable = CompositeDisposable()
     /**
@@ -195,7 +202,14 @@ class BackgroundDataService : DaggerService() {
      * Packages all existing un-uploaded data and attempts to upload it to bridge
      */
     private fun uploadDataToBridge() {
-        val completable = Completable.fromAction {
+        // Always try to upload all past failed uploads if any exist
+        subscribeCompletableAsync(
+                RxJavaInterop.toV2Completable(uploadManager.processUploadFiles()),
+                "Successfully uploaded all past data in upload manager",
+                "Failed to uploaded all past data in upload manager")
+
+        // Upload all the data from the background data table
+        subscribeCompletableAsync(Completable.fromAction {
             val dataToUpload =
                     database.backgroundDataDao().getData(false)
 
@@ -219,11 +233,9 @@ class BackgroundDataService : DaggerService() {
 
         } .doOnError {
             Log.w(TAG, it.localizedMessage ?: "")
-        }
-
-        subscribeCompletableAsync(completable,
-                "Successfully saved BackgroundData to room",
-                "Failed to save BackgroundData to room")
+        },
+        "Successfully saved BackgroundData to room",
+        "Failed to save BackgroundData to room")
     }
 
     private fun createTaskResult(backgroundData: List<BackgroundDataEntity>): TaskResultBase {
