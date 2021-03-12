@@ -65,7 +65,7 @@ class TaskListFragment : DaggerFragment(), OnRequestPermissionsResultCallback {
     lateinit var reportRepo: ReportRepository
 
     @Inject
-    lateinit var appConfigRepo: AppConfigRepository
+    lateinit var appConfigRepo:     AppConfigRepository
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_task_list, container, false)
@@ -82,20 +82,26 @@ class TaskListFragment : DaggerFragment(), OnRequestPermissionsResultCallback {
             launchGad7()
         }
 
-        view.findViewById<Button>(R.id.buttonUploadData).setOnClickListener {
+        val uploadDataButton = view.findViewById<Button>(R.id.buttonUploadData)
+        uploadDataButton.visibility = View.GONE
+        uploadDataButton.setOnClickListener {
             uploadBackgroundData()
         }
 
-        view.findViewById<Button>(R.id.buttonBackgroundData).setOnClickListener {
-            val button = it as? Button ?: run { return@setOnClickListener }
-            if (button.text == "Start background data") {
-                startBackgroundData(button)
+        val serviceButton = view.findViewById<Button>(R.id.buttonBackgroundData)
+        serviceButton.visibility = View.GONE
+        serviceButton.setOnClickListener {
+            if (serviceButton.text == "Start background data") {
+                startBackgroundDataService(serviceButton)
             } else {
-                stopBackgroundData(button)
+                stopBackgroundDataService(serviceButton)
             }
         }
 
         refreshServiceButtonState()
+
+        // Auto-start background data collector
+        startBackgroundDataService()
     }
 
     fun refreshServiceButtonState() {
@@ -121,12 +127,12 @@ class TaskListFragment : DaggerFragment(), OnRequestPermissionsResultCallback {
     fun uploadBackgroundData() {
         // Notifies the server that it should upload the background data to bridge
         LocalBroadcastManager.getInstance(requireContext())
-                .sendBroadcast(Intent(BackgroundDataService.UPLOAD_DATA_ACTION))
+                .sendBroadcast(Intent(BackgroundDataService.ACTIVITY_UPLOAD_DATA_ACTION))
     }
 
-    fun startBackgroundData(button: Button) {
+    fun startBackgroundDataService(button: Button? = null) {
         @SuppressLint("SetTextI18n")
-        button.text = "Stop background data"
+        button?.text = "Stop background data"
         val ctx = activity ?: run { return }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             ctx.startForegroundService(Intent(ctx, BackgroundDataService::class.java))
@@ -135,9 +141,9 @@ class TaskListFragment : DaggerFragment(), OnRequestPermissionsResultCallback {
         }
     }
 
-    fun stopBackgroundData(button: Button) {
+    fun stopBackgroundDataService(button: Button? = null) {
         @SuppressLint("SetTextI18n")
-        button.text = "Start background data"
+        button?.text = "Start background data"
         val ctx = activity ?: run { return }
         ctx.stopService(Intent(ctx, BackgroundDataService::class.java))
     }

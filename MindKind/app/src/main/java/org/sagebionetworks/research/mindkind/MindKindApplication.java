@@ -47,6 +47,8 @@ import org.sagebionetworks.research.sageresearch.BridgeSageResearchApp;
 
 import javax.inject.Inject;
 
+import androidx.work.Configuration;
+import androidx.work.WorkerFactory;
 import dagger.android.AndroidInjector;
 import dagger.android.DispatchingAndroidInjector;
 import dagger.android.HasActivityInjector;
@@ -55,7 +57,7 @@ import dagger.android.support.DaggerApplication;
 import dagger.android.support.HasSupportFragmentInjector;
 
 public class MindKindApplication extends BridgeSageResearchApp implements HasSupportFragmentInjector,
-        HasActivityInjector, HasServiceInjector {
+        HasActivityInjector, HasServiceInjector, Configuration.Provider {
     @Inject
     DispatchingAndroidInjector<Activity> dispatchingActivityInjector;
 
@@ -86,5 +88,13 @@ public class MindKindApplication extends BridgeSageResearchApp implements HasSup
                 .bridgeStudyComponent(bridgeStudyComponent)
                 .build();
         return bridgeManagerProvider;
+    }
+
+    @Override
+    public Configuration getWorkManagerConfiguration() {
+        // Default custom initialization of work manager
+        return new Configuration.Builder()
+                .setMinimumLoggingLevel(android.util.Log.INFO)
+                .build();
     }
 }
