@@ -127,6 +127,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
 
         var hasQuestions = false
         (step as? ConversationFormStep)?.let {
+            viewModel.userShown(it.identifier)
             hasQuestions = true
             addButtons(findChoices(it.inputFieldId, conversation.inputFields))
         } ?: buttonContainer?.removeAllViews()
@@ -143,18 +144,19 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         }
     }
 
-    private fun addAnswer(text: String) {
+    private fun addAnswer(stepId: String, text: String, value: Any) {
         val adapter = recyclerView?.adapter as ConversationAdapter
         adapter.addItem(text, false)
         recyclerView?.smoothScrollToPosition(adapter.itemCount)
 
+        viewModel.addAnswer()
+
         handler?.postDelayed({
             addQuestion()
         }, DELAY)
-
     }
 
-    private fun addButtons(choices: List<ConversationInputFieldChoice>?) {
+    private fun addButtons(stepId: String, choices: List<ConversationInputFieldChoice>?) {
         buttonContainer?.removeAllViews()
 
         choices?.forEach { c ->
@@ -162,7 +164,11 @@ open class ConversationSurveyActivity: AppCompatActivity() {
             button.text = c.text
 
             button.setOnClickListener {
-                addAnswer(c.text)
+                var value: Any = c.text
+                (c as? IntegerConversationInputFieldChoice)?.let {
+                    value = it.value
+                }
+                addAnswer(stepId, c.text, value)
                 disableAllButtons()
             }
 
@@ -256,18 +262,16 @@ open class ConversationSurveyViewModel : ViewModel() {
     /**
      * Adds an answer to the answer live data
      */
-    fun addAnswer(stepId: String, formType: ConversationInputFieldType, answer: Any?) {
+    fun addAnswer(stepId: String, inputField: ConversationInputFieldChoice, answer: Any?) {
         val startTime = startTimeMap[stepId] ?: Instant.now()
         val endTime = Instant.now()
 
-        val answerResult: AnswerResultBase<Any> = when(formType) {
-            ConversationInputFieldType.singleChoiceInt -> {
-                val intAnswer = (answer as? Int) ?: 0
-                AnswerResultBase(stepId, startTime, endTime, intAnswer, AnswerResultType.INTEGER)
-            }
+        (inputField as? IntegerConversationInputFieldChoice)?.let {
+            val intAnswer = (answer as? Int) ?: 0
+            val answerResult: AnswerResultBase<Any> = AnswerResultBase(
+                    stepId, startTime, endTime, intAnswer, AnswerResultType.INTEGER)
+            answersLiveData += answerResult
         }
-
-        answersLiveData += answerResult
     }
 
     /**
