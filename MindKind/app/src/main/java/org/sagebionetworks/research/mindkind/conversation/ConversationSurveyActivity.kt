@@ -15,12 +15,21 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
-import org.sagebionetworks.research.domain.step.interfaces.FormUIStep
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
+import org.sagebionetworks.research.domain.Schema
+import org.sagebionetworks.research.domain.result.AnswerResultType
+import org.sagebionetworks.research.domain.result.implementations.AnswerResultBase
+import org.sagebionetworks.research.domain.result.implementations.TaskResultBase
 import org.sagebionetworks.research.mindkind.R
+import org.sagebionetworks.research.sageresearch_app_sdk.TaskResultUploader
+import org.threeten.bp.Instant
+import java.util.*
+import javax.inject.Inject
+import kotlin.collections.ArrayList
 
 open class ConversationSurveyActivity: AppCompatActivity() {
 
@@ -193,9 +202,23 @@ class SpacesItemDecoration(private val space: Int) : ItemDecoration() {
 }
 
 open class ConversationSurveyViewModel : ViewModel() {
+
+    companion object {
+        private val TAG = ConversationSurveyViewModel::class.java.simpleName
+    }
+
+    private val startTimeMap = mutableMapOf<String, Instant>()
+    private val answersLiveData = MutableLiveData<ArrayList<AnswerResultBase<Any>>>()
+    private val uploadCompleteLiveData = MutableLiveData<Boolean>()
+
     private val conversationSurvey: MutableLiveData<ConversationSurvey> by lazy {
         return@lazy MutableLiveData<ConversationSurvey>()
     }
+
+    @Inject
+    lateinit var taskResultUploader: TaskResultUploader
+
+    private val compositeDisposable = CompositeDisposable()
 
     fun initConversation(conversation: ConversationSurvey) {
         conversationSurvey.value = conversation
@@ -221,5 +244,69 @@ open class ConversationSurveyViewModel : ViewModel() {
     fun inputFieldFor(step: ConversationStep): ConversationInputField? {
         val conversation = conversationSurvey.value ?: run { return null }
         return (step as? ConversationFormStep)?.inputField(conversation.inputFields)
+    }
+
+    /**
+     * Call when user is shown a step, used to later set start times in "addAnswer" func
+     */
+    fun userShown(stepId: String) {
+        startTimeMap[stepId] = Instant.now()
+    }
+
+    /**
+     * Adds an answer to the answer live data
+     */
+    fun addAnswer(stepId: String, formType: ConversationInputFieldType, answer: Any?) {
+        val startTime = startTimeMap[stepId] ?: Instant.now()
+        val endTime = Instant.now()
+
+        val answerResult: AnswerResultBase<Any> = when(formType) {
+            ConversationInputFieldType.singleChoiceInt -> {
+                val intAnswer = (answer as? Int) ?: 0
+                AnswerResultBase(stepId, startTime, endTime, intAnswer, AnswerResultType.INTEGER)
+            }
+        }
+
+        answersLiveData += answerResult
+    }
+
+    /**
+     * Complete the conversation and upload it to bridge
+     * @return live data to monitor for changes
+     */
+    fun completeConversation(conversationType: String): LiveData<Boolean> {
+        val answers = answersLiveData.value ?: arrayListOf()
+        val stepHistory = answers.sortedWith(compareBy { it.startTime })
+        val startTime = stepHistory.firstOrNull()?.startTime ?: Instant.now()
+        val endTime = Instant.now()
+        // TODO: mdephillips 3/12/21 get this revision from app config
+        val schema = Schema(conversationType, 1)
+        val taskResult = TaskResultBase(
+                conversationType, startTime, endTime,
+                UUID.randomUUID(), schema, stepHistory, listOf())
+
+        // Upload the conversation result
+        compositeDisposable.add(
+                taskResultUploader.processTaskResult(taskResult)
+                .subscribeOn(Schedulers.io())
+                .subscribe({
+                    Log.i(TAG, "Conversation Upload Complete")
+                    uploadCompleteLiveData.postValue(true)
+                }, {
+                    Log.w(TAG, "Conversation Upload Failed ${it.localizedMessage}")
+                    // Archive will upload eventually as we retry later
+                    uploadCompleteLiveData.postValue(true)
+                }))
+
+        return uploadCompleteLiveData
+    }
+
+    /**
+     * Adds "+=" operator to mutable live data
+     */
+    operator fun <T> MutableLiveData<ArrayList<T>>.plusAssign(item: T) {
+        val values = this.value ?: arrayListOf()
+        values.add(item)
+        this.value = values
     }
 }
