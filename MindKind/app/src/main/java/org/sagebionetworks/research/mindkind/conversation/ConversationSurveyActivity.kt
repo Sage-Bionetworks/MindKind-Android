@@ -10,14 +10,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
+import com.google.common.base.Preconditions
+import dagger.android.AndroidInjection
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import org.sagebionetworks.research.domain.Schema
@@ -29,7 +28,7 @@ import org.sagebionetworks.research.sageresearch_app_sdk.TaskResultUploader
 import org.threeten.bp.Instant
 import java.util.*
 import javax.inject.Inject
-import kotlin.collections.ArrayList
+import kotlin.collections.set
 
 open class ConversationSurveyActivity: AppCompatActivity() {
 
@@ -54,21 +53,28 @@ open class ConversationSurveyActivity: AppCompatActivity() {
     var buttonContainer: ViewGroup? = null
     var handler: Handler? = null
 
+    @Inject
+    lateinit var taskResultUploader: TaskResultUploader
+
     // Create a ViewModel the first time the system calls an activity's onCreate() method.
     // Re-created activities receive the same ConversationSurveyViewModel
     // instance created by the first activity.
     // Use the 'by viewModels()' Kotlin property delegate
     // from the activity-ktx artifact
-    val viewModel: ConversationSurveyViewModel by viewModels()
+    lateinit var viewModel: ConversationSurveyViewModel
 
     var itemCount: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_conversation_survey)
 
         handler = Handler()
+
+        viewModel = ViewModelProvider(this,
+                ConversationSurveyViewModel.Factory(taskResultUploader)).get()
 
         findViewById<View>(R.id.back_button).setOnClickListener {
             finish()
@@ -97,7 +103,6 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         questionButton?.setOnClickListener {
             addQuestion()
         }
-
     }
 
     open fun startConversation() {
@@ -119,7 +124,6 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         var count = steps.size
         logInfo("Count: $itemCount - $count")
         if(itemCount > (steps.size-1)) {
-            finish()
             return
         }
 
@@ -129,7 +133,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         (step as? ConversationFormStep)?.let {
             viewModel.userShown(it.identifier)
             hasQuestions = true
-            addButtons(findChoices(it.inputFieldId, conversation.inputFields))
+            addButtons(it.identifier, findChoices(it.inputFieldId, conversation.inputFields))
         } ?: buttonContainer?.removeAllViews()
 
         val adapter = recyclerView?.adapter as ConversationAdapter
@@ -137,19 +141,25 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         itemCount++
         recyclerView?.smoothScrollToPosition(adapter.itemCount)
 
-        if(!hasQuestions && itemCount < steps.size) {
+        val isLastItem = itemCount >= steps.size
+
+        if(!hasQuestions && !isLastItem) {
             handler?.postDelayed({
                 addQuestion()
             }, DELAY)
         }
+
+        if (isLastItem) {
+            viewModel.completeConversation()
+        }
     }
 
-    private fun addAnswer(stepId: String, text: String, value: Any) {
+    private fun addAnswer(stepId: String, inputField: ConversationInputFieldChoice, value: Any?) {
         val adapter = recyclerView?.adapter as ConversationAdapter
-        adapter.addItem(text, false)
+        adapter.addItem(inputField.text, false)
         recyclerView?.smoothScrollToPosition(adapter.itemCount)
 
-        viewModel.addAnswer()
+        viewModel.addAnswer(stepId, inputField, value)
 
         handler?.postDelayed({
             addQuestion()
@@ -168,7 +178,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
                 (c as? IntegerConversationInputFieldChoice)?.let {
                     value = it.value
                 }
-                addAnswer(stepId, c.text, value)
+                addAnswer(stepId, c, value)
                 disableAllButtons()
             }
 
@@ -177,7 +187,6 @@ open class ConversationSurveyActivity: AppCompatActivity() {
             llp.bottomMargin = resources.getDimensionPixelSize(R.dimen.conversation_button_margin)
             buttonContainer?.addView(button, llp)
         }
-
     }
 
     private fun disableAllButtons() {
@@ -207,7 +216,7 @@ class SpacesItemDecoration(private val space: Int) : ItemDecoration() {
 
 }
 
-open class ConversationSurveyViewModel : ViewModel() {
+open class ConversationSurveyViewModel(private val taskResultUploader: TaskResultUploader) : ViewModel() {
 
     companion object {
         private val TAG = ConversationSurveyViewModel::class.java.simpleName
@@ -215,14 +224,21 @@ open class ConversationSurveyViewModel : ViewModel() {
 
     private val startTimeMap = mutableMapOf<String, Instant>()
     private val answersLiveData = MutableLiveData<ArrayList<AnswerResultBase<Any>>>()
-    private val uploadCompleteLiveData = MutableLiveData<Boolean>()
 
     private val conversationSurvey: MutableLiveData<ConversationSurvey> by lazy {
         return@lazy MutableLiveData<ConversationSurvey>()
     }
 
-    @Inject
-    lateinit var taskResultUploader: TaskResultUploader
+    class Factory @Inject constructor(private val taskResultUploader: TaskResultUploader):
+            ViewModelProvider.Factory {
+
+        // Suppress unchecked cast, pre-condition would catch it first anyways
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            Preconditions.checkArgument(modelClass.isAssignableFrom(ConversationSurveyViewModel::class.java))
+            return ConversationSurveyViewModel(taskResultUploader) as T
+        }
+    }
 
     private val compositeDisposable = CompositeDisposable()
 
@@ -278,15 +294,16 @@ open class ConversationSurveyViewModel : ViewModel() {
      * Complete the conversation and upload it to bridge
      * @return live data to monitor for changes
      */
-    fun completeConversation(conversationType: String): LiveData<Boolean> {
+    fun completeConversation() {
+        val conversationId = conversationSurvey.value?.identifier ?: run { return }
         val answers = answersLiveData.value ?: arrayListOf()
         val stepHistory = answers.sortedWith(compareBy { it.startTime })
         val startTime = stepHistory.firstOrNull()?.startTime ?: Instant.now()
         val endTime = Instant.now()
         // TODO: mdephillips 3/12/21 get this revision from app config
-        val schema = Schema(conversationType, 1)
+        val schema = Schema(conversationId, 1)
         val taskResult = TaskResultBase(
-                conversationType, startTime, endTime,
+                conversationId, startTime, endTime,
                 UUID.randomUUID(), schema, stepHistory, listOf())
 
         // Upload the conversation result
@@ -295,14 +312,10 @@ open class ConversationSurveyViewModel : ViewModel() {
                 .subscribeOn(Schedulers.io())
                 .subscribe({
                     Log.i(TAG, "Conversation Upload Complete")
-                    uploadCompleteLiveData.postValue(true)
                 }, {
                     Log.w(TAG, "Conversation Upload Failed ${it.localizedMessage}")
                     // Archive will upload eventually as we retry later
-                    uploadCompleteLiveData.postValue(true)
                 }))
-
-        return uploadCompleteLiveData
     }
 
     /**
