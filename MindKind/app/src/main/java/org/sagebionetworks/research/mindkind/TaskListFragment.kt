@@ -40,6 +40,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.RelativeLayout
 import androidx.core.app.ActivityCompat.OnRequestPermissionsResultCallback
 import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -74,11 +75,11 @@ class TaskListFragment : DaggerFragment(), OnRequestPermissionsResultCallback {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        view.findViewById<Button>(R.id.buttonPhq9).setOnClickListener {
+        view.findViewById<RelativeLayout>(R.id.buttonPhq9).setOnClickListener {
             launchPhq9()
         }
 
-        view.findViewById<Button>(R.id.buttonGad7).setOnClickListener {
+        view.findViewById<RelativeLayout>(R.id.buttonGad7).setOnClickListener {
             launchGad7()
         }
 
