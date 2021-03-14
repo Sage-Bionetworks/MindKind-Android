@@ -136,6 +136,9 @@
         android:layout_height="0dp"
         android:layout_weight=".30"
         android:background="@color/white"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
         android:paddingHorizontal="16dp">
 
         <LinearLayout
@@ -205,6 +208,9 @@
         android:layout_height="0dp"
         android:layout_weight=".30"
         android:background="@color/white"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
         android:paddingHorizontal="16dp">
 
         <LinearLayout
