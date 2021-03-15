@@ -147,6 +147,7 @@ dependencies {
     // room db functionality
     implementation 'androidx.room:room-runtime:2.2.2'
     implementation 'androidx.room:room-rxjava2:2.2.2'
+    implementation 'com.github.akarnokd:rxjava2-interop:0.13.2'
     kapt 'androidx.room:room-compiler:2.2.2'
     kaptAndroidTest 'androidx.room:room-compiler:2.2.2'
     androidTestImplementation 'androidx.room:room-testing:2.2.2'

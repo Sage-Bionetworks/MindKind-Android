@@ -2,19 +2,17 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@android:id/background">
         <shape>
-            <solid android:color="@color/royal800" />
-            <corners android:radius="@dimen/study_burst_progress_radius"/>
+            <corners android:radius="8dp" />
+            <solid android:color="#FAD99E" />
         </shape>
     </item>
 
-    <item
-        android:id="@android:id/progress">
+    <item android:id="@android:id/progress">
         <clip>
             <shape>
-                <solid android:color="@color/royal400" />
-                <corners android:radius="@dimen/study_burst_progress_radius"/>
+                <corners android:radius="8dp" />
+                <solid android:color="#3E8F92" />
             </shape>
         </clip>
     </item>
-
 </layer-list>

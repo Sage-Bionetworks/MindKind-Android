@@ -17,7 +17,7 @@ class ConversationGsonHelper {
             return RuntimeTypeAdapterFactory
                     .of<ConversationInputField>(ConversationInputField::class.java, "type")
                     .registerSubtype(ConversationIntegerInputField::class.java,
-                            ConversationInputFieldType.singleChoiceInt.type)
+                            ConversationFormType.singleChoiceInt.type)
         }
 
         private fun getStepTypeAdapterFactory(): RuntimeTypeAdapterFactory<ConversationStep> {
@@ -79,6 +79,6 @@ data class ConversationFormStep(
     }
 }
 
-enum class ConversationInputFieldType(val type: String) {
+public enum class ConversationFormType(val type: String) {
     singleChoiceInt("singleChoice.integer")
 }
