@@ -37,42 +37,38 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.NotificationManager.IMPORTANCE_LOW
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.content.*
 import android.os.BatteryManager
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
-import androidx.annotation.VisibleForTesting
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.Builder
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.room.Room
 import dagger.android.DaggerService
+import hu.akarnokd.rxjava.interop.RxJavaInterop
 import io.reactivex.Completable
 import io.reactivex.Scheduler
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import org.sagebionetworks.bridge.android.manager.UploadManager
 import org.sagebionetworks.research.domain.Schema
 import org.sagebionetworks.research.domain.result.implementations.FileResultBase
 import org.sagebionetworks.research.domain.result.implementations.TaskResultBase
-import org.sagebionetworks.research.domain.result.interfaces.Result
 import org.sagebionetworks.research.mindkind.R
 import org.sagebionetworks.research.mindkind.R.drawable
 import org.sagebionetworks.research.mindkind.R.string
 import org.sagebionetworks.research.mindkind.research.SageTaskIdentifier
 import org.sagebionetworks.research.mindkind.room.BackgroundDataEntity
 import org.sagebionetworks.research.mindkind.room.MindKindDatabase
-import org.sagebionetworks.research.presentation.perform_task.TaskResultManager
-import org.sagebionetworks.research.presentation.perform_task.TaskResultProcessingManager
+import org.sagebionetworks.research.mindkind.util.NoLimitRateLimiter
+import org.sagebionetworks.research.mindkind.util.RateLimiter
 import org.sagebionetworks.research.sageresearch.extensions.toInstant
 import org.sagebionetworks.research.sageresearch_app_sdk.TaskResultUploader
 import org.threeten.bp.Instant
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneId
-import org.threeten.bp.temporal.ChronoUnit
 import java.io.File
 import java.util.*
 import javax.inject.Inject
@@ -80,9 +76,15 @@ import javax.inject.Inject
 class BackgroundDataService : DaggerService() {
 
     companion object {
-        public const val UPLOAD_DATA_ACTION = "UPLOAD_DATA_TO_BRIDGE_ACTION"
-        public const val BACKGROUND_DATA_DB_FILENAME = "org.sagebionetworks.research.MindKind.BackgroundData"
         private const val TAG = "BackgroundDataService"
+
+        public const val ACTIVITY_UPLOAD_DATA_ACTION =
+                "org.sagebionetworks.research.MindKind.UploadDataToBridge"
+        public const val WIFI_CHARGING_UPLOAD_DATA_ACTION =
+                "org.sagebionetworks.research.MindKind.WifiChargingUploadDataToBridge"
+        public const val BACKGROUND_DATA_DB_FILENAME =
+                "org.sagebionetworks.research.MindKind.BackgroundData"
+
         private const val TASK_IDENTIFIER = SageTaskIdentifier.BACKGROUND_DATA
         private const val FOREGROUND_NOTIFICATION_ID = 100
         private const val JSON_MIME_CONTENT_TYPE = "application/json"
@@ -90,32 +92,27 @@ class BackgroundDataService : DaggerService() {
         // True when this service is running, false otherwise
         public var isServiceRunning = false
 
-        private fun createMinuteRateLimit(): RateLimiter {
-            return RateLimiter(1000L * 60L)
+        private fun createMinuteRateLimit(minutes: Int): RateLimiter {
+            return RateLimiter(minutes * 1000L * 60L)
         }
     }
 
-    private var taskUUID = UUID.randomUUID()
-    private val taskIdentifier = SageTaskIdentifier.BACKGROUND_DATA
-
     lateinit var database: MindKindDatabase
 
-    @Inject
-    lateinit var taskResultManager: TaskResultManager
-
-    @Inject
-    lateinit var taskResultProcessingManager: TaskResultProcessingManager
-
+    // Injected from BridgeAndroidSdk, this controls uploading a TaskResult
     @Inject
     lateinit var taskResultUploader: TaskResultUploader
+
+    // Injected from BridgeAndroidSdk, it controls uploading past failed uploads
+    @Inject
+    lateinit var uploadManager: UploadManager
 
     private val compositeDisposable = CompositeDisposable()
     /**
      * Subscribes to the completable using the CompositeDisposable
      * This is open for unit testing purposes to to run a blockingGet() instead of an asynchronous subscribe
      */
-    @VisibleForTesting
-    protected open fun subscribeCompletableAsync(
+    private fun subscribeCompletableAsync(
             completable: Completable, successMsg: String, errorMsg: String) {
 
         compositeDisposable.add(completable
@@ -126,20 +123,26 @@ class BackgroundDataService : DaggerService() {
                     Log.w(TAG, "$errorMsg ${it.localizedMessage}")
                 }))
     }
+
     /**
      * @property asyncScheduler for performing network and database operations
      */
-    @VisibleForTesting
-    protected open val asyncScheduler: Scheduler get() = Schedulers.io()
+    private val asyncScheduler: Scheduler get() = Schedulers.io()
 
     private val receiver = BackgroundDataReceiver()
 
+    // If you always want to log an event, use no rate limit
     private val noRateLimit = NoLimitRateLimiter()
-    private val batterChangedLimiter = createMinuteRateLimit()
+
+    // Battery changed broadcast receiver is very noisy, so rate limit it every 1 minute
+    private val batterChangedLimiter = createMinuteRateLimit(1)
 
     override fun onCreate() {
         Log.d(TAG, "onCreate")
         super.onCreate()
+
+        // Setup daily wifi & charger upload worker
+        BridgeUploadWorker.enqueueDailyWork(this)
 
         isServiceRunning = true
         startForeground()
@@ -161,7 +164,7 @@ class BackgroundDataService : DaggerService() {
         registerReceiver(receiver, filter)
 
         LocalBroadcastManager.getInstance(this).registerReceiver(
-                uploadDataReceiver, IntentFilter(UPLOAD_DATA_ACTION))
+                uploadDataReceiver, IntentFilter(ACTIVITY_UPLOAD_DATA_ACTION))
     }
 
     override fun onDestroy() {
@@ -188,9 +191,18 @@ class BackgroundDataService : DaggerService() {
         }
     }
 
+    /**
+     * Packages all existing un-uploaded data and attempts to upload it to bridge
+     */
     private fun uploadDataToBridge() {
+        // Always try to upload all past failed uploads if any exist
+        subscribeCompletableAsync(
+                RxJavaInterop.toV2Completable(uploadManager.processUploadFiles()),
+                "Successfully uploaded all past data in upload manager",
+                "Failed to uploaded all past data in upload manager")
 
-        val completable = Completable.fromAction {
+        // Upload all the data from the background data table
+        subscribeCompletableAsync(Completable.fromAction {
             val dataToUpload =
                     database.backgroundDataDao().getData(false)
 
@@ -206,7 +218,7 @@ class BackgroundDataService : DaggerService() {
                     "Successfully uploaded task result to bridge",
                     "Failed to upload task result to bridge")
 
-            // Write database changes
+            // Write database changes - archive/uploader always eventually succeeds
             dataToUpload.forEach {
                 it.uploaded = true
             }
@@ -214,11 +226,9 @@ class BackgroundDataService : DaggerService() {
 
         } .doOnError {
             Log.w(TAG, it.localizedMessage ?: "")
-        }
-
-        subscribeCompletableAsync(completable,
-                "Successfully saved BackgroundData to room",
-                "Failed to save BackgroundData to room")
+        },
+        "Successfully saved BackgroundData to room",
+        "Failed to save BackgroundData to room")
     }
 
     private fun createTaskResult(backgroundData: List<BackgroundDataEntity>): TaskResultBase {
@@ -246,6 +256,10 @@ class BackgroundDataService : DaggerService() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.d(TAG, "onStartCommand: startId = $startId")
 
+        if (intent?.action == WIFI_CHARGING_UPLOAD_DATA_ACTION) {
+            uploadDataToBridge()
+        }
+
 //        START_STICKY- tells the system to create a fresh copy of the service,
 //        when sufficient memory is available, after it recovers from low memory.
 //        Here you will lose the results that might have computed before.
@@ -268,7 +282,6 @@ class BackgroundDataService : DaggerService() {
 
     private fun createNotification(text: String? = null): Notification {
         return Builder(this, getString(string.foreground_channel_id))
-                .setContentTitle("MindKind Study")
                 .setContentText(text ?: "")
                 .setSmallIcon(
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
@@ -364,33 +377,6 @@ class BackgroundDataService : DaggerService() {
             Log.d(TAG, "Received $batteryPct% ${intent.action}")
             // TODO: mdephillips 3/7/21 save battery percentage entity in its own table
         }
-    }
-}
-
-open class NoLimitRateLimiter: RateLimiter(0) {
-    override fun shouldLimit(eventTime: LocalDateTime): Boolean {
-        return false
-    }
-}
-
-open class RateLimiter(val limitTime: Long) {
-    var lastEventTime: LocalDateTime? = null
-    /**
-     * @param eventTime time of event to possibly limit
-     * @return if eventTime should be limited or not.
-     *          note: if returning true, eventTime will
-     *          be used as limit time on next function call
-     */
-    open fun shouldLimit(eventTime: LocalDateTime): Boolean {
-        val last = lastEventTime ?: run {
-            lastEventTime = LocalDateTime.now()
-            return false
-        }
-        if (ChronoUnit.MILLIS.between(last, eventTime) > limitTime) {
-            lastEventTime = LocalDateTime.now()
-            return false
-        }
-        return true
     }
 }
 
