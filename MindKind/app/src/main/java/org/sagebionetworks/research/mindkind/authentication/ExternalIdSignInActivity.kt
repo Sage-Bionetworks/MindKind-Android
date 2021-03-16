@@ -44,9 +44,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.common.base.Strings
 import dagger.android.AndroidInjection
 import org.sagebionetworks.research.mindkind.authentication.ExternalIdSignInViewModel.Factory
-import kotlinx.android.synthetic.main.activity_external_id_sign_in.customPassword
-import kotlinx.android.synthetic.main.activity_external_id_sign_in.customPasswordCheckBox
-import kotlinx.android.synthetic.main.activity_external_id_sign_in.customPasswordLabel
 import kotlinx.android.synthetic.main.activity_external_id_sign_in.externalId
 import kotlinx.android.synthetic.main.activity_external_id_sign_in.progressBar
 import kotlinx.android.synthetic.main.activity_external_id_sign_in.signIn
@@ -109,17 +106,8 @@ class ExternalIdSignInActivity : AppCompatActivity() {
             externalIdSignInViewModel?.externalId = externalId?.toString()
         }
 
-        customPassword.doOnTextChanged { customPassword, _, _, _ ->
-            externalIdSignInViewModel?.customPassword = customPassword?.toString()
-        }
-
         signIn.setOnClickListener {
             externalIdSignInViewModel?.doSignIn()
-        }
-
-        customPasswordCheckBox.setOnCheckedChangeListener { compoundButton, isChecked ->
-            customPassword.visibility = if (isChecked) { View.VISIBLE } else { View.GONE }
-            customPasswordLabel.visibility = if (isChecked) { View.VISIBLE } else { View.GONE }
         }
     }
 

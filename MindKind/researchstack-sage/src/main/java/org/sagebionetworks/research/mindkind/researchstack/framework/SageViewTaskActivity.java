@@ -37,7 +37,6 @@ import android.content.Intent;
 import android.media.AudioManager;
 import android.os.Bundle;
 import androidx.annotation.IdRes;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -49,9 +48,6 @@ import org.sagebionetworks.researchstack.backbone.ui.step.layout.ActiveStepLayou
 import org.sagebionetworks.researchstack.backbone.ui.step.layout.StepLayout;
 
 import org.sagebionetworks.research.mindkind.researchstack.R;
-import org.sagebionetworks.research.mindkind.researchstack.framework.step.toolbar.SageTaskToolbar;
-import org.sagebionetworks.research.mindkind.researchstack.framework.step.toolbar.SageTaskToolbarActionManipulator;
-import org.sagebionetworks.research.mindkind.researchstack.framework.step.toolbar.SageTaskToolbarIconManipulator;
 import org.sagebionetworks.research.mindkind.researchstack.inject.SageResearchStackModule;
 
 /**
@@ -66,26 +62,11 @@ public class SageViewTaskActivity extends ViewTaskActivity {
     protected ViewGroup toolbarContainer;
     protected TextView stepProgressTextView;
 
-    protected SageTaskToolbar getToolbar() {
-        if (toolbar != null && toolbar instanceof SageTaskToolbar) {
-            return (SageTaskToolbar)toolbar;
-        }
-        return null;
-    }
-
     @Override
     public void onDataAuth() {
         storageAccessUnregister();
         SageResearchStackModule.mockAuthenticate(this);
         super.onDataReady();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu){
-        boolean superResult = super.onCreateOptionsMenu(menu);
-        // Needed to initialize the toolbar icons after the menu is inflated
-        getToolbar().refreshToolbarIcons(currentStepLayout, getSupportActionBar());
-        return superResult;
     }
 
     @Override
@@ -99,12 +80,6 @@ public class SageViewTaskActivity extends ViewTaskActivity {
         stepProgressTextView = findViewById(R.id.bp_step_progress_textview);
 
         toolbarContainer = findViewById(R.id.bp_toolbar_container);
-        SageTaskToolbar toolbar = getToolbar();
-        toolbar.setDefaultLeftIcon(R.drawable.mp_cancel_icon);
-        toolbar.setDefaultRightIcon(SageTaskToolbarIconManipulator.NO_ICON);
-        toolbar.setDefaultTintColor(R.color.white);
-        toolbar.setDefaultBehindToolbar(false);
-        toolbar.setDefaultStatusBarColor(R.color.sageResearchPrimary);
     }
 
     @Override
@@ -115,12 +90,7 @@ public class SageViewTaskActivity extends ViewTaskActivity {
 
     @Override
     public int getContentViewId() {
-        return R.layout.mp_activity_view_task;
-    }
-
-    @Override
-    public @IdRes int getToolbarResourceId() {
-        return R.id.bp_task_toolbar;
+        return R.layout.sage_activity_view_task;
     }
 
     @Override
@@ -132,17 +102,6 @@ public class SageViewTaskActivity extends ViewTaskActivity {
     @Override
     public void showStep(Step step, boolean alwaysReplaceView) {
         super.showStep(step, alwaysReplaceView);
-
-        SageTaskToolbar toolbar = getToolbar();
-        toolbar.refreshToolbarIcons(currentStepLayout, getSupportActionBar());
-        toolbar.refreshToolbarBackgroundColor(currentStepLayout, toolbarContainer);
-        toolbar.refreshViewBehindToolbar(root, currentStepLayout);
-        toolbar.refreshViewHideToolbar(currentStepLayout, toolbarContainer);
-
-        SageTaskToolbar.Progress stepProgressText = toolbar.createOrderedTaskStepProgressText(task, currentStep);
-        toolbar.refreshStepProgress(currentStepLayout, stepProgressTextView, stepProgressText);
-
-        toolbar.setStatusBarColor(this, currentStepLayout);
 
         SageViewTaskActivity.refreshVolumeControl(this, currentStepLayout);
         SageViewTaskActivity.callTaskResultListener(taskResult, currentStepLayout);
@@ -156,15 +115,6 @@ public class SageViewTaskActivity extends ViewTaskActivity {
 
         boolean clickWasConsumed = false;
         // Allow for customization of the toolbar
-        if (current instanceof SageTaskToolbarActionManipulator) {
-            SageTaskToolbarActionManipulator manipulator = (SageTaskToolbarActionManipulator) current;
-            if(item.getItemId() == org.sagebionetworks.researchstack.backbone.R.id.rsb_clear_menu_item) {
-                return manipulator.bpToolbarRightIconClicked();
-            } else if (item.getItemId() == android.R.id.home) {
-                clickWasConsumed = manipulator.bpToolbarLeftIconClicked();
-            }
-        }
-
         if(!clickWasConsumed && item.getItemId() == android.R.id.home) {
             activity.showConfirmExitDialog();
             return true;

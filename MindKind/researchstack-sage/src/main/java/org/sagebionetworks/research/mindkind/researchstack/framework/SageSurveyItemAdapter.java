@@ -11,8 +11,6 @@ import org.sagebionetworks.researchstack.backbone.model.survey.IntegerRangeSurve
 import org.sagebionetworks.researchstack.backbone.model.survey.SurveyItem;
 import org.sagebionetworks.researchstack.backbone.model.survey.TextfieldSurveyItem;
 import org.sagebionetworks.bridge.researchstack.task.creation.BridgeSurveyItemAdapter;
-import org.sagebionetworks.research.mindkind.researchstack.framework.step.SageFormSurveyItem;
-import org.sagebionetworks.research.mindkind.researchstack.framework.step.SageInstructionSurveyItem;
 
 import java.util.Map;
 
@@ -38,7 +36,6 @@ public class SageSurveyItemAdapter extends BridgeSurveyItemAdapter {
             ImmutableMap.<String, Class<? extends org.sagebionetworks.researchstack.backbone.model.survey.SurveyItem>>builder()
 
                     // Form Mappings
-                    .put(MP_FORM_SURVEY_ITEM_TYPE,              SageFormSurveyItem.class)
                     .put(MP_TEXT_SURVEY_ITEM_TYPE,              TextfieldSurveyItem.class)
                     .put(MP_INTEGER_SURVEY_ITEM_TYPE,           IntegerRangeSurveyItem.class)
                     .put(MP_SINGLE_CHOICE_SURVEY_ITEM_TYPE,     ChoiceQuestionSurveyItem.class)
@@ -49,8 +46,6 @@ public class SageSurveyItemAdapter extends BridgeSurveyItemAdapter {
                     .put(MP_SPINNER_SURVEY_ITEM_TYPE,           ChoiceQuestionSurveyItem.class)
 
                     // Custom Mappings
-                    .put(MP_INSTRUCTION_SURVEY_ITEM_TYPE,       SageInstructionSurveyItem.class)
-                    .put(MP_INSTRUCTION_PHONE_SURVEY_ITEM_TYPE, SageInstructionSurveyItem.class)
                     .build();
 
     @Override

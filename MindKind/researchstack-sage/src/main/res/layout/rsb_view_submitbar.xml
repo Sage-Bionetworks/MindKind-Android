@@ -17,7 +17,7 @@
   -->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@id/bp_submit_bar"
+    android:id="@+id/bp_submit_bar"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_alignParentBottom="true"
@@ -28,7 +28,6 @@
 
     <Button
         android:id="@+id/bar_submit_postitive"
-        style="@style/MP.ButterScotch.RoundedCornerMaterialButton"
         android:layout_width="match_parent"
         android:layout_height="@dimen/mp_rounded_button_height"
         android:layout_margin="16dp"
@@ -41,7 +40,6 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/rsb_padding_medium"
         android:textAllCaps="false"
-        android:textColor="@color/royal500"
         android:layout_gravity="center_horizontal"/>
 
 </LinearLayout>
