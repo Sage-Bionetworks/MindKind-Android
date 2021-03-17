@@ -15,6 +15,7 @@ import androidx.lifecycle.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
+import com.google.android.material.button.MaterialButton
 import com.google.common.base.Preconditions
 import dagger.android.AndroidInjection
 import io.reactivex.disposables.CompositeDisposable
@@ -170,29 +171,35 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         buttonContainer?.removeAllViews()
 
         choices?.forEach { c ->
-            val button = Button(this)
-            button.text = c.text
+            (this.layoutInflater.inflate(R.layout.conversation_material_button,
+                    buttonContainer, false) as? MaterialButton)?.let {
 
-            button.setOnClickListener {
-                var value: Any = c.text
-                (c as? IntegerConversationInputFieldChoice)?.let {
-                    value = it.value
+                it.text = c.text
+
+                it.setOnClickListener {
+                    var value: Any = c.text
+                    (c as? IntegerConversationInputFieldChoice)?.let {
+                        value = it.value
+                    }
+                    addAnswer(stepId, c, value)
+                    disableAllButtons()
                 }
-                addAnswer(stepId, c, value)
-                disableAllButtons()
-            }
 
-            val llp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT)
-            llp.bottomMargin = resources.getDimensionPixelSize(R.dimen.conversation_button_margin)
-            buttonContainer?.addView(button, llp)
+                val llp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT)
+                llp.bottomMargin = resources.getDimensionPixelSize(R.dimen.conversation_button_margin)
+                buttonContainer?.addView(it, llp)
+            }
         }
     }
 
     private fun disableAllButtons() {
         val count = buttonContainer!!.childCount
-        repeat(count) {
-            buttonContainer?.getChildAt(it)?.isEnabled = false
+        repeat(count) { idx ->
+            buttonContainer?.getChildAt(idx)?.let {
+                it.isEnabled = false
+                it.alpha = 0.33f
+            }
         }
     }
 

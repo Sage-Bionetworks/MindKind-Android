@@ -42,30 +42,39 @@
     tools:context=".conversation.ConversationSurveyActivity">
 
 
+    <FrameLayout
+        android:id="@+id/back_button_container"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="@color/sageResearchSecondary"
+        android:padding="@dimen/margin_medium"/>
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-    <FrameLayout
-        android:id="@+id/back_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:foreground="?attr/selectableItemBackgroundBorderless"
-        android:background="@color/transparent"
-        android:padding="@dimen/margin_medium">
 
-        <ImageView
+        <FrameLayout
+            android:id="@+id/back_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_back"/>
+            android:foreground="?attr/selectableItemBackgroundBorderless"
+            android:background="@color/transparent"
+            android:padding="@dimen/margin_medium"
+            android:layout_marginTop="24dp">
 
-    </FrameLayout>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_back"/>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view_conversation"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/back_button"
-        android:layout_above="@id/button_container"/>
+        </FrameLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view_conversation"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/back_button"
+            android:layout_above="@id/button_container"/>
 
         <View
             android:id="@+id/gradient"
@@ -79,14 +88,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:padding="8dp"
+            android:padding="@dimen/margin_small"
             android:orientation="vertical">
-            <Button
+
+            <com.google.android.material.button.MaterialButton
+                style="@style/Sage.MaterialButton.Rounded"
                 android:id="@+id/add_question"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="64dp"
                 android:text="Let's Start!"
-                android:layout_margin="8dp"/>
+                tools:ignore="HardcodedText" />
+
         </LinearLayout>
 
     </RelativeLayout>

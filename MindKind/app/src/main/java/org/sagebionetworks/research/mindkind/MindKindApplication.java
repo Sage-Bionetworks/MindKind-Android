@@ -76,7 +76,7 @@ public class MindKindApplication extends BridgeSageResearchApp implements HasSup
     protected AndroidInjector<? extends DaggerApplication> applicationInjector() {
         return DaggerSageApplicationComponent
                 .builder()
-                .mPowerUserScopeComponent((SageUserScopeComponent) getOrInitBridgeManagerProvider())
+                .mindKindUserScopeComponent((SageUserScopeComponent) getOrInitBridgeManagerProvider())
                 .application(this)
                 .build();
     }

@@ -41,8 +41,6 @@ import dagger.android.ContributesAndroidInjector;
 
 @Module()
 public abstract class SageAppModule {
-//    @ContributesAndroidInjector
-//    abstract ArcPhoneAuthActivity contributeMpMainActivityInjector();
 
     @ContributesAndroidInjector
     abstract PerformTaskActivity contributePerformTaskActivityInjector();

@@ -41,12 +41,7 @@ import org.sagebionetworks.bridge.data.ArchiveFile
 import org.sagebionetworks.bridge.data.JsonArchiveFile
 import org.sagebionetworks.bridge.researchstack.survey.SurveyAnswer
 import org.sagebionetworks.research.mindkind.researchstack.framework.SageTaskHelper
-import org.sagebionetworks.research.mindkind.researchstack.framework.step.body.SageBooleanAnswerFormat
-import org.sagebionetworks.research.mindkind.researchstack.framework.step.body.SageChoiceAnswerFormat
-import org.sagebionetworks.research.mindkind.researchstack.framework.step.body.SageIntegerAnswerFormat
-import org.sagebionetworks.research.mindkind.researchstack.framework.step.body.SageTextQuestionBody
 import org.sagebionetworks.research.sageresearch.viewmodel.ResearchStackUploadArchiveFactory
-import org.sagebionetworks.research.mindkind.research.SageTaskIdentifier
 import org.slf4j.LoggerFactory
 
 open class SageResearchStackArchiveFactory: ResearchStackUploadArchiveFactory() {
@@ -125,32 +120,6 @@ open class SageResearchStackArchiveFactory: ResearchStackUploadArchiveFactory() 
         if (stepResult.results == null || stepResult.results.isEmpty()) {
             return null  // question was skipped
         }
-        if (format is SageBooleanAnswerFormat) {
-            val surveyAnswer = SurveyAnswer.BooleanSurveyAnswer(stepResult)
-            surveyAnswer.questionType = AnswerFormat.Type.Boolean.ordinal
-            surveyAnswer.questionTypeName = AnswerFormat.Type.Boolean.name
-            return surveyAnswer
-        } else if (format is SageTextQuestionBody.AnswerFormat) {
-            val surveyAnswer = SurveyAnswer.TextSurveyAnswer(stepResult)
-            surveyAnswer.questionType = AnswerFormat.Type.Text.ordinal
-            surveyAnswer.questionTypeName = AnswerFormat.Type.Text.name
-            return surveyAnswer
-        } else if (format is SageChoiceAnswerFormat) {
-            val surveyAnswer = SurveyAnswer.ChoiceSurveyAnswer(stepResult)
-            if (format.answerStyle == AnswerFormat.ChoiceAnswerStyle.SingleChoice) {
-                surveyAnswer.questionType = AnswerFormat.Type.SingleChoice.ordinal
-                surveyAnswer.questionTypeName = AnswerFormat.Type.SingleChoice.name
-            } else {
-                surveyAnswer.questionType = AnswerFormat.Type.MultipleChoice.ordinal
-                surveyAnswer.questionTypeName = AnswerFormat.Type.MultipleChoice.name
-            }
-            return surveyAnswer
-        } else if (format is SageIntegerAnswerFormat) {
-            val surveyAnswer = SurveyAnswer.NumericSurveyAnswer<Int>(stepResult)
-            surveyAnswer.questionType = AnswerFormat.Type.Integer.ordinal
-            surveyAnswer.questionTypeName = AnswerFormat.Type.Integer.name
-            return surveyAnswer
-        }
-        return null
+        return super.customSurveyAnswer(stepResult, format)
     }
 }

@@ -46,6 +46,7 @@
     <color name="sageResearchPrimary">#0D8FC0</color>
     <color name="sageResearchPrimaryDark">@color/royal800</color>
     <color name="sageResearchSecondary">@color/butterscotch500</color>
+    <color name="sageResearchSecondaryLight">@color/butterscotch300</color>
     <color name="secondaryTint">@color/sageResearchSecondary</color>
 
     <color name="black_overlay">#66000000</color>

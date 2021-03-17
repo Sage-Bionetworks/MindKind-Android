@@ -53,10 +53,6 @@ import org.sagebionetworks.bridge.researchstack.TaskHelper;
 import org.sagebionetworks.bridge.researchstack.factory.ArchiveFileFactory;
 import org.sagebionetworks.bridge.researchstack.survey.SurveyAnswer;
 import org.sagebionetworks.bridge.researchstack.wrapper.StorageAccessWrapper;
-import org.sagebionetworks.research.mindkind.researchstack.framework.step.body.SageBooleanAnswerFormat;
-import org.sagebionetworks.research.mindkind.researchstack.framework.step.body.SageChoiceAnswerFormat;
-import org.sagebionetworks.research.mindkind.researchstack.framework.step.body.SageIntegerAnswerFormat;
-import org.sagebionetworks.research.mindkind.researchstack.framework.step.body.SageTextQuestionBody;
 
 import java.util.HashMap;
 import java.util.List;
@@ -95,9 +91,6 @@ public class SageTaskHelper extends TaskHelper {
     @Override
     protected Task createSmartSurveyTask(Context context, @Nullable TaskModel taskModel) {
         // We provide our own smart survey tasks
-        if (surveyFactory instanceof SageTaskFactory) {
-            return ((SageTaskFactory) surveyFactory).createMpSmartSurveyTask(context, taskModel);
-        }
         return surveyFactory.createSmartSurveyTask(context, taskModel);
     }
 
@@ -199,33 +192,7 @@ public class SageTaskHelper extends TaskHelper {
             if (stepResult.getResults() == null || stepResult.getResults().isEmpty()) {
                 return null;  // question was skipped
             }
-            if (format instanceof SageBooleanAnswerFormat) {
-                SurveyAnswer surveyAnswer = new SurveyAnswer.BooleanSurveyAnswer(stepResult);
-                surveyAnswer.questionType = AnswerFormat.Type.Boolean.ordinal();
-                surveyAnswer.questionTypeName = AnswerFormat.Type.Boolean.name();
-                return surveyAnswer;
-            } else if (format instanceof SageTextQuestionBody.AnswerFormat) {
-                SurveyAnswer surveyAnswer = new SurveyAnswer.TextSurveyAnswer(stepResult);
-                surveyAnswer.questionType = AnswerFormat.Type.Text.ordinal();
-                surveyAnswer.questionTypeName = AnswerFormat.Type.Text.name();
-                return surveyAnswer;
-            } else if (format instanceof SageChoiceAnswerFormat) {
-                SurveyAnswer surveyAnswer = new SurveyAnswer.ChoiceSurveyAnswer(stepResult);
-                if (((SageChoiceAnswerFormat)format).getAnswerStyle() == AnswerFormat.ChoiceAnswerStyle.SingleChoice) {
-                    surveyAnswer.questionType = AnswerFormat.Type.SingleChoice.ordinal();
-                    surveyAnswer.questionTypeName = AnswerFormat.Type.SingleChoice.name();
-                } else {
-                    surveyAnswer.questionType = AnswerFormat.Type.MultipleChoice.ordinal();
-                    surveyAnswer.questionTypeName = AnswerFormat.Type.MultipleChoice.name();
-                }
-                return surveyAnswer;
-            } else if (format instanceof SageIntegerAnswerFormat) {
-                SurveyAnswer surveyAnswer = new SurveyAnswer.NumericSurveyAnswer(stepResult);
-                surveyAnswer.questionType = AnswerFormat.Type.Integer.ordinal();
-                surveyAnswer.questionTypeName = AnswerFormat.Type.Integer.name();
-                return surveyAnswer;
-            }
-            return null;
+            return super.customSurveyAnswer(stepResult, format);
         }
     }
 }

@@ -32,50 +32,34 @@
 
 package org.sagebionetworks.research.mindkind
 
-import android.app.PendingIntent
+import android.content.Intent
 import android.os.Bundle
-import dagger.android.support.DaggerAppCompatActivity
-import org.slf4j.LoggerFactory
+import androidx.appcompat.app.AppCompatActivity
+import dagger.android.AndroidInjection
+import org.sagebionetworks.bridge.android.manager.AuthenticationManager
+import org.sagebionetworks.research.mindkind.authentication.ExternalIdSignInActivity
+import javax.inject.Inject
 
-class EntryActivity : DaggerAppCompatActivity() {
+class EntryActivity : AppCompatActivity() {
 
-    private val LOGGER = LoggerFactory.getLogger(EntryActivity::class.java)
-
-    private lateinit var pendingIntent: PendingIntent
+    @Inject
+    lateinit var authManager: AuthenticationManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.entry_activity)
-        if (savedInstanceState == null) {
-            supportFragmentManager.beginTransaction()
-                    .replace(R.id.container, EntryFragment())
-                    .commitNow()
-        }
     }
 
-    private fun onBackPressed(fm: androidx.fragment.app.FragmentManager): Boolean {
-        for (frag in fm.fragments) {
-            if (frag.isVisible) {
-                val childFm = frag.childFragmentManager
-                if (onBackPressed(childFm)) {
-                    return true
-                } else if (childFm.backStackEntryCount > 0) {
-                    childFm.popBackStack()
-                    return true
-                }
-            }
-        }
-        return false
-    }
+    override fun onResume() {
+        super.onResume()
 
-    /**
-     * Override the default back behavior so that it works for nested fragments.
-     */
-    override fun onBackPressed() {
-        if (onBackPressed(supportFragmentManager)) {
-            return
+        if (authManager.userSessionInfo?.isAuthenticated != true) {
+            startActivity(Intent(this, ExternalIdSignInActivity::class.java))
         } else {
-            super.onBackPressed()
+            startActivity(Intent(this, TaskListActivity::class.java))
         }
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
+        finish()
     }
 }

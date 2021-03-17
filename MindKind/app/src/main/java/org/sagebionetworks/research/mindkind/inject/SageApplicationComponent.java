@@ -72,7 +72,7 @@ public interface SageApplicationComponent extends AndroidInjector<MindKindApplic
         @BindsInstance
         Builder application(Application application);
 
-        Builder mPowerUserScopeComponent(SageUserScopeComponent mPowerUserScopeComponent);
+        Builder mindKindUserScopeComponent(SageUserScopeComponent sageUserScopeComponent);
 
         SageApplicationComponent build();
     }
