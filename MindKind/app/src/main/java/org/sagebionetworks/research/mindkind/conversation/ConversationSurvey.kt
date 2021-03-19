@@ -71,7 +71,8 @@ data class ConversationFormStep(
     override val identifier: String,
     override val type: String,
     override val title: String,
-    val inputFieldId: String
+    val inputFieldId: String,
+    val optional: Boolean? = true
 ): ConversationStep() {
 
     fun inputField(from: List<ConversationInputField>): ConversationInputField {

@@ -62,6 +62,13 @@
         <item name="shapeAppearanceOverlay">@style/ShapeAppearanceOverlay.Sage.RoundedButton</item>
     </style>
 
+    <style name="Sage.MaterialButton.UnderlinedBorderless" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/appTextDark</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:strokeColor">@color/sageResearchSecondaryLight</item>
+    </style>
+
     <style name="ShapeAppearanceOverlay.Sage.RoundedButton" parent="">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>

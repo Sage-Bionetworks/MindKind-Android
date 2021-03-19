@@ -91,6 +91,7 @@
     <string name="button_undo">Undo</string>
     <string name="button_edit">Edit</string>
     <string name="button_add_details">Add details</string>
+    <string name="button_skip"><u>Skip Question</u></string>
 
     <!-- Withdraw -->
     <string name="withdraw_title">Hi %1$s,\n You have been enrolled in the mPower2 Study since %2$s</string>
