@@ -34,6 +34,7 @@
 
     <!-- MindKind Colors -->
     <color name="denim">#343F56</color>
+    <color name="denim88">#88343F56</color>
     <color name="splash">#162752</color>
     <color name="ic_launcher_background">#FDFDFD</color>
     <color name="ic_launcher_round_background">#172752</color>
@@ -42,8 +43,8 @@
     <!-- Sage Colors -->
     <color name="colorPrimary">@color/sageResearchPrimary</color>
 
-    <color name="sageResearchPrimaryLight">@color/royal300</color>
-    <color name="sageResearchPrimary">#0D8FC0</color>
+    <color name="sageResearchPrimaryLight">@color/denim88</color>
+    <color name="sageResearchPrimary">@color/denim</color>
     <color name="sageResearchPrimaryDark">@color/royal800</color>
     <color name="sageResearchSecondary">@color/butterscotch500</color>
     <color name="sageResearchSecondaryLight">@color/butterscotch300</color>
@@ -52,19 +53,6 @@
     <color name="black_overlay">#66000000</color>
 
     <color name="butterscotch_disabled">#59BD7900</color>
-
-    <color name="severity_none">#E8FAE8</color>
-    <color name="severity_mild">#FFF0D4</color>
-    <color name="severity_moderate">#FFE8D6</color>
-    <color name="severity_severe">#FCE9E6</color>
-
-    <color name="severity_none_stroke">#C0EBC0</color>
-    <color name="severity_mild_stroke">#FFE2AD</color>
-    <color name="severity_moderate_stroke">#FACFAF</color>
-    <color name="severity_severe_stroke">#FFC5BD</color>
-
-    <color name="severity_selected_text">@color/appDarkGrey</color>
-    <color name="severity_unselected_text">@color/appLightGray</color>
 
     <color name="question_background">#F9BF92</color>
     <color name="question_background_fade">#83F9BF92</color>

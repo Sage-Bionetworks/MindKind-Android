@@ -199,7 +199,9 @@ open class ConversationSurveyActivity: AppCompatActivity() {
 
                 it.setOnClickListener {
                     disableAllButtons()
-                    addQuestion()
+                    handler?.postDelayed({
+                        addQuestion()
+                    }, DELAY)
                 }
                 val llp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT)
