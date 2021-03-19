@@ -32,6 +32,7 @@
 
 package org.sagebionetworks.research.mindkind.authentication
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -48,6 +49,7 @@ import kotlinx.android.synthetic.main.activity_external_id_sign_in.externalId
 import kotlinx.android.synthetic.main.activity_external_id_sign_in.progressBar
 import kotlinx.android.synthetic.main.activity_external_id_sign_in.signIn
 import org.sagebionetworks.research.mindkind.R
+import org.sagebionetworks.research.mindkind.TaskListActivity
 import javax.inject.Inject
 
 class ExternalIdSignInActivity : AppCompatActivity() {
@@ -123,7 +125,9 @@ class ExternalIdSignInActivity : AppCompatActivity() {
 
     @VisibleForTesting
     fun proceedToTaskListActivity() {
-        // this will go back to the entry activity and show the main fragement
+        val intent = Intent(this, TaskListActivity::class.java)
+        startActivity(intent)
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
         finish()
     }
 }

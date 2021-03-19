@@ -193,7 +193,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
             }
         }
 
-        if(step.optional == null || step.optional!!) {
+        if(step.optional != false) {
             (this.layoutInflater.inflate(R.layout.conversation_button_unfilled,
                     buttonContainer, false) as? MaterialButton)?.let {
 
