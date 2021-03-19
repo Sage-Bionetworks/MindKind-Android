@@ -25,7 +25,8 @@
       "identifier": "question3",
       "type": "form",
       "title": "Worrying too much about different things?",
-      "inputFieldId": "choices_how_many_days"
+      "inputFieldId": "choices_how_many_days",
+      "optional": false
     },
     {
       "identifier": "question4",

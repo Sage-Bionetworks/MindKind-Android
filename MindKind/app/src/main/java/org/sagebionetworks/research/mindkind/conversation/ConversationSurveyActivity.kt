@@ -134,7 +134,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         (step as? ConversationFormStep)?.let {
             viewModel.userShown(it.identifier)
             hasQuestions = true
-            addButtons(it.identifier, findChoices(it.inputFieldId, conversation.inputFields))
+            addButtons(it, findChoices(it.inputFieldId, conversation.inputFields))
         } ?: buttonContainer?.removeAllViews()
 
         val adapter = recyclerView?.adapter as ConversationAdapter
@@ -167,7 +167,8 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         }, DELAY)
     }
 
-    private fun addButtons(stepId: String, choices: List<ConversationInputFieldChoice>?) {
+    private fun addButtons(step: ConversationFormStep, choices: List<ConversationInputFieldChoice>?) {
+        var stepId = step.identifier
         buttonContainer?.removeAllViews()
 
         choices?.forEach { c ->
@@ -191,10 +192,27 @@ open class ConversationSurveyActivity: AppCompatActivity() {
                 buttonContainer?.addView(it, llp)
             }
         }
+
+        if(step.optional != false) {
+            (this.layoutInflater.inflate(R.layout.conversation_button_unfilled,
+                    buttonContainer, false) as? MaterialButton)?.let {
+
+                it.setOnClickListener {
+                    disableAllButtons()
+                    handler?.postDelayed({
+                        addQuestion()
+                    }, DELAY)
+                }
+                val llp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT)
+                llp.bottomMargin = resources.getDimensionPixelSize(R.dimen.conversation_button_margin)
+                buttonContainer?.addView(it, llp)
+            }
+        }
     }
 
     private fun disableAllButtons() {
-        val count = buttonContainer!!.childCount
+        val count = buttonContainer?.childCount ?: 0
         repeat(count) { idx ->
             buttonContainer?.getChildAt(idx)?.let {
                 it.isEnabled = false
