@@ -35,7 +35,6 @@ package org.sagebionetworks.research.mindkind.room
 import androidx.annotation.VisibleForTesting
 import androidx.room.*
 import com.google.gson.annotations.SerializedName
-import org.joda.time.DateTime
 import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataType
 import org.threeten.bp.LocalDateTime
 
@@ -65,10 +64,10 @@ data class BackgroundDataEntity(
         @ColumnInfo(index = true)
         var uploaded: Boolean = false,
         /**
-         * @property data id which is the primary key of the specified data within the type entity
+         * @property data free-form string blob data associated with the entity
          */
         @SerializedName("data")
-        var dataId: Int = 0)
+        var data: String? = null)
 
 @Dao
 interface BackgroundDataEntityDao {

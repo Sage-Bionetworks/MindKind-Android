@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
 import org.sagebionetworks.research.mindkind.R
 import java.util.*
@@ -49,14 +50,16 @@ class ConversationAdapter(private val dataSet: ArrayList<ConversationItem>) :
         // handle fade
         var resources = viewHolder.container.resources
         if(position != (dataSet.size-1)) {
-            viewHolder.textView.setTextColor(resources.getColor(R.color.black_overlay))
+            val textColor = ResourcesCompat.getColor(resources, R.color.black_overlay, null)
+            viewHolder.textView.setTextColor(textColor)
             if(type == 0) {
                 viewHolder.container.setBackgroundResource(R.drawable.reply_background_fade)
             } else {
                 viewHolder.container.setBackgroundResource(R.drawable.question_background_fade)
             }
         } else {
-            viewHolder.textView.setTextColor(resources.getColor(R.color.black))
+            val textColor = ResourcesCompat.getColor(resources, R.color.black, null)
+            viewHolder.textView.setTextColor(textColor)
             if(type == 0) {
                 viewHolder.container.setBackgroundResource(R.drawable.reply_background)
             } else {

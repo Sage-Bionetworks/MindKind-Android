@@ -352,30 +352,32 @@ class BackgroundDataService : DaggerService() {
                 return
             }
 
+            val data = // Do dataType specific operations
+                    when(intent.action) {
+                        Intent.ACTION_BATTERY_CHANGED -> onReceiveBatteryChanged(intent)
+                        else -> onReceiveDefaultActionChanged(intent)
+                    }
+
             val backgroundData = BackgroundDataEntity(
                     date = now,
                     dataType = dataType,
-                    uploaded = false)
+                    uploaded = false,
+                    data = data)
 
             writeBackgroundDataToRoom(backgroundData)
-
-            // Do dataType specific operations
-            when(intent.action) {
-                Intent.ACTION_BATTERY_CHANGED -> onReceiveBatteryChanged(intent)
-                else -> onReceiveDefaultActionChanged(intent)
-            }
         }
 
-        private fun onReceiveDefaultActionChanged(intent: Intent) {
+        private fun onReceiveDefaultActionChanged(intent: Intent): String? {
             Log.d(TAG, "Received ${intent.action}")
+            return null
         }
 
-        private fun onReceiveBatteryChanged(intent: Intent) {
+        private fun onReceiveBatteryChanged(intent: Intent): String {
             val level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
             val scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
             val batteryPct = level * 100 / scale.toFloat()
             Log.d(TAG, "Received $batteryPct% ${intent.action}")
-            // TODO: mdephillips 3/7/21 save battery percentage entity in its own table
+            return "$batteryPct%"
         }
     }
 }
