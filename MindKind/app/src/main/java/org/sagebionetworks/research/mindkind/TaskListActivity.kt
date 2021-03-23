@@ -119,6 +119,11 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
         ConversationSurveyActivity.start(this, json)
     }
 
+    fun launchPlayground() {
+        val json = stringFromJsonAsset("Playground") ?: run { return }
+        ConversationSurveyActivity.start(this, json)
+    }
+
     fun uploadBackgroundData() {
         // Notifies the server that it should upload the background data to bridge
         LocalBroadcastManager.getInstance(this)
