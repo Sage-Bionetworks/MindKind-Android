@@ -32,6 +32,7 @@
 
 package org.sagebionetworks.research.mindkind.authentication
 
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -114,12 +115,15 @@ class ExternalIdSignInActivity : AppCompatActivity() {
     }
 
     private fun onErrorMessage(errorMessage: String?) {
-        if (Strings.isNullOrEmpty(errorMessage)) {
-            return
+        var error = errorMessage ?: run { return }
+        // This is the no internet error message string from web sdk
+        // It's a bit technical, so replace it with more informative copy
+        if (error.contains("Unable to resolve host")) {
+            error = getString(R.string.rsb_error_no_internet)
         }
         AlertDialog.Builder(this)
-                .setTitle(errorMessage)
-                .setPositiveButton(android.R.string.ok, null)
+                .setMessage(error)
+                .setNeutralButton(R.string.rsb_ok, null)
                 .show()
     }
 
