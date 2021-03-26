@@ -9,7 +9,9 @@ import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.EditText
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.*
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -27,6 +29,8 @@ import org.sagebionetworks.research.domain.result.implementations.TaskResultBase
 import org.sagebionetworks.research.mindkind.R
 import org.sagebionetworks.research.sageresearch_app_sdk.TaskResultUploader
 import org.threeten.bp.Instant
+import java.text.SimpleDateFormat
+import java.time.format.DateTimeFormatter
 import java.util.*
 import javax.inject.Inject
 import kotlin.collections.set
@@ -134,7 +138,17 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         (step as? ConversationFormStep)?.let {
             viewModel.userShown(it.identifier)
             hasQuestions = true
-            addButtons(it, findChoices(it.inputFieldId, conversation.inputFields))
+            var inputs = findInputs(it.inputFieldId, conversation.inputFields)
+            when(inputs?.type) {
+                ConversationFormType.singleChoiceInt.type ->
+                    handleSingleChoice(it, inputs)
+                ConversationFormType.integer.type ->
+                    handleIntegerInput(it, inputs)
+                ConversationFormType.text.type ->
+                    handleTextInput(it, inputs)
+                ConversationFormType.timeOfDay.type ->
+                    handleTimeOfDayInput(it, inputs)
+            }
         } ?: buttonContainer?.removeAllViews()
 
         val adapter = recyclerView?.adapter as ConversationAdapter
@@ -167,8 +181,9 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         }, DELAY)
     }
 
-    private fun addButtons(step: ConversationFormStep, choices: List<ConversationInputFieldChoice>?) {
-        var stepId = step.identifier
+    private fun handleSingleChoice(step: ConversationFormStep, input: ConversationInputField?) {
+        val stepId = step.identifier
+        val choices = (input as ConversationSingleChoiceInputField).choices
         buttonContainer?.removeAllViews()
 
         choices?.forEach { c ->
@@ -194,20 +209,24 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         }
 
         if(step.optional != false) {
-            (this.layoutInflater.inflate(R.layout.conversation_button_unfilled,
-                    buttonContainer, false) as? MaterialButton)?.let {
+            addSkipButton()
+        }
+    }
 
-                it.setOnClickListener {
-                    disableAllButtons()
-                    handler?.postDelayed({
-                        addQuestion()
-                    }, DELAY)
-                }
-                val llp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT)
-                llp.bottomMargin = resources.getDimensionPixelSize(R.dimen.conversation_button_margin)
-                buttonContainer?.addView(it, llp)
+    private fun addSkipButton() {
+        (this.layoutInflater.inflate(R.layout.conversation_button_unfilled,
+                buttonContainer, false) as? MaterialButton)?.let {
+
+            it.setOnClickListener {
+                disableAllButtons()
+                handler?.postDelayed({
+                    addQuestion()
+                }, DELAY)
             }
+            val llp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT)
+            llp.bottomMargin = resources.getDimensionPixelSize(R.dimen.conversation_button_margin)
+            buttonContainer?.addView(it, llp)
         }
     }
 
@@ -221,8 +240,151 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         }
     }
 
-    private fun findChoices(id: String, fields: List<ConversationInputField>): List<ConversationInputFieldChoice>? {
-        return fields.firstOrNull { it.identifier == id }?.choices
+    private fun findInputs(id: String, fields: List<ConversationInputField>): ConversationInputField? {
+        return fields.firstOrNull { it.identifier == id }
+    }
+
+    private fun handleIntegerInput(step: ConversationFormStep, input: ConversationInputField?) {
+        var stepId = step.identifier
+        var integerInput = input as ConversationIntegerInputField
+        buttonContainer?.removeAllViews()
+        var counter = 0
+        var current: TextView? = null
+
+        (this.layoutInflater.inflate(R.layout.integer_input,
+                buttonContainer, false) as? ViewGroup)?.let {
+
+            current = it.findViewById(R.id.integer_current)
+
+            val neg: View = it.findViewById(R.id.integer_negative)
+            val pos: View = it.findViewById(R.id.integer_positive)
+            applyBounds(integerInput.min, integerInput.max, counter, neg, pos)
+
+            neg.setOnClickListener {
+                counter--
+                current?.text = counter.toString()
+                applyBounds(integerInput.min, integerInput.max, counter, neg, pos)
+            }
+
+            pos.setOnClickListener {
+                counter++
+                current?.text = counter.toString()
+                applyBounds(integerInput.min, integerInput.max, counter, neg, pos)
+            }
+            buttonContainer?.addView(it)
+        }
+
+        (this.layoutInflater.inflate(R.layout.conversation_material_button,
+                buttonContainer, false) as? MaterialButton)?.let {
+
+            it.text = step.buttonText
+
+            it.setOnClickListener {
+                disableAllButtons()
+                val d = current?.text
+                // TODO: fix storing/sending data
+                val i = StringConversationInputFieldChoice(d.toString(), d.toString())
+                addAnswer(stepId, i, d.toString())
+            }
+            val llp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT)
+            llp.bottomMargin = resources.getDimensionPixelSize(R.dimen.conversation_button_margin)
+            buttonContainer?.addView(it, llp)
+        }
+
+        if(step.optional != false) {
+            addSkipButton()
+        }
+    }
+
+    private fun applyBounds(min: Int, max: Int, current: Int, neg: View, pos: View) {
+        if(current <= min) {
+            neg.isEnabled = false
+            neg.setBackgroundResource(R.drawable.integer_background_disabled)
+        } else {
+            neg.isEnabled = true
+            neg.setBackgroundResource(R.drawable.integer_background)
+        }
+
+        if(current >= max) {
+            pos.isEnabled = false
+            pos.setBackgroundResource(R.drawable.integer_background_disabled)
+        } else {
+            pos.isEnabled = true
+            pos.setBackgroundResource(R.drawable.integer_background)
+        }
+    }
+
+    private fun handleTextInput(step: ConversationFormStep, input: ConversationInputField?) {
+        val stepId = step.identifier
+        val textInput = input as ConversationTextInputField
+        var inputView: EditText? = null
+        buttonContainer?.removeAllViews()
+
+        (this.layoutInflater.inflate(R.layout.text_input,
+                buttonContainer, false) as? ViewGroup)?.let {
+
+            inputView = it.findViewById(R.id.text_input)
+            inputView?.hint = textInput.placeholderText
+            buttonContainer?.addView(it)
+        }
+
+        (this.layoutInflater.inflate(R.layout.conversation_material_button,
+                buttonContainer, false) as? MaterialButton)?.let {
+
+            it.text = getString(R.string.text_input_submit_button)
+
+            it.setOnClickListener {
+                disableAllButtons()
+                val d = inputView?.text
+                // TODO: fix storing/sending data
+                val i = StringConversationInputFieldChoice(d.toString(), d.toString())
+                addAnswer(stepId, i, d.toString())
+            }
+            val llp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT)
+            llp.bottomMargin = resources.getDimensionPixelSize(R.dimen.conversation_button_margin)
+            buttonContainer?.addView(it, llp)
+        }
+
+        if(step.optional != false) {
+            addSkipButton()
+        }
+    }
+
+    private fun handleTimeOfDayInput(step: ConversationFormStep, input: ConversationInputField?) {
+        val stepId = step.identifier
+        buttonContainer?.removeAllViews()
+
+        (this.layoutInflater.inflate(R.layout.conversation_material_button,
+                buttonContainer, false) as? MaterialButton)?.let {
+
+            it.text = step.buttonText
+
+            val activity = this
+            it.setOnClickListener {
+                val dialog = ConversationTimeOfDayDialog()
+                val callback = object: ConversationTimeOfDayDialog.Callback {
+                    override fun onDateSelected(d: Date) {
+                        var formatter = SimpleDateFormat("hh:mm aa")
+                        logInfo("Received date callback: " + formatter.format(d))
+                        // TODO: fix store/sending data
+                        val i = StringConversationInputFieldChoice(formatter.format(d), d.toString())
+                        addAnswer(stepId, i, d.toString())
+                    }
+                }
+                dialog.setCallback(callback)
+                dialog.show(activity.supportFragmentManager, ConversationTimeOfDayDialog.TAG)
+            }
+            val llp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT)
+            llp.bottomMargin = resources.getDimensionPixelSize(R.dimen.conversation_button_margin)
+            buttonContainer?.addView(it, llp)
+        }
+
+        if(step.optional != false) {
+            addSkipButton()
+        }
     }
 }
 

@@ -42,7 +42,7 @@
       "type": "form",
       "title": "How many times did you wake up last night?",
       "inputFieldId": "integer_input",
-      "buttonText": "Submit"
+      "buttonText": "Ok"
     }
   ]
 }

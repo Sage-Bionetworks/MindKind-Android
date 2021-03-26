@@ -84,7 +84,8 @@
     </string-array>
 
     <string name="time_picker_ok_button">Ok</string>
-    <string name="time_picker_cancel_button">Cancel</string>
+    <string name="time_picker_cancel_button"><u>Cancel</u></string>
+    <string name="text_input_submit_button">Submit</string>
 
     <string name="button_record">Record</string>
     <string name="button_recorded">Recorded</string>
