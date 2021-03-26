@@ -5,6 +5,8 @@ import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
 import android.os.Handler
+import android.text.format.DateFormat
+import android.text.format.DateFormat.is24HourFormat
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
@@ -366,7 +368,12 @@ open class ConversationSurveyActivity: AppCompatActivity() {
                 val dialog = ConversationTimeOfDayDialog()
                 val callback = object: ConversationTimeOfDayDialog.Callback {
                     override fun onDateSelected(d: Date) {
-                        var formatter = SimpleDateFormat("hh:mm aa")
+                        // For localization support, switch to whatever clock the user is using
+                        val formatter = if (is24HourFormat(baseContext)) {
+                            SimpleDateFormat("H:mm", Locale.US)
+                        } else {
+                            SimpleDateFormat("h:mm aa", Locale.US)
+                        }
                         logInfo("Received date callback: " + formatter.format(d))
                         // TODO: fix store/sending data
                         val i = StringConversationInputFieldChoice(formatter.format(d), d.toString())
