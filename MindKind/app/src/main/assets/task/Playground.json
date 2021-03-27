@@ -28,7 +28,8 @@
       "inputFieldId": "text_entry",
       "buttonTitle": "Let's journal",
       "maxCharacters": 100,
-      "placeholderText": "Write something here.."
+      "placeholderText": "Write something here..",
+      "maxLines": 4
     }
   ]
 }

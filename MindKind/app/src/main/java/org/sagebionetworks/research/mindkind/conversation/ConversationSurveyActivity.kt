@@ -23,6 +23,7 @@ import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.activity_conversation_survey.*
 import kotlinx.android.synthetic.main.integer_input.*
 import kotlinx.android.synthetic.main.integer_input.view.*
+import kotlinx.android.synthetic.main.text_input.view.*
 import org.sagebionetworks.research.mindkind.R
 import org.sagebionetworks.research.sageresearch_app_sdk.TaskResultUploader
 import java.text.SimpleDateFormat
@@ -291,32 +292,31 @@ open class ConversationSurveyActivity: AppCompatActivity() {
 
     private fun handleTextInput(textStep: ConversationTextFormStep?) {
         val step = textStep ?: run { return }
-        val stepId = step.identifier
-        var inputView: EditText? = null
         button_container.removeAllViews()
 
         (this.layoutInflater.inflate(R.layout.text_input,
-                button_container, false) as? ViewGroup)?.let {
+                button_container, false) as? ViewGroup)?.let { vg ->
 
-            inputView = it.findViewById(R.id.text_input)
+            val inputView = vg.text_input
+            inputView?.maxLines = 4
             inputView?.hint = step.placeholderText
-            button_container.addView(it)
-        }
+            button_container.addView(vg)
 
-        (this.layoutInflater.inflate(R.layout.conversation_material_button,
-                button_container, false) as? MaterialButton)?.let {
+            (this.layoutInflater.inflate(R.layout.conversation_material_button,
+                    button_container, false) as? MaterialButton)?.let {
 
-            it.text = getString(R.string.text_input_submit_button)
+                it.text = getString(R.string.text_input_submit_button)
 
-            it.setOnClickListener {
-                disableAllButtons()
-                val text = inputView?.text?.toString() ?: run { return@setOnClickListener }
-                addAnswer(step, text, text)
+                it.setOnClickListener {
+                    disableAllButtons()
+                    val text = inputView?.text?.toString() ?: run { return@setOnClickListener }
+                    addAnswer(step, text, text)
+                }
+                val llp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT)
+                llp.bottomMargin = resources.getDimensionPixelSize(R.dimen.conversation_button_margin)
+                button_container.addView(it, llp)
             }
-            val llp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT)
-            llp.bottomMargin = resources.getDimensionPixelSize(R.dimen.conversation_button_margin)
-            button_container.addView(it, llp)
         }
 
         if(step.optional != false) {

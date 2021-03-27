@@ -67,6 +67,7 @@ data class ConversationIntegerFormStep(
         override val buttonTitle: String,
         val min: Int,
         val max: Int,
+        var maxLines: Int = 4,
         override val optional: Boolean? = true): ConversationStep()
 
 data class ConversationTimeOfDayStep(
