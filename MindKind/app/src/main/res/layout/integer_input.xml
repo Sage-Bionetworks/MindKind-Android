@@ -1,0 +1,42 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_horizontal"
+    tools:ignore="HardcodedText">
+
+    <TextView
+        android:id="@+id/integer_negative"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:gravity="center"
+        android:textSize="24sp"
+        android:text="-"
+        android:textColor="@color/black"
+        android:background="@drawable/integer_background">
+    </TextView>
+
+    <TextView
+        android:id="@+id/integer_current"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:gravity="center"
+        android:textSize="24sp"
+        android:text="0"
+        android:textColor="@color/black"
+        android:background="@drawable/integer_background">
+    </TextView>
+
+    <TextView
+        android:id="@+id/integer_positive"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:gravity="center"
+        android:textSize="24sp"
+        android:text="+"
+        android:textColor="@color/black"
+        android:background="@drawable/integer_background">
+    </TextView>
+
+</LinearLayout>

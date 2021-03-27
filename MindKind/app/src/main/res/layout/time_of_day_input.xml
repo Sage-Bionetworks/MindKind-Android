@@ -1,0 +1,37 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:background="@color/white"
+    android:padding="8dp">
+
+    <TimePicker
+        android:id="@+id/time_of_day_picker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:timePickerMode="spinner"
+        style="@style/ConversationTimePicker"
+        android:theme="@style/ConversationTimePicker"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/time_of_day_submit"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_gravity="center"
+        android:textSize="16sp"
+        android:text="@string/time_picker_ok_button"
+        android:textColor="@color/black"
+        style="@style/Sage.MaterialButton.Rounded">
+    </com.google.android.material.button.MaterialButton>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/time_of_day_cancel"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:textSize="16sp"
+        android:text="@string/time_picker_cancel_button"
+        style="@style/Sage.MaterialButton.UnderlinedBorderless">
+    </com.google.android.material.button.MaterialButton>
+
+</LinearLayout>

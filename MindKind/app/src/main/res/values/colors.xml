@@ -33,6 +33,7 @@
 <resources>
 
     <!-- MindKind Colors -->
+    <color name="clear">#00000000</color>
     <color name="denim">#343F56</color>
     <color name="denim88">#88343F56</color>
     <color name="splash">#162752</color>

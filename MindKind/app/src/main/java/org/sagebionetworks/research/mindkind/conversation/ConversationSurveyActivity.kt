@@ -5,31 +5,30 @@ import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
 import android.os.Handler
+import android.text.format.DateFormat.is24HourFormat
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
+import android.widget.EditText
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.children
 import androidx.lifecycle.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
 import com.google.android.material.button.MaterialButton
-import com.google.common.base.Preconditions
 import dagger.android.AndroidInjection
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
-import org.sagebionetworks.research.domain.Schema
-import org.sagebionetworks.research.domain.result.AnswerResultType
-import org.sagebionetworks.research.domain.result.implementations.AnswerResultBase
-import org.sagebionetworks.research.domain.result.implementations.TaskResultBase
+import kotlinx.android.synthetic.main.activity_conversation_survey.*
+import kotlinx.android.synthetic.main.integer_input.*
+import kotlinx.android.synthetic.main.integer_input.view.*
+import kotlinx.android.synthetic.main.text_input.view.*
 import org.sagebionetworks.research.mindkind.R
 import org.sagebionetworks.research.sageresearch_app_sdk.TaskResultUploader
-import org.threeten.bp.Instant
+import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
-import kotlin.collections.set
 
 open class ConversationSurveyActivity: AppCompatActivity() {
 
@@ -48,10 +47,6 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         }
     }
 
-    var recyclerView: RecyclerView? = null
-    var questionButton: Button? = null
-    var answerButton: Button? = null
-    var buttonContainer: ViewGroup? = null
     var handler: Handler? = null
 
     @Inject
@@ -77,18 +72,15 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         viewModel = ViewModelProvider(this,
                 ConversationSurveyViewModel.Factory(taskResultUploader)).get()
 
-        findViewById<View>(R.id.back_button).setOnClickListener {
+        back_button.setOnClickListener {
             finish()
         }
 
-        questionButton = findViewById(R.id.add_question)
-
-        recyclerView = findViewById(R.id.recycler_view_conversation)
         var llm = LinearLayoutManager(this)
         llm.orientation = LinearLayoutManager.VERTICAL
-        recyclerView?.layoutManager = llm
+        recycler_view_conversation.layoutManager = llm
 
-        recyclerView?.addItemDecoration(SpacesItemDecoration(resources.getDimensionPixelSize(R.dimen.converation_recycler_spacing)))
+        recycler_view_conversation.addItemDecoration(SpacesItemDecoration(resources.getDimensionPixelSize(R.dimen.converation_recycler_spacing)))
 
         intent.extras?.getString(extraConversationId)?.let {
             val conversation = ConversationGsonHelper.createGson()
@@ -99,9 +91,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
             startConversation()
         }
 
-        buttonContainer = findViewById(R.id.button_container)
-
-        questionButton?.setOnClickListener {
+        add_question.setOnClickListener {
             addQuestion()
         }
     }
@@ -115,32 +105,44 @@ open class ConversationSurveyActivity: AppCompatActivity() {
 
         // TODO: this text should come from json
         list.add( ConversationItem("Hello, just a few questions to get your day started.", true))
-        recyclerView?.adapter = ConversationAdapter(list)
+        recycler_view_conversation.adapter = ConversationAdapter(list)
     }
 
     private fun addQuestion() {
         val conversation = viewModel.getConversationSurvey().value ?: run { return }
         val steps = conversation.steps
 
-        var count = steps.size
+        val count = steps.size
         logInfo("Count: $itemCount - $count")
         if(itemCount > (steps.size-1)) {
+            viewModel.completeConversation()
             return
         }
 
         val step = steps[itemCount]
 
-        var hasQuestions = false
-        (step as? ConversationFormStep)?.let {
-            viewModel.userShown(it.identifier)
-            hasQuestions = true
-            addButtons(it, findChoices(it.inputFieldId, conversation.inputFields))
-        } ?: buttonContainer?.removeAllViews()
+        var hasQuestions = true
+        when(step.type) {
+            ConversationFormType.singleChoiceInt.type ->
+                handleSingleChoice(step as? ConversationSingleChoiceIntFormStep)
+            ConversationFormType.integer.type ->
+                handleIntegerInput(step as? ConversationIntegerFormStep)
+            ConversationFormType.text.type ->
+                handleTextInput(step as? ConversationTextFormStep)
+            ConversationFormType.timeOfDay.type ->
+                handleTimeOfDayInput(step as? ConversationTimeOfDayStep)
+            else -> hasQuestions = false
+        }
 
-        val adapter = recyclerView?.adapter as ConversationAdapter
+        viewModel.userShown(step.identifier)
+        if (!hasQuestions) { // Remove all views for non-question type instruction step
+            button_container.removeAllViews()
+        }
+
+        val adapter = recycler_view_conversation.adapter as ConversationAdapter
         adapter.addItem(step.title, true)
         itemCount++
-        recyclerView?.smoothScrollToPosition(adapter.itemCount)
+        recycler_view_conversation.smoothScrollToPosition(adapter.itemCount)
 
         val isLastItem = itemCount >= steps.size
 
@@ -155,74 +157,214 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         }
     }
 
-    private fun addAnswer(stepId: String, inputField: ConversationInputFieldChoice, value: Any?) {
-        val adapter = recyclerView?.adapter as ConversationAdapter
-        adapter.addItem(inputField.text, false)
-        recyclerView?.smoothScrollToPosition(adapter.itemCount)
+    private fun addAnswer(step: ConversationStep, textAnswer: String, value: Any?) {
+        val adapter = recycler_view_conversation.adapter as ConversationAdapter
+        adapter.addItem(textAnswer, false)
+        recycler_view_conversation.smoothScrollToPosition(adapter.itemCount)
 
-        viewModel.addAnswer(stepId, inputField, value)
+        viewModel.addAnswer(step, value)
 
         handler?.postDelayed({
             addQuestion()
         }, DELAY)
     }
 
-    private fun addButtons(step: ConversationFormStep, choices: List<ConversationInputFieldChoice>?) {
-        var stepId = step.identifier
-        buttonContainer?.removeAllViews()
+    private fun handleSingleChoice(choiceIntFormStep: ConversationSingleChoiceIntFormStep?) {
+        val step = choiceIntFormStep ?: run { return }
+        val choices = step.choices
+        button_container.removeAllViews()
 
-        choices?.forEach { c ->
+        choices.forEach { c ->
             (this.layoutInflater.inflate(R.layout.conversation_material_button,
-                    buttonContainer, false) as? MaterialButton)?.let {
+                    button_container, false) as? MaterialButton)?.let {
 
                 it.text = c.text
 
                 it.setOnClickListener {
-                    var value: Any = c.text
-                    (c as? IntegerConversationInputFieldChoice)?.let {
-                        value = it.value
-                    }
-                    addAnswer(stepId, c, value)
+                    addAnswer(step, c.text, c.value)
                     disableAllButtons()
                 }
 
                 val llp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT)
                 llp.bottomMargin = resources.getDimensionPixelSize(R.dimen.conversation_button_margin)
-                buttonContainer?.addView(it, llp)
+                button_container.addView(it, llp)
             }
         }
 
         if(step.optional != false) {
-            (this.layoutInflater.inflate(R.layout.conversation_button_unfilled,
-                    buttonContainer, false) as? MaterialButton)?.let {
+            addSkipButton()
+        }
+    }
 
-                it.setOnClickListener {
-                    disableAllButtons()
-                    handler?.postDelayed({
-                        addQuestion()
-                    }, DELAY)
-                }
-                val llp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT)
-                llp.bottomMargin = resources.getDimensionPixelSize(R.dimen.conversation_button_margin)
-                buttonContainer?.addView(it, llp)
+    private fun addSkipButton() {
+        (this.layoutInflater.inflate(R.layout.conversation_button_unfilled,
+                button_container, false) as? MaterialButton)?.let {
+
+            it.setOnClickListener {
+                disableAllButtons()
+                handler?.postDelayed({
+                    addQuestion()
+                }, DELAY)
             }
+            val llp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT)
+            llp.bottomMargin = resources.getDimensionPixelSize(R.dimen.conversation_button_margin)
+            button_container.addView(it, llp)
         }
     }
 
     private fun disableAllButtons() {
-        val count = buttonContainer?.childCount ?: 0
-        repeat(count) { idx ->
-            buttonContainer?.getChildAt(idx)?.let {
-                it.isEnabled = false
-                it.alpha = 0.33f
-            }
+        button_container.children.forEach {
+            it.isEnabled = false
+            it.alpha = 0.33f
         }
     }
 
-    private fun findChoices(id: String, fields: List<ConversationInputField>): List<ConversationInputFieldChoice>? {
-        return fields.firstOrNull { it.identifier == id }?.choices
+    private fun handleIntegerInput(intStep: ConversationIntegerFormStep?) {
+        val step = intStep ?: run { return }
+
+        button_container.removeAllViews()
+        var counter = 0
+
+        (this.layoutInflater.inflate(R.layout.integer_input,
+                button_container, false) as? ViewGroup)?.let { vg ->
+
+            val negView = vg.integer_negative
+            val posView = vg.integer_positive
+            val curView = vg.integer_current
+
+            applyBounds(step.min, step.max, counter, negView, posView)
+
+            negView.setOnClickListener { _ ->
+                counter--
+                vg.integer_current.text = counter.toString()
+                applyBounds(step.min, step.max, counter, negView, posView)
+            }
+
+            posView.setOnClickListener { _ ->
+                counter++
+                vg.integer_current.text = counter.toString()
+                applyBounds(step.min, step.max, counter, negView, posView)
+            }
+            button_container.addView(vg)
+
+            (this.layoutInflater.inflate(R.layout.conversation_material_button,
+                    button_container, false) as? MaterialButton)?.let {
+
+                it.text = step.buttonTitle
+
+                it.setOnClickListener { _ ->
+                    disableAllButtons()
+                    val text = curView.text?.toString() ?: run { return@setOnClickListener }
+                    val intAnswer = text.toInt()
+                    addAnswer(step, text, intAnswer)
+                }
+                val llp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT)
+                llp.bottomMargin = resources.getDimensionPixelSize(R.dimen.conversation_button_margin)
+                button_container.addView(it, llp)
+            }
+        }
+
+        if(step.optional != false) {
+            addSkipButton()
+        }
+    }
+
+    private fun applyBounds(min: Int, max: Int, current: Int, neg: View, pos: View) {
+        if(current <= min) {
+            neg.isEnabled = false
+            neg.setBackgroundResource(R.drawable.integer_background_disabled)
+        } else {
+            neg.isEnabled = true
+            neg.setBackgroundResource(R.drawable.integer_background)
+        }
+
+        if(current >= max) {
+            pos.isEnabled = false
+            pos.setBackgroundResource(R.drawable.integer_background_disabled)
+        } else {
+            pos.isEnabled = true
+            pos.setBackgroundResource(R.drawable.integer_background)
+        }
+    }
+
+    private fun handleTextInput(textStep: ConversationTextFormStep?) {
+        val step = textStep ?: run { return }
+        button_container.removeAllViews()
+
+        (this.layoutInflater.inflate(R.layout.text_input,
+                button_container, false) as? ViewGroup)?.let { vg ->
+
+            val inputView = vg.text_input
+            inputView?.maxLines = 4
+            inputView?.hint = step.placeholderText
+            button_container.addView(vg)
+
+            (this.layoutInflater.inflate(R.layout.conversation_material_button,
+                    button_container, false) as? MaterialButton)?.let {
+
+                it.text = getString(R.string.text_input_submit_button)
+
+                it.setOnClickListener {
+                    disableAllButtons()
+                    val text = inputView?.text?.toString() ?: run { return@setOnClickListener }
+                    addAnswer(step, text, text)
+                }
+                val llp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT)
+                llp.bottomMargin = resources.getDimensionPixelSize(R.dimen.conversation_button_margin)
+                button_container.addView(it, llp)
+            }
+        }
+
+        if(step.optional != false) {
+            addSkipButton()
+        }
+    }
+
+    private fun handleTimeOfDayInput(timeStep: ConversationTimeOfDayStep?) {
+        val step = timeStep ?: run { return }
+        button_container.removeAllViews()
+
+        (this.layoutInflater.inflate(R.layout.conversation_material_button,
+                button_container, false) as? MaterialButton)?.let {
+
+            it.text = step.buttonTitle
+
+            val activity = this
+            it.setOnClickListener {
+                val dialog = ConversationTimeOfDayDialog()
+                val callback = object: ConversationTimeOfDayDialog.Callback {
+                    override fun onDateSelected(d: Date) {
+                        disableAllButtons()
+                        logInfo("Received date callback: $d")
+
+                        // For localization support, switch to whatever clock the user is using
+                        val textFormatter = if (is24HourFormat(baseContext)) {
+                            SimpleDateFormat("H:mm", Locale.US)
+                        } else {
+                            SimpleDateFormat("h:mm aa", Locale.US)
+                        }
+                        // Answer format should always be the same length and format for researchers
+                        val answerFormatter = SimpleDateFormat("hh:mm aa", Locale.US)
+
+                        addAnswer(step, textFormatter.format(d), answerFormatter.format(d))
+                    }
+                }
+                dialog.setCallback(callback)
+                dialog.show(activity.supportFragmentManager, ConversationTimeOfDayDialog.TAG)
+            }
+            val llp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT)
+            llp.bottomMargin = resources.getDimensionPixelSize(R.dimen.conversation_button_margin)
+            button_container.addView(it, llp)
+        }
+
+        if(step.optional != false) {
+            addSkipButton()
+        }
     }
 }
 
@@ -234,121 +376,8 @@ class SpacesItemDecoration(private val space: Int) : ItemDecoration() {
         outRect.bottom = space
 
         // Add top margin only for the first item to avoid double space between items
-        if (parent.getChildAdapterPosition(view!!) == 0) {
+        if (parent.getChildAdapterPosition(view) == 0) {
             outRect.top = space
         }
-    }
-
-}
-
-open class ConversationSurveyViewModel(private val taskResultUploader: TaskResultUploader) : ViewModel() {
-
-    companion object {
-        private val TAG = ConversationSurveyViewModel::class.java.simpleName
-    }
-
-    private val startTimeMap = mutableMapOf<String, Instant>()
-    private val answersLiveData = MutableLiveData<ArrayList<AnswerResultBase<Any>>>()
-
-    private val conversationSurvey: MutableLiveData<ConversationSurvey> by lazy {
-        return@lazy MutableLiveData<ConversationSurvey>()
-    }
-
-    class Factory @Inject constructor(private val taskResultUploader: TaskResultUploader):
-            ViewModelProvider.Factory {
-
-        // Suppress unchecked cast, pre-condition would catch it first anyways
-        @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            Preconditions.checkArgument(modelClass.isAssignableFrom(ConversationSurveyViewModel::class.java))
-            return ConversationSurveyViewModel(taskResultUploader) as T
-        }
-    }
-
-    private val compositeDisposable = CompositeDisposable()
-
-    fun initConversation(conversation: ConversationSurvey) {
-        conversationSurvey.value = conversation
-    }
-
-    fun getConversationSurvey(): LiveData<ConversationSurvey> {
-        return conversationSurvey
-    }
-
-    /**
-     * @param step the step within the conversation to look for an input field
-     * @return the input field for input field step
-     */
-    fun conversationTitles(): List<String>? {
-        val conversation = conversationSurvey.value ?: run { return null }
-        return conversation.steps.map { it.title }
-    }
-
-    /**
-     * @param step the step within the conversation to look for an input field
-     * @return the input field for input field step
-     */
-    fun inputFieldFor(step: ConversationStep): ConversationInputField? {
-        val conversation = conversationSurvey.value ?: run { return null }
-        return (step as? ConversationFormStep)?.inputField(conversation.inputFields)
-    }
-
-    /**
-     * Call when user is shown a step, used to later set start times in "addAnswer" func
-     */
-    fun userShown(stepId: String) {
-        startTimeMap[stepId] = Instant.now()
-    }
-
-    /**
-     * Adds an answer to the answer live data
-     */
-    fun addAnswer(stepId: String, inputField: ConversationInputFieldChoice, answer: Any?) {
-        val startTime = startTimeMap[stepId] ?: Instant.now()
-        val endTime = Instant.now()
-
-        (inputField as? IntegerConversationInputFieldChoice)?.let {
-            val intAnswer = (answer as? Int) ?: 0
-            val answerResult: AnswerResultBase<Any> = AnswerResultBase(
-                    stepId, startTime, endTime, intAnswer, AnswerResultType.INTEGER)
-            answersLiveData += answerResult
-        }
-    }
-
-    /**
-     * Complete the conversation and upload it to bridge
-     * @return live data to monitor for changes
-     */
-    fun completeConversation() {
-        val conversationId = conversationSurvey.value?.identifier ?: run { return }
-        val answers = answersLiveData.value ?: arrayListOf()
-        val stepHistory = answers.sortedWith(compareBy { it.startTime })
-        val startTime = stepHistory.firstOrNull()?.startTime ?: Instant.now()
-        val endTime = Instant.now()
-        // TODO: mdephillips 3/12/21 get this revision from app config
-        val schema = Schema(conversationId, 1)
-        val taskResult = TaskResultBase(
-                conversationId, startTime, endTime,
-                UUID.randomUUID(), schema, stepHistory, listOf())
-
-        // Upload the conversation result
-        compositeDisposable.add(
-                taskResultUploader.processTaskResult(taskResult)
-                .subscribeOn(Schedulers.io())
-                .subscribe({
-                    Log.i(TAG, "Conversation Upload Complete")
-                }, {
-                    Log.w(TAG, "Conversation Upload Failed ${it.localizedMessage}")
-                    // Archive will upload eventually as we retry later
-                }))
-    }
-
-    /**
-     * Adds "+=" operator to mutable live data
-     */
-    operator fun <T> MutableLiveData<ArrayList<T>>.plusAssign(item: T) {
-        val values = this.value ?: arrayListOf()
-        values.add(item)
-        this.value = values
     }
 }
