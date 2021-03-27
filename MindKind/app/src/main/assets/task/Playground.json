@@ -3,46 +3,32 @@
   "type": "conversationSurvey",
   "taskIdentifier": "Playground",
   "schemaIdentifier": "Playground",
-  "inputFields": [
+  "steps": [
+    {
+      "identifier": "integer_input",
+      "type": "integer",
+      "title": "How many times did you wake up last night?",
+      "inputFieldId": "integer_input",
+      "buttonTitle": "Ok",
+      "min": 0,
+      "max": 9
+    },
     {
       "identifier": "time_selector",
       "type": "timeOfDay",
+      "title": "When did you fall asleep last night?",
+      "inputFieldId": "time_selector",
+      "buttonTitle": "Submit time",
       "defaultTime": "10:00 PM"
     },
     {
       "identifier": "text_entry",
       "type": "text",
-      "maxCharacters": 100,
-      "placeholderText": "Write something here.."
-    },
-    {
-      "identifier": "integer_input",
-      "type": "integer",
-      "min": 0,
-      "max": 9
-    }
-  ],
-  "steps": [
-    {
-      "identifier": "question1",
-      "type": "form",
-      "title": "When did you fall asleep last night?",
-      "inputFieldId": "time_selector",
-      "buttonText": "Submit time"
-    },
-    {
-      "identifier": "question2",
-      "type": "form",
       "title": "Tell us about your day.",
       "inputFieldId": "text_entry",
-      "buttonText": "Let's journal"
-    },
-    {
-      "identifier": "question3",
-      "type": "form",
-      "title": "How many times did you wake up last night?",
-      "inputFieldId": "integer_input",
-      "buttonText": "Ok"
+      "buttonTitle": "Let's journal",
+      "maxCharacters": 100,
+      "placeholderText": "Write something here.."
     }
   ]
 }

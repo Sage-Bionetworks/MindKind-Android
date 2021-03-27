@@ -74,9 +74,7 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
         setContentView(R.layout.activity_task_list)
 
         buttonPhq9.setOnClickListener {
-            //launchPhq9()
-            // TODO: changed this for developing new UI components
-            launchPlayground()
+            launchPhq9()
         }
 
         buttonGad7.setOnClickListener {
