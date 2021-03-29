@@ -105,7 +105,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
 
         // TODO: this text should come from json
         list.add( ConversationItem("Hello, just a few questions to get your day started.", true))
-        recycler_view_conversation.adapter = ConversationAdapter(list)
+        recycler_view_conversation.adapter = ConversationAdapter(this, list)
     }
 
     private fun addQuestion() {
@@ -122,6 +122,8 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         val step = steps[itemCount]
 
         var hasQuestions = true
+        var shouldAddItem = true
+
         when(step.type) {
             ConversationFormType.singleChoiceInt.type ->
                 handleSingleChoice(step as? ConversationSingleChoiceIntFormStep)
@@ -131,6 +133,10 @@ open class ConversationSurveyActivity: AppCompatActivity() {
                 handleTextInput(step as? ConversationTextFormStep)
             ConversationFormType.timeOfDay.type ->
                 handleTimeOfDayInput(step as? ConversationTimeOfDayStep)
+            ConversationFormType.gif.type -> {
+                handleGifInput(step as? GifStep)
+                shouldAddItem = false // gif handles it, as there is no question
+            }
             else -> hasQuestions = false
         }
 
@@ -140,7 +146,11 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         }
 
         val adapter = recycler_view_conversation.adapter as ConversationAdapter
-        adapter.addItem(step.title, true)
+
+        if (shouldAddItem) {
+            adapter.addItem(step.title, true)
+        }
+
         itemCount++
         recycler_view_conversation.smoothScrollToPosition(adapter.itemCount)
 
@@ -365,6 +375,13 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         if(step.optional != false) {
             addSkipButton()
         }
+    }
+
+    private fun handleGifInput(gifStep: GifStep?) {
+        val step = gifStep ?: run { return }
+        button_container.removeAllViews()
+        val adapter = recycler_view_conversation.adapter as ConversationAdapter
+        adapter.addGif(step.gifUrl)
     }
 }
 

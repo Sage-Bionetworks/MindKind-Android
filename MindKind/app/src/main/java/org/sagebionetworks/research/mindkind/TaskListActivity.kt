@@ -73,12 +73,12 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_task_list)
 
-        buttonPhq9.setOnClickListener {
-            launchPhq9()
-        }
-
         buttonGad7.setOnClickListener {
             launchGad7()
+        }
+
+        buttonPhq9.setOnClickListener {
+            launchPhq9()
         }
 
         buttonUploadData.visibility = View.GONE

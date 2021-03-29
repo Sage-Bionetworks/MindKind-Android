@@ -24,6 +24,8 @@ class ConversationGsonHelper {
                             ConversationFormType.text.type)
                     .registerSubtype(ConversationTimeOfDayStep::class.java,
                             ConversationFormType.timeOfDay.type)
+                    .registerSubtype(GifStep::class.java,
+                            ConversationFormType.gif.type)
         }
     }
 }
@@ -93,9 +95,18 @@ data class IntegerConversationInputFieldChoice(
         val text: String,
         val value: Int)
 
+data class GifStep(
+        override val identifier: String,
+        override val type: String,
+        override val title: String,
+        override val buttonTitle: String,
+        override val optional: Boolean? = true,
+        val gifUrl: String): ConversationStep()
+
 public enum class ConversationFormType(val type: String) {
     singleChoiceInt("singleChoice.integer"),
     timeOfDay("timeOfDay"),
     text("text"),
-    integer("integer")
+    integer("integer"),
+    gif("gif")
 }

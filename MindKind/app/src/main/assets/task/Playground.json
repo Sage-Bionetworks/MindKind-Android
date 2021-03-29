@@ -30,6 +30,11 @@
       "maxCharacters": 100,
       "placeholderText": "Write something here..",
       "maxLines": 4
+    },
+    {
+      "identifier": "reward",
+      "type": "gif",
+      "gifUrl": "https://docs.sagebridge.org/rCRViTgChEmKePBqQrcfiVqd.1616987337543"
     }
   ]
 }
