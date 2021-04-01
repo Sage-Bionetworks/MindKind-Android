@@ -34,8 +34,8 @@ package org.sagebionetworks.research.mindkind.room
 
 import androidx.annotation.VisibleForTesting
 import androidx.room.*
+import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
-import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataType
 import org.threeten.bp.LocalDateTime
 
 /**
@@ -51,13 +51,14 @@ data class BackgroundDataEntity(
         /**
          * @property date when the background data was collected
          */
+        @Expose
         @ColumnInfo(index = true)
         var date: LocalDateTime? = null,
         /**
          * @property type of the background data
          */
         @ColumnInfo(index = true)
-        var dataType: BackgroundDataType? = null,
+        var dataType: String? = null,
         /**
          * @property uploaded if this background data has been packaged for upload already
          */
@@ -66,6 +67,7 @@ data class BackgroundDataEntity(
         /**
          * @property data free-form string blob data associated with the entity
          */
+        @Expose
         @SerializedName("data")
         var data: String? = null)
 
@@ -102,3 +104,12 @@ interface BackgroundDataEntityDao {
         @Query(RoomSqlHelper.BACKGROUND_DATA_DELETE)
         fun clear()
 }
+
+/**
+ * Helper class for the DataUsage data fields
+ */
+data class DataUsageStats(
+        val totalRx: Long,
+        val totalTx: Long,
+        val mobileRx: Long,
+        val mobileTx: Long)

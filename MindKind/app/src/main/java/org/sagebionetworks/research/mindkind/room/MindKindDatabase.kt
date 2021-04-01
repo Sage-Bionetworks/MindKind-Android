@@ -35,10 +35,6 @@ package org.sagebionetworks.research.mindkind.room
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import androidx.room.migration.Migration
-import androidx.sqlite.db.SupportSQLiteDatabase
-import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataTypeConverters
-import org.sagebionetworks.research.sageresearch.dao.room.*
 
 /**
  * To keep track of database changes, use this comment group as a change log

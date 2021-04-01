@@ -47,4 +47,8 @@ public @interface SageTaskIdentifier {
     String PHQ9 = "PHQ9";
     String GAD7 = "GAD7";
     String BACKGROUND_DATA = "BackgroundData";
+    String DataUsage = "DataUsage";
+    String BatteryStatistics = "BatteryStatistics";
+    String ChargingTime = "ChargingTime";
+    String ScreenTime = "ScreenTime";
 }

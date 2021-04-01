@@ -73,6 +73,10 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_task_list)
 
+        settings_icon_button.setOnClickListener {
+            uploadBackgroundData()
+        }
+
         buttonGad7.setOnClickListener {
             launchGad7()
         }
