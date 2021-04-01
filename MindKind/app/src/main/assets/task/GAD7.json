@@ -7,7 +7,9 @@
     {
       "identifier": "introduction",
       "type": "instruction",
-      "title": "Over the last two weeks, how often have you been bothered by the following problems?"
+      "title": "Over the last two weeks, how often have you been bothered by the following problems?",
+      "optional": false,
+      "continueAfterDelay": true
     },
     {
       "identifier": "question1",

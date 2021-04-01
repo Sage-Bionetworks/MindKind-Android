@@ -15,17 +15,18 @@ class ConversationGsonHelper {
         private fun getStepTypeAdapterFactory(): RuntimeTypeAdapterFactory<ConversationStep> {
             return RuntimeTypeAdapterFactory
                     .of<ConversationStep>(ConversationStep::class.java, "type")
-                    .registerSubtype(ConversationInfoStep::class.java, "instruction")
+                    .registerSubtype(ConversationInstructionStep::class.java,
+                            ConversationStepType.instruction.type)
                     .registerSubtype(ConversationSingleChoiceIntFormStep::class.java,
-                            ConversationFormType.singleChoiceInt.type)
+                            ConversationStepType.singleChoiceInt.type)
                     .registerSubtype(ConversationIntegerFormStep::class.java,
-                            ConversationFormType.integer.type)
+                            ConversationStepType.integer.type)
                     .registerSubtype(ConversationTextFormStep::class.java,
-                            ConversationFormType.text.type)
+                            ConversationStepType.text.type)
                     .registerSubtype(ConversationTimeOfDayStep::class.java,
-                            ConversationFormType.timeOfDay.type)
+                            ConversationStepType.timeOfDay.type)
                     .registerSubtype(GifStep::class.java,
-                            ConversationFormType.gif.type)
+                            ConversationStepType.gif.type)
         }
     }
 }
@@ -45,12 +46,13 @@ abstract class ConversationStep {
     abstract val optional: Boolean?
 }
 
-data class ConversationInfoStep(
+data class ConversationInstructionStep(
         override val identifier: String,
         override val type: String,
         override val title: String,
         override val buttonTitle: String,
-        override val optional: Boolean? = true
+        override val optional: Boolean? = true,
+        val continueAfterDelay: Boolean? = false
 ): ConversationStep()
 
 data class ConversationTextFormStep(
@@ -103,7 +105,8 @@ data class GifStep(
         override val optional: Boolean? = true,
         val gifUrl: String): ConversationStep()
 
-public enum class ConversationFormType(val type: String) {
+public enum class ConversationStepType(val type: String) {
+    instruction("instruction"),
     singleChoiceInt("singleChoice.integer"),
     timeOfDay("timeOfDay"),
     text("text"),
