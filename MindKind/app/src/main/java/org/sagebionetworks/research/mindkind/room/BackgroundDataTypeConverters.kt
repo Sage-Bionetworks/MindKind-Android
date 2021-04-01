@@ -58,6 +58,7 @@ open class BackgroundDataTypeConverters {
             .registerTypeAdapter(Instant::class.java, InstantAdapter())
 
     val gson = gsonBuilder.create()
+    val gsonExposeOnly = gsonBuilder.excludeFieldsWithoutExposeAnnotation().create()
 
     @TypeConverter
     fun fromLocalDateString(value: String?): LocalDate? {

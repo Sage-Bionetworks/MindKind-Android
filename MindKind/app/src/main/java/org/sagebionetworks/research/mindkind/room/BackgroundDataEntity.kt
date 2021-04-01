@@ -55,10 +55,17 @@ data class BackgroundDataEntity(
         @ColumnInfo(index = true)
         var date: LocalDateTime? = null,
         /**
-         * @property type of the background data
+         * @property dataType of the background data
          */
         @ColumnInfo(index = true)
         var dataType: String? = null,
+        /**
+         * @property subType of the background data, this isn't always used
+         *                   but can be when there are additional qualifications for the data field
+         */
+        @Expose
+        @ColumnInfo(index = true)
+        var subType: String? = null,
         /**
          * @property uploaded if this background data has been packaged for upload already
          */
@@ -104,12 +111,3 @@ interface BackgroundDataEntityDao {
         @Query(RoomSqlHelper.BACKGROUND_DATA_DELETE)
         fun clear()
 }
-
-/**
- * Helper class for the DataUsage data fields
- */
-data class DataUsageStats(
-        val totalRx: Long,
-        val totalTx: Long,
-        val mobileRx: Long,
-        val mobileTx: Long)

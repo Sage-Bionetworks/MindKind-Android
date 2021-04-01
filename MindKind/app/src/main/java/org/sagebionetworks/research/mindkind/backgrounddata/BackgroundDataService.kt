@@ -37,7 +37,10 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.NotificationManager.IMPORTANCE_LOW
-import android.content.*
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.net.TrafficStats
 import android.os.BatteryManager
 import android.os.Build
@@ -63,7 +66,6 @@ import org.sagebionetworks.research.mindkind.R.string
 import org.sagebionetworks.research.mindkind.research.SageTaskIdentifier
 import org.sagebionetworks.research.mindkind.room.BackgroundDataEntity
 import org.sagebionetworks.research.mindkind.room.BackgroundDataTypeConverters
-import org.sagebionetworks.research.mindkind.room.DataUsageStats
 import org.sagebionetworks.research.mindkind.room.MindKindDatabase
 import org.sagebionetworks.research.mindkind.util.NoLimitRateLimiter
 import org.sagebionetworks.research.mindkind.util.RateLimiter
@@ -73,6 +75,7 @@ import org.threeten.bp.Instant
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneId
 import java.io.File
+import java.io.FileOutputStream
 import java.util.*
 import javax.inject.Inject
 
@@ -187,6 +190,9 @@ class BackgroundDataService : DaggerService() {
 
         LocalBroadcastManager.getInstance(this).registerReceiver(
                 uploadDataReceiver, IntentFilter(ACTIVITY_UPLOAD_DATA_ACTION))
+
+        // Some events need to be tracked immediately
+        recordStartupBackgroundData()
     }
 
     override fun onDestroy() {
@@ -211,6 +217,10 @@ class BackgroundDataService : DaggerService() {
         override fun onReceive(context: Context, intent: Intent) {
             uploadDataToBridge()
         }
+    }
+
+    private fun recordStartupBackgroundData() {
+        writeDataUsageToDatabase()
     }
 
     /**
@@ -239,7 +249,7 @@ class BackgroundDataService : DaggerService() {
                     return@filter it.dataType == taskIdentifier
                 }
                 if (filtered.isNotEmpty()) {
-                    taskResultList.add(createTaskResult(data))
+                    taskResultList.add(createTaskResult(taskIdentifier, filtered))
                 }
             }
 
@@ -264,22 +274,34 @@ class BackgroundDataService : DaggerService() {
         "Failed to save BackgroundData to room")
     }
 
-    private fun createTaskResult(backgroundData: List<BackgroundDataEntity>): TaskResultBase {
+    private fun createTaskResult(taskIdentifier: String,
+                                 backgroundData: List<BackgroundDataEntity>): TaskResultBase {
+
         val startTime = backgroundData.firstOrNull()?.date
                 ?.toInstant(ZoneId.systemDefault()) ?: Instant.now()
         val endTime = backgroundData.lastOrNull()?.date
                 ?.toInstant(ZoneId.systemDefault()) ?: Instant.now()
 
         val json = BackgroundDataTypeConverters().gson.toJson(backgroundData)
-        openFileOutput("data.json", Context.MODE_PRIVATE).use {
-            it.write(json.toByteArray())
+        val folder = File(cacheDir.absolutePath + File.separator + taskIdentifier)
+        // Create folder to hold data file
+        if (!folder.exists()) {
+            folder.mkdir()
+        }
+
+        val file = File(folder, "data.json")
+        val stream = FileOutputStream(file)
+        try {
+            stream.write(json.toByteArray())
+        } finally {
+            stream.close()
         }
 
         val jsonFileResult = FileResultBase("data",
                 startTime, endTime, JSON_MIME_CONTENT_TYPE, filesDir.path + File.separator + "data.json")
 
-        var taskResultBase = TaskResultBase(TASK_IDENTIFIER, startTime,
-                endTime, UUID.randomUUID(), Schema(TASK_IDENTIFIER, 1),
+        var taskResultBase = TaskResultBase(taskIdentifier, startTime,
+                endTime, UUID.randomUUID(), Schema(taskIdentifier, 1),
                 mutableListOf(), mutableListOf())
 
         taskResultBase = taskResultBase.addStepHistory(jsonFileResult)
@@ -296,16 +318,6 @@ class BackgroundDataService : DaggerService() {
         if (intent?.action == DATA_USAGE_RECEIVER_ACTION) {
             writeDataUsageToDatabase()
         }
-
-//        START_STICKY- tells the system to create a fresh copy of the service,
-//        when sufficient memory is available, after it recovers from low memory.
-//        Here you will lose the results that might have computed before.
-//
-//        START_NOT_STICKY- tells the system not to bother to restart the service,
-//        even when it has sufficient memory.
-//
-//        START_REDELIVER_INTENT- tells the system to restart the service after the crash
-//                and also redeliver the intents that were present at the time of crash.
 
         return START_STICKY
     }
@@ -364,6 +376,10 @@ class BackgroundDataService : DaggerService() {
      * @param backgroundData to add to room
      */
     fun writeBackgroundDataToRoom(backgroundData: List<BackgroundDataEntity>) {
+        backgroundData.forEach {
+            Log.d(TAG, "Writing ${it.dataType} ${it.subType} ${it.data}")
+        }
+
         val completable = Completable.fromAction {
             database.backgroundDataDao().upsert(backgroundData)
         } .doOnError {
@@ -383,17 +399,28 @@ class BackgroundDataService : DaggerService() {
     }
 
     fun writeDataUsageToDatabase() {
-        val dataUsage = DataUsageStats(
-                TrafficStats.getTotalRxBytes(),
-                TrafficStats.getTotalTxBytes(),
-                TrafficStats.getMobileRxBytes(),
-                TrafficStats.getMobileTxBytes())
+        if (!dataToTrack.contains(SageTaskIdentifier.DataUsage)) {
+            // User did not consent to have this tracked
+            return
+        }
 
-        writeBackgroundDataToRoom(BackgroundDataEntity(
-                date = LocalDateTime.now(),
-                dataType = SageTaskIdentifier.DataUsage,
-                uploaded = false,
-                data = typeConverters.gson.toJson(dataUsage)))
+        val now = LocalDateTime.now()
+        val backgroundData = mutableListOf<BackgroundDataEntity>()
+        mapOf(
+            "totalRx" to TrafficStats.getTotalRxBytes(),
+            "totalTx" to TrafficStats.getTotalTxBytes(),
+            "mobileRx" to TrafficStats.getMobileRxBytes(),
+            "mobileTx" to TrafficStats.getMobileTxBytes()).forEach {
+
+            backgroundData.add(BackgroundDataEntity(
+                    date = now,
+                    dataType = SageTaskIdentifier.DataUsage,
+                    subType = it.key,
+                    uploaded = false,
+                    data = it.value.toString()))
+        }
+
+        writeBackgroundDataToRoom(backgroundData)
     }
 
     inner class BackgroundDataReceiver : BroadcastReceiver() {
