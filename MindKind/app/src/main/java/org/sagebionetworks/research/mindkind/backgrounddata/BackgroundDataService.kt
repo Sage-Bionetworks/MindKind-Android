@@ -299,7 +299,7 @@ class BackgroundDataService : DaggerService() {
         val endTime = backgroundData.lastOrNull()?.date
                 ?.toInstant(ZoneId.systemDefault()) ?: Instant.now()
 
-        val json = BackgroundDataTypeConverters().gson.toJson(backgroundData)
+        val json = BackgroundDataTypeConverters().gsonExposeOnly.toJson(backgroundData)
         val folderPath = cacheDir.absolutePath + File.separator + taskIdentifier
         val folder = File(folderPath)
         // Create folder to hold data file
@@ -396,7 +396,7 @@ class BackgroundDataService : DaggerService() {
      */
     fun writeBackgroundDataToRoom(backgroundData: List<BackgroundDataEntity>) {
         backgroundData.forEach {
-            Log.d(TAG, "Writing ${it.dataType} ${it.subType} ${it.data}")
+            Log.d(TAG, "Writing ${it.dataType} ${it.subType ?: ""} ${it.data}")
         }
 
         val completable = Completable.fromAction {
