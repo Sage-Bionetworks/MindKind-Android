@@ -9,9 +9,7 @@ import android.text.format.DateFormat.is24HourFormat
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
 import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.children
 import androidx.lifecycle.*
@@ -21,7 +19,6 @@ import androidx.recyclerview.widget.RecyclerView.ItemDecoration
 import com.google.android.material.button.MaterialButton
 import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.activity_conversation_survey.*
-import kotlinx.android.synthetic.main.integer_input.*
 import kotlinx.android.synthetic.main.integer_input.view.*
 import kotlinx.android.synthetic.main.text_input.view.*
 import org.sagebionetworks.research.mindkind.R
@@ -59,8 +56,6 @@ open class ConversationSurveyActivity: AppCompatActivity() {
     // from the activity-ktx artifact
     lateinit var viewModel: ConversationSurveyViewModel
 
-    var itemCount: Int = 0
-
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
@@ -88,24 +83,16 @@ open class ConversationSurveyActivity: AppCompatActivity() {
 
             // Setup the view model and start the conversation
             viewModel.initConversation(conversation)
-            startConversation()
-        }
-
-        add_question.setOnClickListener {
+            val adapter = ConversationAdapter(this, arrayListOf())
+            recycler_view_conversation.adapter = adapter
             addQuestion()
+
+            // Pre-load GIFs for quicker access when they come upMD
+            val gifSteps = conversation.steps.filter {
+                it.type == ConversationStepType.gif.type && (it as? GifStep) != null
+            }.map { it as GifStep }
+            adapter.preloadGifs(gifSteps)
         }
-    }
-
-    open fun startConversation() {
-        logInfo("startConversation()")
-        // TODO: mdephillips 3/3/2021 show first row of recycler view conversation
-        val conversation = viewModel.getConversationSurvey().value ?: run { return }
-
-        val list = arrayListOf<ConversationItem>()
-
-        // TODO: this text should come from json
-        list.add( ConversationItem("Hello, just a few questions to get your day started.", true))
-        recycler_view_conversation.adapter = ConversationAdapter(this, list)
     }
 
     private fun addQuestion() {
@@ -113,48 +100,46 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         val steps = conversation.steps
 
         val count = steps.size
-        logInfo("Count: $itemCount - $count")
-        if(itemCount > (steps.size-1)) {
+        logInfo("Count: ${viewModel.itemCount} - $count")
+        if(viewModel.itemCount > (steps.size-1)) {
             viewModel.completeConversation()
             return
         }
 
-        val step = steps[itemCount]
+        val step = steps[viewModel.itemCount]
 
         var hasQuestions = true
         var shouldAddItem = true
 
         when(step.type) {
-            ConversationFormType.singleChoiceInt.type ->
+            ConversationStepType.instruction.type -> {
+                hasQuestions = !handleInstructionItem(step as? ConversationInstructionStep)
+            }
+            ConversationStepType.singleChoiceInt.type ->
                 handleSingleChoice(step as? ConversationSingleChoiceIntFormStep)
-            ConversationFormType.integer.type ->
+            ConversationStepType.integer.type ->
                 handleIntegerInput(step as? ConversationIntegerFormStep)
-            ConversationFormType.text.type ->
+            ConversationStepType.text.type ->
                 handleTextInput(step as? ConversationTextFormStep)
-            ConversationFormType.timeOfDay.type ->
+            ConversationStepType.timeOfDay.type ->
                 handleTimeOfDayInput(step as? ConversationTimeOfDayStep)
-            ConversationFormType.gif.type -> {
+            ConversationStepType.gif.type -> {
                 handleGifInput(step as? GifStep)
-                shouldAddItem = false // gif handles it, as there is no question
+                shouldAddItem = false // gif handles it, as there is no text
             }
             else -> hasQuestions = false
         }
 
         viewModel.userShown(step.identifier)
-        if (!hasQuestions) { // Remove all views for non-question type instruction step
-            button_container.removeAllViews()
-        }
-
         val adapter = recycler_view_conversation.adapter as ConversationAdapter
-
         if (shouldAddItem) {
-            adapter.addItem(step.title, true)
+            adapter.addItem(step.identifier, step.title, true)
         }
 
-        itemCount++
+        viewModel.itemCount++
         recycler_view_conversation.smoothScrollToPosition(adapter.itemCount)
 
-        val isLastItem = itemCount >= steps.size
+        val isLastItem = viewModel.itemCount >= steps.size
 
         if(!hasQuestions && !isLastItem) {
             handler?.postDelayed({
@@ -169,7 +154,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
 
     private fun addAnswer(step: ConversationStep, textAnswer: String, value: Any?) {
         val adapter = recycler_view_conversation.adapter as ConversationAdapter
-        adapter.addItem(textAnswer, false)
+        adapter.addItem(step.identifier, textAnswer, false)
         recycler_view_conversation.smoothScrollToPosition(adapter.itemCount)
 
         viewModel.addAnswer(step, value)
@@ -177,6 +162,35 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         handler?.postDelayed({
             addQuestion()
         }, DELAY)
+    }
+
+    private fun handleInstructionItem(instructionStep: ConversationInstructionStep?): Boolean {
+        val step = instructionStep ?: run { return false }
+        button_container.removeAllViews()
+
+        (this.layoutInflater.inflate(R.layout.conversation_material_button,
+                button_container, false) as? MaterialButton)?.let {
+
+            it.text = step.buttonTitle
+
+            it.setOnClickListener { _ ->
+                disableAllButtons()
+                handler?.postDelayed({
+                    addQuestion()
+                }, DELAY)
+            }
+
+            val llp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT)
+            llp.bottomMargin = resources.getDimensionPixelSize(R.dimen.conversation_button_margin)
+            button_container.addView(it, llp)
+        }
+
+        if(step.optional != false) {
+            addSkipButton()
+        }
+
+        return instructionStep.continueAfterDelay ?: false
     }
 
     private fun handleSingleChoice(choiceIntFormStep: ConversationSingleChoiceIntFormStep?) {
@@ -381,7 +395,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         val step = gifStep ?: run { return }
         button_container.removeAllViews()
         val adapter = recycler_view_conversation.adapter as ConversationAdapter
-        adapter.addGif(step.gifUrl)
+        adapter.addGif(gifStep.identifier, gifStep.title, step.gifUrl)
     }
 }
 

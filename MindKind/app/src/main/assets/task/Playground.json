@@ -5,10 +5,16 @@
   "schemaIdentifier": "Playground",
   "steps": [
     {
+      "identifier": "intro",
+      "type": "instruction",
+      "title": "Test the user inputs",
+      "buttonTitle": "Let's begin",
+      "optional": false
+    },
+    {
       "identifier": "integer_input",
       "type": "integer",
       "title": "How many times did you wake up last night?",
-      "inputFieldId": "integer_input",
       "buttonTitle": "Ok",
       "min": 0,
       "max": 9
@@ -17,7 +23,6 @@
       "identifier": "time_selector",
       "type": "timeOfDay",
       "title": "When did you fall asleep last night?",
-      "inputFieldId": "time_selector",
       "buttonTitle": "Submit time",
       "defaultTime": "10:00 PM"
     },
@@ -25,7 +30,6 @@
       "identifier": "text_entry",
       "type": "text",
       "title": "Tell us about your day.",
-      "inputFieldId": "text_entry",
       "buttonTitle": "Let's journal",
       "maxCharacters": 100,
       "placeholderText": "Write something here..",
@@ -34,6 +38,7 @@
     {
       "identifier": "reward",
       "type": "gif",
+      "title": "W00t w00t!.... This title will be shown in chat if the user does not have internet",
       "gifUrl": "https://docs.sagebridge.org/rCRViTgChEmKePBqQrcfiVqd.1616987337543"
     }
   ]

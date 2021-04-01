@@ -43,6 +43,8 @@ open class ConversationSurveyViewModel(private val taskResultUploader: TaskResul
 
     private val compositeDisposable = CompositeDisposable()
 
+    public var itemCount: Int = 0
+
     fun initConversation(conversation: ConversationSurvey) {
         conversationSurvey.value = conversation
     }

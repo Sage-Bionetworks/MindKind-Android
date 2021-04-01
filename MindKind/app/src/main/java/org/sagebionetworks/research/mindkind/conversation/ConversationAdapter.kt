@@ -1,28 +1,40 @@
 package org.sagebionetworks.research.mindkind.conversation
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.FutureTarget
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import org.sagebionetworks.research.mindkind.R
 import java.util.*
 
-data class ConversationItem(val text: String, val isQuestion: Boolean, val gifUrl: String? = null)
+
+data class ConversationItem(
+        val stepIdentifier: String,
+        val text: String,
+        val isQuestion: Boolean,
+        val gifUrl: String? = null)
 
 class ConversationAdapter(
         context: Context,
         private val dataSet: ArrayList<ConversationItem>) :
         RecyclerView.Adapter<ConversationAdapter.ViewHolder>() {
 
-    private val LOG_TAG = this::class.java.canonicalName
+    companion object {
+        private val LOG_TAG = this::class.java.canonicalName
+    }
 
     private val glide = Glide.with(context)
 
@@ -87,8 +99,12 @@ class ConversationAdapter(
         (viewHolder as? GifViewHolder)?.let {
             val gifUrl = item.gifUrl ?: run { return@let }
             glide.load(gifUrl)
-                 .placeholder(it.loadingDrawable)
-                 .into(it.imageView)
+                    .placeholder(it.loadingDrawable)
+                    .listener(GifLoaderListener(item.stepIdentifier))
+                    .into(it.imageView)
+
+            // Accessibility support
+            it.imageView.contentDescription = item.text
         }
     }
 
@@ -103,8 +119,8 @@ class ConversationAdapter(
 
     override fun getItemCount() = dataSet.size
 
-    open fun addItem(message: String, question: Boolean) {
-        dataSet.add(ConversationItem(message, question))
+    open fun addItem(stepId: String, message: String, question: Boolean) {
+        dataSet.add(ConversationItem(stepId, message, question))
         notifyItemInserted(dataSet.size)
 
         // TODO: this logic needs improving
@@ -115,8 +131,32 @@ class ConversationAdapter(
         }
     }
 
-    open fun addGif(gifUrl: String) {
-        dataSet.add(ConversationItem("", false, gifUrl))
+    open fun preloadGifs(gifSteps: List<GifStep>) {
+        gifSteps.forEach {
+            glide.load(it.gifUrl).preload()
+        }
+    }
+
+    open fun addGif(stepId: String, backupText: String, gifUrl: String) {
+        dataSet.add(ConversationItem(stepId, backupText, false, gifUrl))
         notifyItemInserted(dataSet.size)
+    }
+
+    inner class GifLoaderListener(val stepIdentifier: String): RequestListener<Drawable> {
+        override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable>?, isFirstResource: Boolean): Boolean {
+            Log.d(LOG_TAG, "GIF failed to load $stepIdentifier")
+            dataSet.firstOrNull { it.stepIdentifier == stepIdentifier }?.let { item ->
+                val idx = dataSet.indexOfFirst { it.stepIdentifier == stepIdentifier }
+                dataSet.removeAt(idx)
+                // Remove the gif and reload backup text
+                dataSet.add(item.copy(gifUrl = null, isQuestion = true))
+                notifyItemChanged(idx)
+            }
+            return false
+        }
+
+        override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
+            return false
+        }
     }
 }
