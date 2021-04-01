@@ -107,6 +107,23 @@ class BackgroundDataService : DaggerService() {
         private fun createHourRateLimit(hours: Double): RateLimiter {
             return RateLimiter((hours * 1000.0 * 60.0 * 60.0).toLong())
         }
+
+        fun chargingTimeData(intentAction: String?): String {
+            return when (intentAction) {
+                Intent.ACTION_POWER_CONNECTED -> "connected"
+                Intent.ACTION_POWER_DISCONNECTED -> "disconnected"
+                else -> "error"
+            }
+        }
+
+        fun screenTimeData(intentAction: String?): String {
+            return when (intentAction) {
+                Intent.ACTION_SCREEN_ON -> "on"
+                Intent.ACTION_SCREEN_OFF -> "off"
+                Intent.ACTION_USER_PRESENT -> "present"
+                else -> "error"
+            }
+        }
     }
 
     private val typeConverters = BackgroundDataTypeConverters()
@@ -283,7 +300,8 @@ class BackgroundDataService : DaggerService() {
                 ?.toInstant(ZoneId.systemDefault()) ?: Instant.now()
 
         val json = BackgroundDataTypeConverters().gson.toJson(backgroundData)
-        val folder = File(cacheDir.absolutePath + File.separator + taskIdentifier)
+        val folderPath = cacheDir.absolutePath + File.separator + taskIdentifier
+        val folder = File(folderPath)
         // Create folder to hold data file
         if (!folder.exists()) {
             folder.mkdir()
@@ -298,7 +316,8 @@ class BackgroundDataService : DaggerService() {
         }
 
         val jsonFileResult = FileResultBase("data",
-                startTime, endTime, JSON_MIME_CONTENT_TYPE, filesDir.path + File.separator + "data.json")
+                startTime, endTime, JSON_MIME_CONTENT_TYPE,
+                folderPath + File.separator + "data.json")
 
         var taskResultBase = TaskResultBase(taskIdentifier, startTime,
                 endTime, UUID.randomUUID(), Schema(taskIdentifier, 1),
@@ -441,9 +460,9 @@ class BackgroundDataService : DaggerService() {
             val data = // Do dataType specific operations
                     when(dataType) {
                         SageTaskIdentifier.BatteryStatistics -> onReceiveBatteryChanged(intent)
-                        SageTaskIdentifier.ScreenTime -> onReceiveScreenTime(intent)
-                        SageTaskIdentifier.ChargingTime -> onReceiveChargingTime(intent)
-                        else -> onReceiveDefaultActionChanged(intent)
+                        SageTaskIdentifier.ScreenTime -> screenTimeData(intent.action)
+                        SageTaskIdentifier.ChargingTime -> chargingTimeData(intent.action)
+                        else -> onReceiveDefaultActionChanged(intent.action)
                     }
 
             val backgroundData = BackgroundDataEntity(
@@ -471,34 +490,18 @@ class BackgroundDataService : DaggerService() {
             }
         }
 
-        private fun onReceiveDefaultActionChanged(intent: Intent): String? {
-            Log.d(TAG, "Received ${intent.action}")
-            return null
-        }
-
-        private fun onReceiveChargingTime(intent: Intent): String {
-            return when (intent.action) {
-                Intent.ACTION_POWER_CONNECTED -> "connected"
-                Intent.ACTION_POWER_DISCONNECTED -> "disconnected"
-                else -> "error"
-            }
-        }
-
-        private fun onReceiveScreenTime(intent: Intent): String {
-            return when (intent.action) {
-                Intent.ACTION_SCREEN_ON -> "on"
-                Intent.ACTION_SCREEN_OFF -> "off"
-                Intent.ACTION_USER_PRESENT -> "present"
-                else -> "error"
-            }
-        }
-
         private fun onReceiveBatteryChanged(intent: Intent): String {
             val level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
             val scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
             val batteryPct = level * 100 / scale.toFloat()
             Log.d(TAG, "Received $batteryPct% ${intent.action}")
             return "$batteryPct%"
+        }
+
+
+        fun onReceiveDefaultActionChanged(intentAction: String?): String? {
+            Log.d(TAG, "Received ${intentAction}")
+            return null
         }
     }
 }
