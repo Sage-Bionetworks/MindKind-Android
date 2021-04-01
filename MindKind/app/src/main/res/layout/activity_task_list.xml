@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -17,8 +17,7 @@
         android:text="Start passive data"
         android:textSize="@dimen/rsb_text_size_title"
         android:layout_marginBottom="@dimen/margin_medium"
-        android:visibility="gone"
-        android:layout_above="@+id/buttonUploadData"/>
+        android:visibility="gone"/>
 
     <Button
         android:id="@+id/buttonUploadData"
@@ -29,27 +28,37 @@
         android:textSize="@dimen/rsb_text_size_title"
         android:layout_marginBottom="@dimen/margin_medium"
         android:visibility="gone"
-        android:layout_above="@+id/buttonPhq9"/>
+        android:layout_below="@+id/buttonBackgroundData"/>
 
 
     <RelativeLayout
         android:id="@+id/task_list_header"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight=".25"
-        android:background="@color/butterscotch400">
+        android:layout_height="wrap_content"
+        android:layout_below="@id/buttonUploadData"
+        android:background="@color/sageResearchSecondary">
+
+        <ImageView
+            android:id="@+id/gear"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_margin="16dp"
+            android:layout_alignParentRight="true"
+            android:tint="@color/denim"
+            android:src="@drawable/gear"
+            android:contentDescription="gear" />
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:paddingLeft="15dp"
             android:orientation="vertical"
-            android:layout_centerInParent="true">
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/gear">
 
             <TextView
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight=".50"
+                android:layout_height="wrap_content"
                 android:text="Great work!"
                 android:textSize="24dp"
                 android:textStyle="bold"
@@ -59,37 +68,28 @@
 
             <TextView
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight=".50"
+                android:layout_height="wrap_content"
                 android:text="You've completed all 3 weeks of stress analysis!"
                 android:textSize="18dp"
                 android:textColor="@color/dark_text"
                 android:gravity="center"
-                android:fontFamily="@font/lato"/>
+                android:fontFamily="@font/lato"
+                android:layout_margin="24dp"/>
 
         </LinearLayout>
-
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_margin="16dp"
-            android:layout_alignParentRight="true"
-            android:tint="@color/denim"
-            android:src="@drawable/gear"
-            android:contentDescription="gear" />
-
 
     </RelativeLayout>
 
     <RelativeLayout
+        android:id="@+id/task_progress_container"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight=".15"
-        android:background="@color/sageResearchSecondary">
+        android:layout_height="wrap_content"
+        android:background="@color/sageResearchSecondary"
+        android:layout_below="@id/task_list_header"
+        android:layout_margin="10dp">
 
         <ProgressBar
             android:id="@+id/task_progress_bar"
-            android:layout_alignBottom="@id/anchor_view"
             style="@style/Widget.AppCompat.ProgressBar.Horizontal"
             android:layout_width="match_parent"
             android:layout_height="10dp"
@@ -103,13 +103,14 @@
             android:id="@+id/anchor_view"
             android:layout_width="match_parent"
             android:layout_height="2dp"
-            android:layout_centerInParent="true"
-            android:background="@color/transparent"/>
+            android:layout_centerHorizontal="true"
+            android:background="@color/transparent"
+            android:layout_below="@id/task_progress_bar"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignTop="@id/anchor_view"
+            android:layout_below="@id/anchor_view"
             android:layout_marginLeft="24dp"
             android:textStyle="italic"
             android:text="Week 3"
@@ -119,7 +120,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignTop="@id/anchor_view"
+            android:layout_below="@id/anchor_view"
             android:layout_alignParentRight="true"
             android:layout_marginRight="24dp"
             android:textStyle="italic"
@@ -128,149 +129,12 @@
             android:textColor="@color/dark_text" />
     </RelativeLayout>
 
-    <RelativeLayout
-        android:id="@+id/buttonGad7"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/taskRecyclerView"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight=".30"
-        android:background="@color/white"
-        android:foreground="?android:attr/selectableItemBackground"
-        android:clickable="true"
-        android:focusable="true"
-        android:paddingHorizontal="16dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingLeft="15dp"
-            android:orientation="vertical"
-            android:layout_centerInParent="true">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_above="@id/survey1_detail_label"
-                android:text="GAD-7 Anxiety"
-                android:textSize="18dp"
-                android:textColor="@color/dark_text"
-                android:textStyle="bold"
-                android:fontFamily="@font/lato"
-                android:paddingBottom="8dp"/>
-
-            <TextView
-                android:id="@+id/survey1_detail_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:text="Ready to start your day!?  "
-                android:textSize="16dp"
-                android:textStyle="italic"
-                android:fontFamily="@font/lato"
-                android:paddingRight="84dp"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/survey1_detail_label"
-                android:text="See how your daily life affects your stress levels and happiness."
-                android:textSize="18dp"
-                android:textColor="@color/dark_text"
-                android:fontFamily="@font/lato"
-                android:paddingRight="84dp"
-                android:paddingTop="8dp"/>
-
-        </LinearLayout>
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="28dp"
-            android:src="@drawable/arrow"
-            android:contentDescription="@string/rsb_continue"
-            android:tint="@color/denim"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:paddingRight="21dp"/>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#d3d3d3"
-            android:layout_marginHorizontal="16dp"
-            android:layout_alignParentBottom="true"/>
-
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/buttonPhq9"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight=".30"
-        android:background="@color/white"
-        android:foreground="?android:attr/selectableItemBackground"
-        android:clickable="true"
-        android:focusable="true"
-        android:paddingHorizontal="16dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingLeft="15dp"
-            android:orientation="vertical"
-            android:layout_centerInParent="true">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_above="@id/survey2_detail_label"
-                android:text="Patient Health Questionnaire"
-                android:textSize="18dp"
-                android:textColor="@color/dark_text"
-                android:textStyle="bold"
-                android:fontFamily="@font/lato"
-                android:paddingBottom="8dp"/>
-
-            <TextView
-                android:id="@+id/survey2_detail_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:text="How are you feeling today?  "
-                android:textSize="16dp"
-                android:textStyle="italic"
-                android:fontFamily="@font/lato"
-                android:paddingRight="84dp"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/survey1_detail_label"
-                android:text="See how your daily life affects your stress levels and happiness."
-                android:textSize="18dp"
-                android:textColor="@color/dark_text"
-                android:fontFamily="@font/lato"
-                android:paddingRight="84dp"
-                android:paddingTop="8dp"/>
-
-        </LinearLayout>
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="28dp"
-            android:src="@drawable/arrow"
-            android:contentDescription="@string/rsb_continue"
-            android:tint="@color/denim"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:paddingRight="21dp"/>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#d3d3d3"
-            android:layout_marginHorizontal="16dp"
-            android:layout_alignParentBottom="true"/>
-
-    </RelativeLayout>
+        android:layout_height="match_parent"
+        android:layout_below="@id/task_progress_container"
+        android:background="@color/splash"/>
 
 
-</LinearLayout>
+</RelativeLayout>

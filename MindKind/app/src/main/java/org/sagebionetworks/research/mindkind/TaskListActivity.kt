@@ -42,7 +42,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat.OnRequestPermissionsResultCallback
 import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.android.AndroidInjection
+import kotlinx.android.synthetic.main.activity_conversation_survey.*
 import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService
 import org.sagebionetworks.research.mindkind.conversation.ConversationSurveyActivity
 import org.sagebionetworks.research.sageresearch.dao.room.AppConfigRepository
@@ -53,6 +55,7 @@ import java.nio.charset.StandardCharsets
 import javax.inject.Inject
 
 import kotlinx.android.synthetic.main.activity_task_list.*
+import org.sagebionetworks.research.mindkind.conversation.SpacesItemDecoration
 
 /**
  * A simple [Fragment] subclass that shows a list of the available surveys and tasks for the app
@@ -73,13 +76,24 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_task_list)
 
-        buttonGad7.setOnClickListener {
-            launchGad7()
-        }
+        var llm = LinearLayoutManager(this)
+        llm.orientation = LinearLayoutManager.VERTICAL
+        taskRecyclerView.layoutManager = llm
 
-        buttonPhq9.setOnClickListener {
-            launchPhq9()
-        }
+        taskRecyclerView.addItemDecoration(SpacesItemDecoration(resources.getDimensionPixelSize(R.dimen.converation_recycler_spacing)))
+
+        var items = arrayListOf<TaskItem>()
+        items.add(TaskItem("GAD-7 Anxiety",
+                "How are you feeling today.",
+                stringFromJsonAsset("PHQ9")))
+        items.add(TaskItem("Patient Health Questionaire",
+                "Ready to start your day.",
+                stringFromJsonAsset("GAD7")))
+        items.add(TaskItem("Playground",
+                "Ready to start your day.",
+                stringFromJsonAsset("Playground")))
+        var adapter: TaskAdapter = TaskAdapter(this, items)
+        taskRecyclerView.adapter = adapter
 
         buttonUploadData.visibility = View.GONE
         buttonUploadData.setOnClickListener {
@@ -107,21 +121,6 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
         } else {
             buttonBackgroundData?.text = "Start background data"
         }
-    }
-
-    fun launchPhq9() {
-        val json = stringFromJsonAsset("PHQ9") ?: run { return }
-        ConversationSurveyActivity.start(this, json)
-    }
-
-    fun launchGad7() {
-        val json = stringFromJsonAsset("GAD7") ?: run { return }
-        ConversationSurveyActivity.start(this, json)
-    }
-
-    fun launchPlayground() {
-        val json = stringFromJsonAsset("Playground") ?: run { return }
-        ConversationSurveyActivity.start(this, json)
     }
 
     fun uploadBackgroundData() {
