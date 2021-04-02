@@ -71,28 +71,32 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
     @Inject
     lateinit var appConfigRepo: AppConfigRepository
 
+    var taskItems = mutableListOf(
+            TaskItem("GAD-7 Anxiety",
+                    "How are you feeling today.",
+                    "PHQ9"),
+            TaskItem("Patient Health Questionaire",
+                    "Ready to start your day.",
+                    "GAD7"),
+            TaskItem("Playground",
+                    "Ready to start your day.",
+                    "Playground"))
+
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_task_list)
 
-        var llm = LinearLayoutManager(this)
+        val llm = LinearLayoutManager(this)
         llm.orientation = LinearLayoutManager.VERTICAL
         taskRecyclerView.layoutManager = llm
 
         taskRecyclerView.addItemDecoration(SpacesItemDecoration(resources.getDimensionPixelSize(R.dimen.converation_recycler_spacing)))
-
-        var items = arrayListOf<TaskItem>()
-        items.add(TaskItem("GAD-7 Anxiety",
-                "How are you feeling today.",
-                stringFromJsonAsset("PHQ9")))
-        items.add(TaskItem("Patient Health Questionaire",
-                "Ready to start your day.",
-                stringFromJsonAsset("GAD7")))
-        items.add(TaskItem("Playground",
-                "Ready to start your day.",
-                stringFromJsonAsset("Playground")))
-        var adapter: TaskAdapter = TaskAdapter(this, items)
+        val adapter = TaskAdapter(taskItems, object: TaskAdapterListener {
+            override fun onTaskClicked(jsonResourceName: String?) {
+                startTask(jsonResourceName)
+            }
+        })
         taskRecyclerView.adapter = adapter
 
         buttonUploadData.visibility = View.GONE
@@ -143,6 +147,12 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
         @SuppressLint("SetTextI18n")
         button?.text = "Start background data"
         stopService(Intent(this, BackgroundDataService::class.java))
+    }
+
+    fun startTask(jsonResourceName: String?) {
+        val fileName = jsonResourceName ?: run { return }
+        val json = stringFromJsonAsset(fileName) ?: run { return }
+        ConversationSurveyActivity.start(this, json)
     }
 
     fun stringFromJsonAsset(fileName: String): String? {

@@ -1,16 +1,16 @@
-<androidx.cardview.widget.CardView
+<com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white"
-    android:foreground="?android:attr/selectableItemBackground"
-    android:clickable="true"
-    android:focusable="true"
-    app:cardCornerRadius="8dp">
+    app:cardBackgroundColor="@color/white"
+    app:rippleColor="@color/colorPrimary"
+    app:cardElevation="2dp"
+    app:cardCornerRadius="8dp"
+    tools:ignore="HardcodedText,MissingPrefix,RtlSymmetry,RtlHardcoded">
 
     <RelativeLayout
-        android:id="@+id/buttonGad7"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
@@ -28,7 +28,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="GAD-7 Anxiety"
-                android:textSize="18dp"
+                android:textSize="18sp"
                 android:textColor="@color/dark_text"
                 android:textStyle="bold"
                 android:fontFamily="@font/lato"
@@ -38,9 +38,8 @@
                 android:id="@+id/survey_detail_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
                 android:text="Ready to start your day!?  "
-                android:textSize="16dp"
+                android:textSize="16sp"
                 android:textColor="@color/light_text"
                 android:textStyle="italic"
                 android:fontFamily="@font/lato"
@@ -50,7 +49,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="See how your daily life affects your stress levels and happiness."
-                android:textSize="18dp"
+                android:textSize="18sp"
                 android:textColor="@color/dark_text"
                 android:fontFamily="@font/lato"
                 android:layout_marginBottom="8dp"/>
@@ -62,11 +61,11 @@
             android:layout_height="28dp"
             android:src="@drawable/arrow"
             android:contentDescription="@string/rsb_continue"
-            android:tint="@color/denim"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:paddingRight="16dp"
-            android:paddingBottom="8dp"/>
+            android:paddingBottom="8dp"
+            app:tint="@color/denim" />
 
     </RelativeLayout>
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>

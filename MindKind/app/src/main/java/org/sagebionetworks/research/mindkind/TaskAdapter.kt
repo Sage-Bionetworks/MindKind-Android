@@ -1,26 +1,24 @@
 package org.sagebionetworks.research.mindkind
 
-import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
-import org.sagebionetworks.research.mindkind.conversation.ConversationSurveyActivity
-import java.util.*
-
 
 data class TaskItem(
         val title: String,
         val label: String,
-        val json: String?)
+        val jsonResourceName: String?)
+
+public interface TaskAdapterListener {
+    fun onTaskClicked(jsonResourceName: String?)
+}
 
 class TaskAdapter(
-        context: Context,
-        private val dataSet: ArrayList<TaskItem>) :
+        private val dataSet: MutableList<TaskItem>,
+        private val listener: TaskAdapterListener) :
         RecyclerView.Adapter<TaskAdapter.ViewHolder>() {
 
     companion object {
@@ -28,16 +26,14 @@ class TaskAdapter(
     }
 
     open class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        var title: TextView = view.findViewById(R.id.survey_detail_title)
+        val title: TextView = view.findViewById(R.id.survey_detail_title)
         val label: TextView = view.findViewById(R.id.survey_detail_label)
     }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): ViewHolder {
         val view: View = LayoutInflater.from(viewGroup.context).inflate(R.layout.list_item_task,
                 viewGroup, false)
-
-        val viewHolder = ViewHolder(view)
-        return viewHolder
+        return ViewHolder(view)
     }
 
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
@@ -47,9 +43,8 @@ class TaskAdapter(
         viewHolder.title.text = item.title
         viewHolder.label.text = item.label
         viewHolder.itemView.setOnClickListener {
-            item.json?.let { it1 -> ConversationSurveyActivity.start(viewHolder.title.context, it1) }
+            listener.onTaskClicked(item.jsonResourceName)
         }
-
     }
 
     override fun getItemCount() = dataSet.size
