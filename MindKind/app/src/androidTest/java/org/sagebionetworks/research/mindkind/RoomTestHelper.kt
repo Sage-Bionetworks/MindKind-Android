@@ -47,7 +47,6 @@ import org.junit.runner.RunWith
 import org.sagebionetworks.bridge.rest.model.ForwardCursorReportDataList
 import org.sagebionetworks.bridge.rest.model.ReportDataList
 import org.sagebionetworks.bridge.rest.model.ScheduledActivityListV4
-import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataType
 import org.sagebionetworks.research.mindkind.room.BackgroundDataEntityDao
 import org.sagebionetworks.research.mindkind.room.MindKindDatabase
 import org.sagebionetworks.research.sageresearch.dao.room.*

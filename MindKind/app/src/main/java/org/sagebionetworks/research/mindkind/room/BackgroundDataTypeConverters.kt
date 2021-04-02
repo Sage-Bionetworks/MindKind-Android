@@ -31,7 +31,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.sagebionetworks.research.mindkind.backgrounddata
+package org.sagebionetworks.research.mindkind.room
 
 import androidx.room.TypeConverter
 import com.google.gson.GsonBuilder
@@ -58,12 +58,7 @@ open class BackgroundDataTypeConverters {
             .registerTypeAdapter(Instant::class.java, InstantAdapter())
 
     val gson = gsonBuilder.create()
-
-    @TypeConverter
-    fun toBackgroundDataType(value: String) = enumValueOf<BackgroundDataType>(value)
-
-    @TypeConverter
-    fun fromBackgroundDataType(value: BackgroundDataType) = value.name
+    val gsonExposeOnly = gsonBuilder.excludeFieldsWithoutExposeAnnotation().create()
 
     @TypeConverter
     fun fromLocalDateString(value: String?): LocalDate? {
