@@ -2,5 +2,21 @@
   "BackgroundData": {
     "id": "BackgroundData",
     "revision": 1
+  },
+  "ChargingTime": {
+    "id": "ChargingTime",
+    "revision": 1
+  },
+  "ScreenTime": {
+    "id": "ScreenTime",
+    "revision": 1
+  },
+  "BatteryStatistics": {
+    "id": "BatteryStatistics",
+    "revision": 1
+  },
+  "DataUsage": {
+    "id": "DataUsage",
+    "revision": 1
   }
 }

@@ -9,22 +9,24 @@ import androidx.work.*
 import org.sagebionetworks.research.mindkind.BuildConfig
 import java.util.concurrent.TimeUnit
 
-public class BridgeUploadWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, params) {
+public class DataUsageWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, params) {
 
     companion object {
-        public val LOG_TAG = BridgeUploadWorker::class.java.simpleName
-        public val periodicWorkName = "PeriodicBridgeUploader"
+        public val LOG_TAG = DataUsageWorker::class.java.simpleName
+        public val periodicWorkName = "DataUsageWorker"
     }
 
     override fun doWork(): Result {
+
         if (BuildConfig.DEBUG) {
-            Log.d(LOG_TAG, "Requesting bridge upload from Worker")
+            Log.d(LOG_TAG, "Data usage worker initiated")
         }
 
         val ctx = this.applicationContext
-        // Request upload from bridge background data service
+
+        // Request that background data service record mobile data usage
         val intent = Intent(ctx, BackgroundDataService::class.java)
-        intent.action = BackgroundDataService.WIFI_CHARGING_UPLOAD_DATA_ACTION
+        intent.action = BackgroundDataService.DATA_USAGE_RECEIVER_ACTION
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             ctx.startForegroundService(intent)

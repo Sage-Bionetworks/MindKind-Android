@@ -32,24 +32,19 @@
 
 package org.sagebionetworks.research.sageresearch.viewmodel
 
+import android.content.Intent
 import androidx.test.filters.MediumTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import org.joda.time.DateTime
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
 
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.sagebionetworks.research.mindkind.RoomTestHelper
-import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataType
+import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService
+import org.sagebionetworks.research.mindkind.research.SageTaskIdentifier
 import org.sagebionetworks.research.mindkind.room.BackgroundDataEntity
-import org.sagebionetworks.research.sageresearch.dao.room.ReportEntity
-import org.sagebionetworks.research.sageresearch.dao.room.mapValue
-import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
-import org.threeten.bp.ZonedDateTime
-import kotlin.math.exp
 
 @RunWith(AndroidJUnit4::class)
 // ran into multi-dex issues moving this to a library project, leaving it here for now
@@ -85,19 +80,25 @@ class BackgroundDataRoomTests: RoomTestHelper() {
         private val userPresentData = BackgroundDataEntity(
                 primaryKey = 0,
                 date = march7thNoon,
-                dataType = BackgroundDataType.USER_PRESENT,
+                dataType = SageTaskIdentifier.ScreenTime,
+                data = BackgroundDataService.screenTimeData(Intent.ACTION_USER_PRESENT),
+                subType = "subTypeA",
                 uploaded = false)
 
         private val screenOnData = BackgroundDataEntity(
                 primaryKey = 0,
                 date = march7th1PM,
-                dataType = BackgroundDataType.SCREEN_ON,
+                dataType = SageTaskIdentifier.ScreenTime,
+                data = BackgroundDataService.screenTimeData(Intent.ACTION_SCREEN_ON),
+                subType = "subTypeB",
                 uploaded = false)
 
         private val screenOffData = BackgroundDataEntity(
                 primaryKey = 0,
                 date = march7th2PM,
-                dataType = BackgroundDataType.SCREEN_OFF,
+                dataType = SageTaskIdentifier.ScreenTime,
+                data = BackgroundDataService.screenTimeData(Intent.ACTION_SCREEN_OFF),
+                subType = "subTypeC",
                 uploaded = true)
     }
 
@@ -143,7 +144,8 @@ class BackgroundDataRoomTests: RoomTestHelper() {
         for (i in expected.indices) {
             // Don't test primaryKey, it will be different
             assertEquals(expected[i].dataType, actual[i].dataType)
-            assertEquals(expected[i].dataId, actual[i].dataId)
+            assertEquals(expected[i].data, actual[i].data)
+            assertEquals(expected[i].subType, actual[i].subType)
             assertEquals(expected[i].date, actual[i].date)
             assertEquals(expected[i].uploaded, actual[i].uploaded)
         }

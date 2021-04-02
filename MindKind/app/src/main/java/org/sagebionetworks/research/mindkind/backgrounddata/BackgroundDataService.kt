@@ -37,7 +37,11 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.NotificationManager.IMPORTANCE_LOW
-import android.content.*
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.net.TrafficStats
 import android.os.BatteryManager
 import android.os.Build
 import android.os.IBinder
@@ -61,6 +65,7 @@ import org.sagebionetworks.research.mindkind.R.drawable
 import org.sagebionetworks.research.mindkind.R.string
 import org.sagebionetworks.research.mindkind.research.SageTaskIdentifier
 import org.sagebionetworks.research.mindkind.room.BackgroundDataEntity
+import org.sagebionetworks.research.mindkind.room.BackgroundDataTypeConverters
 import org.sagebionetworks.research.mindkind.room.MindKindDatabase
 import org.sagebionetworks.research.mindkind.util.NoLimitRateLimiter
 import org.sagebionetworks.research.mindkind.util.RateLimiter
@@ -70,6 +75,7 @@ import org.threeten.bp.Instant
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneId
 import java.io.File
+import java.io.FileOutputStream
 import java.util.*
 import javax.inject.Inject
 
@@ -84,6 +90,8 @@ class BackgroundDataService : DaggerService() {
                 "org.sagebionetworks.research.MindKind.WifiChargingUploadDataToBridge"
         public const val BACKGROUND_DATA_DB_FILENAME =
                 "org.sagebionetworks.research.MindKind.BackgroundData"
+        public const val DATA_USAGE_RECEIVER_ACTION =
+                "org.sagebionetworks.research.MindKind.DataUsageReceiver"
 
         private const val TASK_IDENTIFIER = SageTaskIdentifier.BACKGROUND_DATA
         private const val FOREGROUND_NOTIFICATION_ID = 100
@@ -95,8 +103,30 @@ class BackgroundDataService : DaggerService() {
         private fun createMinuteRateLimit(minutes: Int): RateLimiter {
             return RateLimiter(minutes * 1000L * 60L)
         }
+
+        private fun createHourRateLimit(hours: Double): RateLimiter {
+            return RateLimiter((hours * 1000.0 * 60.0 * 60.0).toLong())
+        }
+
+        fun chargingTimeData(intentAction: String?): String {
+            return when (intentAction) {
+                Intent.ACTION_POWER_CONNECTED -> "connected"
+                Intent.ACTION_POWER_DISCONNECTED -> "disconnected"
+                else -> "error"
+            }
+        }
+
+        fun screenTimeData(intentAction: String?): String {
+            return when (intentAction) {
+                Intent.ACTION_SCREEN_ON -> "on"
+                Intent.ACTION_SCREEN_OFF -> "off"
+                Intent.ACTION_USER_PRESENT -> "present"
+                else -> "error"
+            }
+        }
     }
 
+    private val typeConverters = BackgroundDataTypeConverters()
     lateinit var database: MindKindDatabase
 
     // Injected from BridgeAndroidSdk, this controls uploading a TaskResult
@@ -106,6 +136,14 @@ class BackgroundDataService : DaggerService() {
     // Injected from BridgeAndroidSdk, it controls uploading past failed uploads
     @Inject
     lateinit var uploadManager: UploadManager
+
+    // List of data types to track
+    // This should be hooked up to the permission manager's list of data the user wants us to track
+    public var dataToTrack = listOf(
+            SageTaskIdentifier.ScreenTime,
+            SageTaskIdentifier.BatteryStatistics,
+            SageTaskIdentifier.ChargingTime,
+            SageTaskIdentifier.DataUsage)
 
     private val compositeDisposable = CompositeDisposable()
     /**
@@ -134,15 +172,19 @@ class BackgroundDataService : DaggerService() {
     // If you always want to log an event, use no rate limit
     private val noRateLimit = NoLimitRateLimiter()
 
-    // Battery changed broadcast receiver is very noisy, so rate limit it every 1 minute
-    private val batterChangedLimiter = createMinuteRateLimit(1)
+    // Battery changed broadcast receiver is very noisy, so rate limit it every 1 hour
+    private val batteryChangedLimiter = createHourRateLimit(1.0)
 
     override fun onCreate() {
         Log.d(TAG, "onCreate")
         super.onCreate()
 
         // Setup daily wifi & charger upload worker
-        BridgeUploadWorker.enqueueDailyWork(this)
+        WorkUtils.enqueueDailyWork(this, BridgeUploadWorker.periodicWorkName)
+        // Setup data usage worker
+        if (dataToTrack.contains(SageTaskIdentifier.DataUsage)) {
+            WorkUtils.enqueueDailyWork(this, DataUsageWorker.periodicWorkName)
+        }
 
         isServiceRunning = true
         startForeground()
@@ -165,6 +207,9 @@ class BackgroundDataService : DaggerService() {
 
         LocalBroadcastManager.getInstance(this).registerReceiver(
                 uploadDataReceiver, IntentFilter(ACTIVITY_UPLOAD_DATA_ACTION))
+
+        // Some events need to be tracked immediately
+        recordStartupBackgroundData()
     }
 
     override fun onDestroy() {
@@ -191,6 +236,10 @@ class BackgroundDataService : DaggerService() {
         }
     }
 
+    private fun recordStartupBackgroundData() {
+        writeDataUsageToDatabase()
+    }
+
     /**
      * Packages all existing un-uploaded data and attempts to upload it to bridge
      */
@@ -203,26 +252,37 @@ class BackgroundDataService : DaggerService() {
 
         // Upload all the data from the background data table
         subscribeCompletableAsync(Completable.fromAction {
-            val dataToUpload =
+            val data =
                     database.backgroundDataDao().getData(false)
 
-            if (dataToUpload.isEmpty()) {
+            if (data.isEmpty()) {
                 return@fromAction
             }
 
-            val taskResultBase = createTaskResult(dataToUpload)
+            val taskResultList = mutableListOf<TaskResultBase>()
+            // Only upload data the user allowed to track
+            dataToTrack.forEach { taskIdentifier ->
+                val filtered = data.filter {
+                    return@filter it.dataType == taskIdentifier
+                }
+                if (filtered.isNotEmpty()) {
+                    taskResultList.add(createTaskResult(taskIdentifier, filtered))
+                }
+            }
 
-            // Upload task result
-            subscribeCompletableAsync(
-                    taskResultUploader.processTaskResult(taskResultBase),
-                    "Successfully uploaded task result to bridge",
-                    "Failed to upload task result to bridge")
+            // Upload all task results
+            taskResultList.forEach {
+                subscribeCompletableAsync(
+                        taskResultUploader.processTaskResult(it),
+                        "Successfully uploaded ${it.identifier} task result to bridge",
+                        "Failed to upload ${it.identifier} task result to bridge")
+            }
 
-            // Write database changes - archive/uploader always eventually succeeds
-            dataToUpload.forEach {
+            // Archive/uploader always eventually succeeds so mark all data as uploaded
+            data.forEach {
                 it.uploaded = true
             }
-            database.backgroundDataDao().upsert(dataToUpload)
+            database.backgroundDataDao().upsert(data)
 
         } .doOnError {
             Log.w(TAG, it.localizedMessage ?: "")
@@ -231,22 +291,36 @@ class BackgroundDataService : DaggerService() {
         "Failed to save BackgroundData to room")
     }
 
-    private fun createTaskResult(backgroundData: List<BackgroundDataEntity>): TaskResultBase {
+    private fun createTaskResult(taskIdentifier: String,
+                                 backgroundData: List<BackgroundDataEntity>): TaskResultBase {
+
         val startTime = backgroundData.firstOrNull()?.date
                 ?.toInstant(ZoneId.systemDefault()) ?: Instant.now()
         val endTime = backgroundData.lastOrNull()?.date
                 ?.toInstant(ZoneId.systemDefault()) ?: Instant.now()
 
-        val json = BackgroundDataTypeConverters().gson.toJson(backgroundData)
-        openFileOutput("data.json", Context.MODE_PRIVATE).use {
-            it.write(json.toByteArray())
+        val json = BackgroundDataTypeConverters().gsonExposeOnly.toJson(backgroundData)
+        val folderPath = cacheDir.absolutePath + File.separator + taskIdentifier
+        val folder = File(folderPath)
+        // Create folder to hold data file
+        if (!folder.exists()) {
+            folder.mkdir()
+        }
+
+        val file = File(folder, "data.json")
+        val stream = FileOutputStream(file)
+        try {
+            stream.write(json.toByteArray())
+        } finally {
+            stream.close()
         }
 
         val jsonFileResult = FileResultBase("data",
-                startTime, endTime, JSON_MIME_CONTENT_TYPE, filesDir.path + File.separator + "data.json")
+                startTime, endTime, JSON_MIME_CONTENT_TYPE,
+                folderPath + File.separator + "data.json")
 
-        var taskResultBase = TaskResultBase(TASK_IDENTIFIER, startTime,
-                endTime, UUID.randomUUID(), Schema(TASK_IDENTIFIER, 1),
+        var taskResultBase = TaskResultBase(taskIdentifier, startTime,
+                endTime, UUID.randomUUID(), Schema(taskIdentifier, 1),
                 mutableListOf(), mutableListOf())
 
         taskResultBase = taskResultBase.addStepHistory(jsonFileResult)
@@ -260,15 +334,9 @@ class BackgroundDataService : DaggerService() {
             uploadDataToBridge()
         }
 
-//        START_STICKY- tells the system to create a fresh copy of the service,
-//        when sufficient memory is available, after it recovers from low memory.
-//        Here you will lose the results that might have computed before.
-//
-//        START_NOT_STICKY- tells the system not to bother to restart the service,
-//        even when it has sufficient memory.
-//
-//        START_REDELIVER_INTENT- tells the system to restart the service after the crash
-//                and also redeliver the intents that were present at the time of crash.
+        if (intent?.action == DATA_USAGE_RECEIVER_ACTION) {
+            writeDataUsageToDatabase()
+        }
 
         return START_STICKY
     }
@@ -315,9 +383,9 @@ class BackgroundDataService : DaggerService() {
      * to avoid constantly writing to the database and draining the user's battery
      * @param dataType to rate limit
      */
-    fun rateLimiterFor(dataType: BackgroundDataType): RateLimiter {
+    fun rateLimiterFor(dataType: String): RateLimiter {
         return when(dataType) {
-            BackgroundDataType.BATTERY_PERCENTAGE -> batterChangedLimiter
+            SageTaskIdentifier.BatteryStatistics -> batteryChangedLimiter
             else -> noRateLimit
         }
     }
@@ -326,9 +394,13 @@ class BackgroundDataService : DaggerService() {
      * Writes background data to room asynchronously
      * @param backgroundData to add to room
      */
-    fun writeBackgroundDataToRoom(backgroundData: BackgroundDataEntity) {
+    fun writeBackgroundDataToRoom(backgroundData: List<BackgroundDataEntity>) {
+        backgroundData.forEach {
+            Log.d(TAG, "Writing ${it.dataType} ${it.subType ?: ""} ${it.data}")
+        }
+
         val completable = Completable.fromAction {
-            database.backgroundDataDao().upsert(listOf(backgroundData))
+            database.backgroundDataDao().upsert(backgroundData)
         } .doOnError {
             Log.w(TAG, it.localizedMessage ?: "")
         }
@@ -337,10 +409,43 @@ class BackgroundDataService : DaggerService() {
                 "Failed to save BackgroundData to room")
     }
 
+    /**
+     * Writes background data to room asynchronously
+     * @param backgroundData to add to room
+     */
+    fun writeBackgroundDataToRoom(backgroundData: BackgroundDataEntity) {
+        writeBackgroundDataToRoom(listOf(backgroundData))
+    }
+
+    fun writeDataUsageToDatabase() {
+        if (!dataToTrack.contains(SageTaskIdentifier.DataUsage)) {
+            // User did not consent to have this tracked
+            return
+        }
+
+        val now = LocalDateTime.now()
+        val backgroundData = mutableListOf<BackgroundDataEntity>()
+        mapOf(
+            "totalRx" to TrafficStats.getTotalRxBytes(),
+            "totalTx" to TrafficStats.getTotalTxBytes(),
+            "mobileRx" to TrafficStats.getMobileRxBytes(),
+            "mobileTx" to TrafficStats.getMobileTxBytes()).forEach {
+
+            backgroundData.add(BackgroundDataEntity(
+                    date = now,
+                    dataType = SageTaskIdentifier.DataUsage,
+                    subType = it.key,
+                    uploaded = false,
+                    data = it.value.toString()))
+        }
+
+        writeBackgroundDataToRoom(backgroundData)
+    }
+
     inner class BackgroundDataReceiver : BroadcastReceiver() {
 
         override fun onReceive(ctx: Context, intent: Intent) {
-            val dataType = BackgroundDataType.from(intent) ?: run {
+            val dataType = dataType(intent) ?: run {
                 Log.e(TAG, "Error creating data type from intent action")
                 return
             }
@@ -353,9 +458,11 @@ class BackgroundDataService : DaggerService() {
             }
 
             val data = // Do dataType specific operations
-                    when(intent.action) {
-                        Intent.ACTION_BATTERY_CHANGED -> onReceiveBatteryChanged(intent)
-                        else -> onReceiveDefaultActionChanged(intent)
+                    when(dataType) {
+                        SageTaskIdentifier.BatteryStatistics -> onReceiveBatteryChanged(intent)
+                        SageTaskIdentifier.ScreenTime -> screenTimeData(intent.action)
+                        SageTaskIdentifier.ChargingTime -> chargingTimeData(intent.action)
+                        else -> onReceiveDefaultActionChanged(intent.action)
                     }
 
             val backgroundData = BackgroundDataEntity(
@@ -367,9 +474,20 @@ class BackgroundDataService : DaggerService() {
             writeBackgroundDataToRoom(backgroundData)
         }
 
-        private fun onReceiveDefaultActionChanged(intent: Intent): String? {
-            Log.d(TAG, "Received ${intent.action}")
-            return null
+        /**
+         * @return the background data type for the action
+         */
+        private fun dataType(intent: Intent): String? {
+            val action = intent.action ?: run { return null }
+            return when(action) {
+                Intent.ACTION_BATTERY_CHANGED -> SageTaskIdentifier.BatteryStatistics
+                Intent.ACTION_SCREEN_ON -> SageTaskIdentifier.ScreenTime
+                Intent.ACTION_SCREEN_OFF -> SageTaskIdentifier.ScreenTime
+                Intent.ACTION_USER_PRESENT -> SageTaskIdentifier.ScreenTime
+                Intent.ACTION_POWER_CONNECTED -> SageTaskIdentifier.ChargingTime
+                Intent.ACTION_POWER_DISCONNECTED -> SageTaskIdentifier.ChargingTime
+                else -> null
+            }
         }
 
         private fun onReceiveBatteryChanged(intent: Intent): String {
@@ -379,32 +497,11 @@ class BackgroundDataService : DaggerService() {
             Log.d(TAG, "Received $batteryPct% ${intent.action}")
             return "$batteryPct%"
         }
-    }
-}
 
-public enum class BackgroundDataType(val type: String) {
-    SCREEN_ON("Screen_On"),
-    SCREEN_OFF("Screen_Off"),
-    USER_PRESENT("User_Present"),
-    BATTERY_PERCENTAGE("Battery_Percentage"),
-    POWER_CONNECTED("Power_Connected"),
-    POWER_DISCONNECTED("Power_Disconnected");
 
-    companion object {
-        /**
-         * @return the background data type for the action
-         */
-        fun from(intent: Intent): BackgroundDataType? {
-            val action = intent.action ?: run { return null }
-            return when(action) {
-                Intent.ACTION_BATTERY_CHANGED -> BATTERY_PERCENTAGE
-                Intent.ACTION_SCREEN_ON -> SCREEN_ON
-                Intent.ACTION_SCREEN_OFF -> SCREEN_OFF
-                Intent.ACTION_USER_PRESENT -> USER_PRESENT
-                Intent.ACTION_POWER_CONNECTED -> POWER_CONNECTED
-                Intent.ACTION_POWER_DISCONNECTED -> POWER_DISCONNECTED
-                else -> null
-            }
+        fun onReceiveDefaultActionChanged(intentAction: String?): String? {
+            Log.d(TAG, "Received ${intentAction}")
+            return null
         }
     }
 }

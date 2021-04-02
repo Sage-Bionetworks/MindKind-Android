@@ -44,9 +44,9 @@
             android:layout_height="24dp"
             android:layout_margin="16dp"
             android:layout_alignParentRight="true"
-            android:tint="@color/denim"
             android:src="@drawable/gear"
-            android:contentDescription="gear" />
+            android:contentDescription="gear"
+            app:tint="@color/denim" />
 
         <LinearLayout
             android:layout_width="match_parent"
