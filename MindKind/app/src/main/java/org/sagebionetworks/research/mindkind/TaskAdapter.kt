@@ -42,7 +42,9 @@ class TaskAdapter(
 
         viewHolder.title.text = item.title
         viewHolder.label.text = item.label
+        viewHolder.itemView.isEnabled = true
         viewHolder.itemView.setOnClickListener {
+            it.isEnabled = false
             listener.onTaskClicked(item.jsonResourceName)
         }
     }

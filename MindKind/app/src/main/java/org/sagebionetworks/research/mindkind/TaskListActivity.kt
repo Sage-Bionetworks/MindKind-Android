@@ -119,6 +119,14 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
         startBackgroundDataService()
     }
 
+    @Override
+    override fun onResume() {
+        super.onResume()
+        // Re-enables the disabled button
+        taskRecyclerView.adapter?.notifyDataSetChanged()
+    }
+
+    @SuppressLint("SetTextI18n")
     fun refreshServiceButtonState() {
         if (BackgroundDataService.isServiceRunning) {
             buttonBackgroundData?.text = "Stop background data"
