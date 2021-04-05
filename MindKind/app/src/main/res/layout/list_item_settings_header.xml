@@ -1,0 +1,25 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="120dp"
+    android:paddingVertical="24dp"
+    android:paddingHorizontal="12dp"
+    android:background="@color/settings_heading_background">
+
+        <TextView
+            android:id="@+id/settings_item_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/TextAppearance.Sage.Settings.Subheader"
+            android:textStyle="bold"
+            android:textSize="26sp"
+            android:text=""/>
+
+        <TextView
+            android:id="@+id/settings_item_subtext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/settings_item_label"
+            android:text=""
+            style="@style/TextAppearance.Sage.Settings.Subheader"/>
+</RelativeLayout>

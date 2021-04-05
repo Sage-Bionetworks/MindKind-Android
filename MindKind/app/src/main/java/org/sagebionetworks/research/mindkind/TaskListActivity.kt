@@ -56,6 +56,7 @@ import javax.inject.Inject
 
 import kotlinx.android.synthetic.main.activity_task_list.*
 import org.sagebionetworks.research.mindkind.conversation.SpacesItemDecoration
+import org.sagebionetworks.research.mindkind.settings.SettingsActivity
 
 /**
  * A simple [Fragment] subclass that shows a list of the available surveys and tasks for the app
@@ -111,6 +112,13 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
             } else {
                 stopBackgroundDataService(buttonBackgroundData)
             }
+        }
+
+        gear.setOnClickListener {
+            val intent = Intent(this, SettingsActivity::class.java)
+            intent.putExtra(SettingsActivity.extraSettingsId, "Settings")
+            startActivity(intent)
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         }
 
         refreshServiceButtonState()
