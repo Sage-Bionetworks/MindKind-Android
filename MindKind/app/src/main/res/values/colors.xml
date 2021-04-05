@@ -40,7 +40,9 @@
     <color name="ic_launcher_background">#FDFDFD</color>
     <color name="ic_launcher_round_background">#172752</color>
     <color name="dark_text">#2A2A2A</color>
-    <color name="light_text">#888</color>
+    <color name="light_text">#6C7489</color>
+    <color name="divider_color">#88E1E2</color>
+    <color name="settings_heading_background">#82CACD</color>
 
     <!-- Sage Colors -->
     <color name="colorPrimary">@color/sageResearchPrimary</color>
