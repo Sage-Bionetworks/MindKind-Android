@@ -395,7 +395,8 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         val step = gifStep ?: run { return }
         button_container.removeAllViews()
         val adapter = recycler_view_conversation.adapter as ConversationAdapter
-        adapter.addGif(gifStep.identifier, gifStep.title, step.gifUrl)
+        val gifTitle: String? = gifStep.title
+        adapter.addGif(gifStep.identifier, gifTitle ?: "", step.gifUrl)
     }
 }
 

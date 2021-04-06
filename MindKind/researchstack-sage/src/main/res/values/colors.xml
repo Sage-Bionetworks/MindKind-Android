@@ -19,5 +19,6 @@
     <color name="butterscotch500">#F5B33C</color>
     <color name="butterscotch300">#66F5B33C</color>
     <color name="appTextDark">#1A1C29</color>
+    <color name="darkDarkPrimary">#363636</color>
 
 </resources>

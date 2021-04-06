@@ -37,6 +37,7 @@
         <item name="colorPrimary">@color/royal500</item>
         <item name="colorPrimaryDark">@color/royal600</item>
         <item name="colorAccent">@color/butterscotch500</item>
+        <item name="colorControlHighlight">@color/ocean100</item>
         <item name="android:windowBackground">@color/colorPrimary</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowActionBar">false</item>

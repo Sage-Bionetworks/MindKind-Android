@@ -11,6 +11,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -76,7 +77,9 @@ open class SettingsActivity: AppCompatActivity() {
         settingsRecycler.layoutManager = llm
 
         val itemDecorator = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
-        itemDecorator.setDrawable(resources.getDrawable(R.drawable.settings_divider))
+        ResourcesCompat.getDrawable(resources, R.drawable.settings_divider, null)?.let {
+            itemDecorator.setDrawable(it)
+        }
         settingsRecycler.addItemDecoration(itemDecorator)
 
         var items: List<SettingsItem>? = null

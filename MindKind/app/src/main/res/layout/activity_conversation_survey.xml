@@ -31,7 +31,7 @@
   ~ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   -->
 
-<androidx.coordinatorlayout.widget.CoordinatorLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -41,17 +41,14 @@
     android:background="@color/white"
     tools:context=".conversation.ConversationSurveyActivity">
 
-
     <FrameLayout
-        android:id="@+id/back_button_container"
+        android:id="@+id/header"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:background="@color/sageResearchSecondary"
-        android:padding="@dimen/margin_medium"/>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="92dp"
+        android:background="@color/white"
+        android:layout_alignParentTop="true"
+        android:paddingTop="24dp"
+        android:elevation="8dp">
 
         <FrameLayout
             android:id="@+id/back_button"
@@ -60,21 +57,28 @@
             android:foreground="?attr/selectableItemBackgroundBorderless"
             android:background="@color/transparent"
             android:padding="@dimen/margin_medium"
-            android:layout_marginTop="24dp">
+            android:layout_marginTop="4dp">
 
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_back"/>
+                android:src="@drawable/ic_back"
+                android:contentDescription="@string/rsb_AX_BUTTON_BACK"/>
 
         </FrameLayout>
+    </FrameLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/header">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view_conversation"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/back_button"
-            android:layout_above="@id/button_container"/>
+            android:layout_above="@id/button_container"
+            android:layout_marginTop="4dp"/>
 
         <View
             android:id="@+id/gradient"
@@ -103,4 +107,4 @@
 
     </RelativeLayout>
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</RelativeLayout>

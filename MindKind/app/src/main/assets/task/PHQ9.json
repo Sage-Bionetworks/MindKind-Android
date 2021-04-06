@@ -100,11 +100,6 @@
       ]
     },
     {
-      "identifier": "reward",
-      "type": "gif",
-      "gifUrl": "https://docs.sagebridge.org/rCRViTgChEmKePBqQrcfiVqd.1616987337543"
-    },
-    {
       "identifier": "question9",
       "type": "singleChoice.integer",
       "title": "Thoughts that you would be better off dead or of hurting yourself in some way?",

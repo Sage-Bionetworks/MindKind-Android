@@ -36,12 +36,13 @@
     <color name="clear">#00000000</color>
     <color name="denim">#343F56</color>
     <color name="denim88">#88343F56</color>
+    <color name="ocean100">#88E1E2</color>
     <color name="splash">#162752</color>
     <color name="ic_launcher_background">#FDFDFD</color>
     <color name="ic_launcher_round_background">#172752</color>
     <color name="dark_text">#2A2A2A</color>
     <color name="light_text">#6C7489</color>
-    <color name="divider_color">#88E1E2</color>
+    <color name="divider_color">@color/ocean100</color>
     <color name="settings_heading_background">#82CACD</color>
 
     <!-- Sage Colors -->

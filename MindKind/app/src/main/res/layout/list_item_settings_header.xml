@@ -1,25 +1,52 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="120dp"
-    android:paddingVertical="24dp"
-    android:paddingHorizontal="12dp"
-    android:background="@color/settings_heading_background">
+    android:layout_height="120dp">
 
-        <TextView
-            android:id="@+id/settings_item_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style="@style/TextAppearance.Sage.Settings.Subheader"
-            android:textStyle="bold"
-            android:textSize="26sp"
-            android:text=""/>
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/background_image"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:adjustViewBounds="true"
+            android:scaleType="fitXY"
+            android:src="@drawable/settings_background"/>
 
-        <TextView
-            android:id="@+id/settings_item_subtext"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/settings_item_label"
-            android:text=""
-            style="@style/TextAppearance.Sage.Settings.Subheader"/>
-</RelativeLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingVertical="24dp"
+            android:paddingHorizontal="12dp">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/background_image_butterflies"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="100dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_butterflies"
+                    tools:ignore="RtlHardcoded" />
+
+                <TextView
+                    android:id="@+id/settings_item_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/TextAppearance.Sage.Settings.Subheader"
+                    android:textStyle="bold"
+                    android:textSize="26sp"
+                    android:text=""/>
+
+                <TextView
+                    android:id="@+id/settings_item_subtext"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/settings_item_label"
+                    android:text=""
+                    style="@style/TextAppearance.Sage.Settings.Subheader"/>
+
+        </RelativeLayout>
+
+</FrameLayout>
