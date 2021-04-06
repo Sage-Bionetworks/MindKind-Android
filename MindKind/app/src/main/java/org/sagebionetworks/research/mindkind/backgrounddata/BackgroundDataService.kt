@@ -180,10 +180,12 @@ class BackgroundDataService : DaggerService() {
         super.onCreate()
 
         // Setup daily wifi & charger upload worker
-        WorkUtils.enqueueDailyWork(this, BridgeUploadWorker.periodicWorkName)
+        WorkUtils.enqueueDailyWorkNetwork(this,
+                BridgeUploadWorker::class.java, BridgeUploadWorker.periodicWorkName)
         // Setup data usage worker
         if (dataToTrack.contains(SageTaskIdentifier.DataUsage)) {
-            WorkUtils.enqueueDailyWork(this, DataUsageWorker.periodicWorkName)
+            WorkUtils.enqueueHourlyWork(this,
+                    DataUsageWorker::class.java, DataUsageWorker.periodicWorkName)
         }
 
         isServiceRunning = true
