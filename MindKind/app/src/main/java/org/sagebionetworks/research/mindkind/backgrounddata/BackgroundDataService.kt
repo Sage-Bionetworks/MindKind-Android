@@ -41,6 +41,12 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
+import android.hardware.SensorManager.SENSOR_DELAY_FASTEST
+import android.hardware.SensorManager.SENSOR_DELAY_NORMAL
 import android.net.TrafficStats
 import android.os.BatteryManager
 import android.os.Build
@@ -79,7 +85,7 @@ import java.io.FileOutputStream
 import java.util.*
 import javax.inject.Inject
 
-class BackgroundDataService : DaggerService() {
+class BackgroundDataService : DaggerService(), SensorEventListener {
 
     companion object {
         private const val TAG = "BackgroundDataService"
@@ -143,7 +149,10 @@ class BackgroundDataService : DaggerService() {
             SageTaskIdentifier.ScreenTime,
             SageTaskIdentifier.BatteryStatistics,
             SageTaskIdentifier.ChargingTime,
-            SageTaskIdentifier.DataUsage)
+            SageTaskIdentifier.DataUsage,
+            SageTaskIdentifier.AmbientLight)
+
+    private var sensorManager: SensorManager? = null
 
     private val compositeDisposable = CompositeDisposable()
     /**
@@ -174,6 +183,7 @@ class BackgroundDataService : DaggerService() {
 
     // Battery changed broadcast receiver is very noisy, so rate limit it every 1 hour
     private val batteryChangedLimiter = createHourRateLimit(1.0)
+    private val ambientLightChangedLimiter = createMinuteRateLimit(5)
 
     override fun onCreate() {
         Log.d(TAG, "onCreate")
@@ -198,14 +208,29 @@ class BackgroundDataService : DaggerService() {
                 .build()
 
         // Register broadcast receivers
-        val filter = IntentFilter(Intent.ACTION_USER_PRESENT).apply {
-            addAction(Intent.ACTION_SCREEN_ON)
-            addAction(Intent.ACTION_SCREEN_OFF)
-            addAction(Intent.ACTION_BATTERY_CHANGED)
-            addAction(Intent.ACTION_POWER_CONNECTED)
-            addAction(Intent.ACTION_POWER_DISCONNECTED)
+        val filter = IntentFilter().apply {
+            if (dataToTrack.contains(SageTaskIdentifier.ChargingTime)) {
+                addAction(Intent.ACTION_POWER_CONNECTED)
+                addAction(Intent.ACTION_POWER_DISCONNECTED)
+            }
+            if (dataToTrack.contains(SageTaskIdentifier.BatteryStatistics)) {
+                addAction(Intent.ACTION_BATTERY_CHANGED)
+            }
+            if (dataToTrack.contains(SageTaskIdentifier.ScreenTime)) {
+                addAction(Intent.ACTION_USER_PRESENT)
+                addAction(Intent.ACTION_SCREEN_ON)
+                addAction(Intent.ACTION_SCREEN_OFF)
+            }
         }
         registerReceiver(receiver, filter)
+
+        // Register for ambient light callbacks
+        if (dataToTrack.contains(SageTaskIdentifier.AmbientLight)) {
+            sensorManager = getSystemService(SENSOR_SERVICE) as? SensorManager
+            sensorManager?.getDefaultSensor(Sensor.TYPE_LIGHT)?.let {
+                sensorManager?.registerListener(this, it, SENSOR_DELAY_NORMAL)
+            }
+        }
 
         LocalBroadcastManager.getInstance(this).registerReceiver(
                 uploadDataReceiver, IntentFilter(ACTIVITY_UPLOAD_DATA_ACTION))
@@ -221,6 +246,8 @@ class BackgroundDataService : DaggerService() {
         unregisterReceiver(receiver)
         compositeDisposable.clear()
         stopForeground(true)
+
+        sensorManager?.unregisterListener(this)
 
         isServiceRunning = false
 
@@ -388,6 +415,7 @@ class BackgroundDataService : DaggerService() {
     fun rateLimiterFor(dataType: String): RateLimiter {
         return when(dataType) {
             SageTaskIdentifier.BatteryStatistics -> batteryChangedLimiter
+            //SageTaskIdentifier.AmbientLight -> ambientLightChangedLimiter
             else -> noRateLimit
         }
     }
@@ -442,6 +470,22 @@ class BackgroundDataService : DaggerService() {
         }
 
         writeBackgroundDataToRoom(backgroundData)
+    }
+
+
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+        // No-op needed
+    }
+
+    override fun onSensorChanged(event: SensorEvent?) {
+        if(event?.sensor?.type == Sensor.TYPE_LIGHT) {
+            val intensity = event?.values?.firstOrNull() ?: run { return }
+            writeBackgroundDataToRoom(BackgroundDataEntity(
+                    date = LocalDateTime.now(),
+                    dataType = SageTaskIdentifier.AmbientLight,
+                    uploaded = false,
+                    data = intensity.toString()))
+        }
     }
 
     inner class BackgroundDataReceiver : BroadcastReceiver() {
