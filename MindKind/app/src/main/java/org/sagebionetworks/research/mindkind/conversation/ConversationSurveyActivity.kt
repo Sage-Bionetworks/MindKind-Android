@@ -71,7 +71,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
             finish()
         }
 
-        var llm = LinearLayoutManager(this)
+        val llm = LinearLayoutManager(this)
         llm.orientation = LinearLayoutManager.VERTICAL
         recycler_view_conversation.layoutManager = llm
 
@@ -83,7 +83,18 @@ open class ConversationSurveyActivity: AppCompatActivity() {
 
             // Setup the view model and start the conversation
             viewModel.initConversation(conversation)
-            val adapter = ConversationAdapter(this, arrayListOf())
+            val adapter = ConversationAdapter(this, arrayListOf(), object: ConversationAdapterListener {
+                override fun onConversationClicked(stepIdentifier: String) {
+                    var step: ConversationStep? = findStep(conversation, stepIdentifier)
+                    if(step != null) {
+                        val index = findIndex(conversation, step)
+                        val isLastItem = index >= conversation.steps.size
+                        viewModel.itemCount--
+                        showQuestion(step, isLastItem)
+                    }
+                 }
+
+            })
             recycler_view_conversation.adapter = adapter
             addQuestion()
 
@@ -92,7 +103,16 @@ open class ConversationSurveyActivity: AppCompatActivity() {
                 it.type == ConversationStepType.gif.type && (it as? GifStep) != null
             }.map { it as GifStep }
             adapter.preloadGifs(gifSteps)
+
         }
+    }
+
+    private fun findStep(conversation: ConversationSurvey, stepIdentifier: String) : ConversationStep? {
+        return conversation.steps.find { it.identifier == stepIdentifier }
+    }
+
+    private fun findIndex(conversation: ConversationSurvey, step: ConversationStep) : Int {
+        return conversation.steps.indexOf(step)
     }
 
     private fun addQuestion() {
@@ -107,14 +127,27 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         }
 
         val step = steps[viewModel.itemCount]
+        val shouldAddItem = (step.type != ConversationStepType.gif.type)
 
+        val adapter = recycler_view_conversation.adapter as ConversationAdapter
+        if (shouldAddItem) {
+            adapter.addItem(step.identifier, step.title, true)
+        }
+
+        val isLastItem = viewModel.itemCount >= steps.size
+        showQuestion(step, isLastItem)
+
+        viewModel.itemCount++
+        recycler_view_conversation.smoothScrollToPosition(adapter.itemCount)
+
+    }
+
+    private fun showQuestion(step: ConversationStep, isLastItem: Boolean) {
         var hasQuestions = true
-        var shouldAddItem = true
 
         when(step.type) {
-            ConversationStepType.instruction.type -> {
+            ConversationStepType.instruction.type ->
                 hasQuestions = !handleInstructionItem(step as? ConversationInstructionStep)
-            }
             ConversationStepType.singleChoiceInt.type ->
                 handleSingleChoice(step as? ConversationSingleChoiceIntFormStep)
             ConversationStepType.integer.type ->
@@ -125,21 +158,13 @@ open class ConversationSurveyActivity: AppCompatActivity() {
                 handleTimeOfDayInput(step as? ConversationTimeOfDayStep)
             ConversationStepType.gif.type -> {
                 handleGifInput(step as? GifStep)
-                shouldAddItem = false // gif handles it, as there is no text
             }
-            else -> hasQuestions = false
+            else -> {
+                hasQuestions = false
+            }
         }
 
         viewModel.userShown(step.identifier)
-        val adapter = recycler_view_conversation.adapter as ConversationAdapter
-        if (shouldAddItem) {
-            adapter.addItem(step.identifier, step.title, true)
-        }
-
-        viewModel.itemCount++
-        recycler_view_conversation.smoothScrollToPosition(adapter.itemCount)
-
-        val isLastItem = viewModel.itemCount >= steps.size
 
         if(!hasQuestions && !isLastItem) {
             handler?.postDelayed({
@@ -152,9 +177,11 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         }
     }
 
-    private fun addAnswer(step: ConversationStep, textAnswer: String, value: Any?) {
+    private fun addAnswer(step: ConversationStep, textAnswer: String?, value: Any?) {
         val adapter = recycler_view_conversation.adapter as ConversationAdapter
-        adapter.addItem(step.identifier, textAnswer, false)
+        val id = step.identifier
+        adapter.addItem(id, textAnswer, false)
+        logInfo("addAnswer(): $id - $textAnswer")
         recycler_view_conversation.smoothScrollToPosition(adapter.itemCount)
 
         viewModel.addAnswer(step, value)
@@ -187,7 +214,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         }
 
         if(step.optional != false) {
-            addSkipButton()
+            addSkipButton(step)
         }
 
         return instructionStep.continueAfterDelay ?: false
@@ -217,16 +244,17 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         }
 
         if(step.optional != false) {
-            addSkipButton()
+            addSkipButton(step)
         }
     }
 
-    private fun addSkipButton() {
+    private fun addSkipButton(step: ConversationStep) {
         (this.layoutInflater.inflate(R.layout.conversation_button_unfilled,
                 button_container, false) as? MaterialButton)?.let {
 
             it.setOnClickListener {
                 disableAllButtons()
+                addAnswer(step, null, null)
                 handler?.postDelayed({
                     addQuestion()
                 }, DELAY)
@@ -292,7 +320,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         }
 
         if(step.optional != false) {
-            addSkipButton()
+            addSkipButton(step)
         }
     }
 
@@ -344,7 +372,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         }
 
         if(step.optional != false) {
-            addSkipButton()
+            addSkipButton(step)
         }
     }
 
@@ -387,7 +415,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         }
 
         if(step.optional != false) {
-            addSkipButton()
+            addSkipButton(step)
         }
     }
 

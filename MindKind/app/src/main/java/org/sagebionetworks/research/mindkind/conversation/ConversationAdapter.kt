@@ -14,7 +14,6 @@ import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.FutureTarget
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import org.sagebionetworks.research.mindkind.R
@@ -23,13 +22,18 @@ import java.util.*
 
 data class ConversationItem(
         val stepIdentifier: String,
-        val text: String,
+        var text: String?,
         val isQuestion: Boolean,
         val gifUrl: String? = null)
 
+public interface ConversationAdapterListener {
+    fun onConversationClicked(stepIdentifier: String)
+}
+
 class ConversationAdapter(
         context: Context,
-        private val dataSet: ArrayList<ConversationItem>) :
+        private val dataSet: ArrayList<ConversationItem>,
+        private val listener: ConversationAdapterListener) :
         RecyclerView.Adapter<ConversationAdapter.ViewHolder>() {
 
     companion object {
@@ -37,6 +41,7 @@ class ConversationAdapter(
     }
 
     private val glide = Glide.with(context)
+    private var currentIdentifier: String? = null
 
     open class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val container: View = view.findViewById(R.id.container)
@@ -71,13 +76,22 @@ class ConversationAdapter(
         Log.i(LOG_TAG, "onBindViewHolder(): $position")
         val item = dataSet[position]
 
+        if(item.isQuestion) {
+            viewHolder.itemView.setOnLongClickListener {
+                listener.onConversationClicked(item.stepIdentifier)
+                currentIdentifier = item.stepIdentifier
+                notifyDataSetChanged()
+                true
+            }
+        }
+
         (viewHolder as? ChatViewHolder)?.let {
             it.textView.text = dataSet[position].text
 
             val type = getItemViewType(position)
             // handle fade
             var resources = viewHolder.container.resources
-            if(position != (dataSet.size-1)) {
+            if(item.stepIdentifier != currentIdentifier) {
                 val textColor = ResourcesCompat.getColor(resources, R.color.black_overlay, null)
                 viewHolder.textView.setTextColor(textColor)
                 if(type == 0) {
@@ -119,16 +133,47 @@ class ConversationAdapter(
 
     override fun getItemCount() = dataSet.size
 
-    open fun addItem(stepId: String, message: String, question: Boolean) {
-        dataSet.add(ConversationItem(stepId, message, question))
-        notifyItemInserted(dataSet.size)
-
-        // TODO: this logic needs improving
-        if(question) {
-            // force previous question/answer to redraw
-            notifyItemChanged(dataSet.size - 2)
-            notifyItemChanged(dataSet.size - 3)
+    open fun addItem(stepId: String, message: String?, question: Boolean) {
+        val item = ConversationItem(stepId, message, question)
+        Log.d(LOG_TAG, "addItem(): $stepId - $question")
+        if(findExistingQuestion(item)) {
+            if(!question) {
+                updateOrInsertItem(item)
+            }
+            currentIdentifier = dataSet.last().stepIdentifier
+        } else {
+            dataSet.add(ConversationItem(stepId, message, question))
+            currentIdentifier = stepId
+            notifyItemInserted(dataSet.size)
         }
+
+        notifyDataSetChanged()
+    }
+
+    private fun findExistingQuestion(item: ConversationItem): Boolean {
+        val found =  dataSet.find {
+            it.stepIdentifier == item.stepIdentifier && it.isQuestion
+        }
+
+        return found != null
+    }
+
+    private fun updateOrInsertItem(item: ConversationItem) {
+        val found = dataSet.find {
+            it.stepIdentifier == item.stepIdentifier && it.isQuestion == item.isQuestion
+        }
+
+        if (found != null) {
+            if(item.text != null) {
+                found.text = item.text
+            } else {
+                dataSet.remove(found)
+            }
+        } else {
+            val question = dataSet.find { it.stepIdentifier == item.stepIdentifier && it.isQuestion }
+            dataSet.add(dataSet.indexOf(question)+1, item)
+        }
+
     }
 
     open fun preloadGifs(gifSteps: List<GifStep>) {
