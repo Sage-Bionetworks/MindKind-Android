@@ -90,13 +90,13 @@ open class ConversationSurveyActivity: AppCompatActivity() {
                         val index = findIndex(conversation, step)
                         val isLastItem = index >= conversation.steps.size
                         viewModel.itemCount--
-                        showQuestion(step, isLastItem)
+                        showQuestion(step, isLastItem, false)
                     }
                  }
 
             })
             recycler_view_conversation.adapter = adapter
-            addQuestion()
+            addQuestion(true)
 
             // Pre-load GIFs for quicker access when they come upMD
             val gifSteps = conversation.steps.filter {
@@ -115,7 +115,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         return conversation.steps.indexOf(step)
     }
 
-    private fun addQuestion() {
+    private fun addQuestion(scroll: Boolean) {
         val conversation = viewModel.getConversationSurvey().value ?: run { return }
         val steps = conversation.steps
 
@@ -135,27 +135,29 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         }
 
         val isLastItem = viewModel.itemCount >= steps.size
-        showQuestion(step, isLastItem)
+        showQuestion(step, isLastItem, true)
 
         viewModel.itemCount++
-        recycler_view_conversation.smoothScrollToPosition(adapter.itemCount)
+        if(scroll) {
+            recycler_view_conversation.smoothScrollToPosition(adapter.itemCount)
+        }
 
     }
 
-    private fun showQuestion(step: ConversationStep, isLastItem: Boolean) {
+    private fun showQuestion(step: ConversationStep, isLastItem: Boolean, scroll: Boolean) {
         var hasQuestions = true
 
         when(step.type) {
             ConversationStepType.instruction.type ->
-                hasQuestions = !handleInstructionItem(step as? ConversationInstructionStep)
+                hasQuestions = !handleInstructionItem(step as? ConversationInstructionStep, scroll)
             ConversationStepType.singleChoiceInt.type ->
-                handleSingleChoice(step as? ConversationSingleChoiceIntFormStep)
+                handleSingleChoice(step as? ConversationSingleChoiceIntFormStep, scroll)
             ConversationStepType.integer.type ->
-                handleIntegerInput(step as? ConversationIntegerFormStep)
+                handleIntegerInput(step as? ConversationIntegerFormStep, scroll)
             ConversationStepType.text.type ->
-                handleTextInput(step as? ConversationTextFormStep)
+                handleTextInput(step as? ConversationTextFormStep, scroll)
             ConversationStepType.timeOfDay.type ->
-                handleTimeOfDayInput(step as? ConversationTimeOfDayStep)
+                handleTimeOfDayInput(step as? ConversationTimeOfDayStep, scroll)
             ConversationStepType.gif.type -> {
                 handleGifInput(step as? GifStep)
             }
@@ -168,7 +170,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
 
         if(!hasQuestions && !isLastItem) {
             handler?.postDelayed({
-                addQuestion()
+                addQuestion(scroll)
             }, DELAY)
         }
 
@@ -177,21 +179,24 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         }
     }
 
-    private fun addAnswer(step: ConversationStep, textAnswer: String?, value: Any?) {
+    private fun addAnswer(step: ConversationStep, textAnswer: String?, value: Any?, scroll: Boolean) {
         val adapter = recycler_view_conversation.adapter as ConversationAdapter
         val id = step.identifier
         adapter.addItem(id, textAnswer, false)
-        logInfo("addAnswer(): $id - $textAnswer")
-        recycler_view_conversation.smoothScrollToPosition(adapter.itemCount)
+        logInfo("addAnswer(): $id - $textAnswer: scroll[$scroll]")
+
+        if(scroll) {
+            recycler_view_conversation.smoothScrollToPosition(adapter.itemCount)
+        }
 
         viewModel.addAnswer(step, value)
 
         handler?.postDelayed({
-            addQuestion()
+            addQuestion(scroll)
         }, DELAY)
     }
 
-    private fun handleInstructionItem(instructionStep: ConversationInstructionStep?): Boolean {
+    private fun handleInstructionItem(instructionStep: ConversationInstructionStep?, scroll: Boolean): Boolean {
         val step = instructionStep ?: run { return false }
         button_container.removeAllViews()
 
@@ -203,7 +208,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
             it.setOnClickListener { _ ->
                 disableAllButtons()
                 handler?.postDelayed({
-                    addQuestion()
+                    addQuestion(scroll)
                 }, DELAY)
             }
 
@@ -214,13 +219,13 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         }
 
         if(step.optional != false) {
-            addSkipButton(step)
+            addSkipButton(step, scroll)
         }
 
         return instructionStep.continueAfterDelay ?: false
     }
 
-    private fun handleSingleChoice(choiceIntFormStep: ConversationSingleChoiceIntFormStep?) {
+    private fun handleSingleChoice(choiceIntFormStep: ConversationSingleChoiceIntFormStep?, scroll: Boolean) {
         val step = choiceIntFormStep ?: run { return }
         val choices = step.choices
         button_container.removeAllViews()
@@ -232,7 +237,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
                 it.text = c.text
 
                 it.setOnClickListener {
-                    addAnswer(step, c.text, c.value)
+                    addAnswer(step, c.text, c.value, scroll)
                     disableAllButtons()
                 }
 
@@ -244,20 +249,17 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         }
 
         if(step.optional != false) {
-            addSkipButton(step)
+            addSkipButton(step, scroll)
         }
     }
 
-    private fun addSkipButton(step: ConversationStep) {
+    private fun addSkipButton(step: ConversationStep, scroll: Boolean) {
         (this.layoutInflater.inflate(R.layout.conversation_button_unfilled,
                 button_container, false) as? MaterialButton)?.let {
 
             it.setOnClickListener {
                 disableAllButtons()
-                addAnswer(step, null, null)
-                handler?.postDelayed({
-                    addQuestion()
-                }, DELAY)
+                addAnswer(step, null, null, scroll)
             }
             val llp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT)
@@ -273,7 +275,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         }
     }
 
-    private fun handleIntegerInput(intStep: ConversationIntegerFormStep?) {
+    private fun handleIntegerInput(intStep: ConversationIntegerFormStep?, scroll: Boolean) {
         val step = intStep ?: run { return }
 
         button_container.removeAllViews()
@@ -310,7 +312,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
                     disableAllButtons()
                     val text = curView.text?.toString() ?: run { return@setOnClickListener }
                     val intAnswer = text.toInt()
-                    addAnswer(step, text, intAnswer)
+                    addAnswer(step, text, intAnswer, scroll)
                 }
                 val llp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT)
@@ -320,7 +322,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         }
 
         if(step.optional != false) {
-            addSkipButton(step)
+            addSkipButton(step, scroll)
         }
     }
 
@@ -342,7 +344,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         }
     }
 
-    private fun handleTextInput(textStep: ConversationTextFormStep?) {
+    private fun handleTextInput(textStep: ConversationTextFormStep?, scroll: Boolean) {
         val step = textStep ?: run { return }
         button_container.removeAllViews()
 
@@ -362,7 +364,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
                 it.setOnClickListener {
                     disableAllButtons()
                     val text = inputView?.text?.toString() ?: run { return@setOnClickListener }
-                    addAnswer(step, text, text)
+                    addAnswer(step, text, text, scroll)
                 }
                 val llp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT)
@@ -372,11 +374,11 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         }
 
         if(step.optional != false) {
-            addSkipButton(step)
+            addSkipButton(step, scroll)
         }
     }
 
-    private fun handleTimeOfDayInput(timeStep: ConversationTimeOfDayStep?) {
+    private fun handleTimeOfDayInput(timeStep: ConversationTimeOfDayStep?, scroll: Boolean) {
         val step = timeStep ?: run { return }
         button_container.removeAllViews()
 
@@ -402,7 +404,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
                         // Answer format should always be the same length and format for researchers
                         val answerFormatter = SimpleDateFormat("hh:mm aa", Locale.US)
 
-                        addAnswer(step, textFormatter.format(d), answerFormatter.format(d))
+                        addAnswer(step, textFormatter.format(d), answerFormatter.format(d), scroll)
                     }
                 }
                 dialog.setCallback(callback)
@@ -415,7 +417,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         }
 
         if(step.optional != false) {
-            addSkipButton(step)
+            addSkipButton(step, scroll)
         }
     }
 

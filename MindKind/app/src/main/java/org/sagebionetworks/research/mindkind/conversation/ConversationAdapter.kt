@@ -76,14 +76,15 @@ class ConversationAdapter(
         Log.i(LOG_TAG, "onBindViewHolder(): $position")
         val item = dataSet[position]
 
-        if(item.isQuestion) {
+        // TODO: for now allow long press on both question and answer
+        //if(item.isQuestion) {
             viewHolder.itemView.setOnLongClickListener {
                 listener.onConversationClicked(item.stepIdentifier)
                 currentIdentifier = item.stepIdentifier
                 notifyDataSetChanged()
                 true
             }
-        }
+        //}
 
         (viewHolder as? ChatViewHolder)?.let {
             it.textView.text = dataSet[position].text
@@ -135,7 +136,7 @@ class ConversationAdapter(
 
     open fun addItem(stepId: String, message: String?, question: Boolean) {
         val item = ConversationItem(stepId, message, question)
-        Log.d(LOG_TAG, "addItem(): $stepId - $question")
+        Log.d(LOG_TAG, "addItem(): $stepId - $question: $message")
         if(findExistingQuestion(item)) {
             if(!question) {
                 updateOrInsertItem(item)
@@ -170,8 +171,10 @@ class ConversationAdapter(
                 dataSet.remove(found)
             }
         } else {
-            val question = dataSet.find { it.stepIdentifier == item.stepIdentifier && it.isQuestion }
-            dataSet.add(dataSet.indexOf(question)+1, item)
+            if(item.text != null) {
+                val question = dataSet.find { it.stepIdentifier == item.stepIdentifier && it.isQuestion }
+                dataSet.add(dataSet.indexOf(question) + 1, item)
+            }
         }
 
     }
