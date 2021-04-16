@@ -4,29 +4,28 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.util.Log
-import android.widget.Toast
-import androidx.work.*
+import androidx.work.Worker
+import androidx.work.WorkerParameters
 import org.sagebionetworks.research.mindkind.BuildConfig
-import java.util.concurrent.TimeUnit
 
-public class DataUsageWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, params) {
+class AmbientLightWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, params) {
 
     companion object {
-        public val LOG_TAG = DataUsageWorker::class.java.simpleName
-        public val periodicWorkName = "DataUsageWorker"
+        public val LOG_TAG = AmbientLightWorker::class.java.simpleName
+        public val periodicWorkName = "AmbientLightWorker"
     }
 
     override fun doWork(): Result {
 
         if (BuildConfig.DEBUG) {
-            Log.d(LOG_TAG, "Data usage worker initiated")
+            Log.d(LOG_TAG, "Ambient light worker initiated")
         }
 
         val ctx = this.applicationContext
 
         // Request that background data service record mobile data usage
         val intent = Intent(ctx, BackgroundDataService::class.java)
-        intent.action = BackgroundDataService.DATA_USAGE_RECEIVER_ACTION
+        intent.action = BackgroundDataService.AMBIENT_LIGHT_WORKER_ACTION
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             ctx.startForegroundService(intent)

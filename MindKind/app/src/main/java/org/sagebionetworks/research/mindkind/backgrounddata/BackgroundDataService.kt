@@ -45,7 +45,6 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import android.hardware.SensorManager.SENSOR_DELAY_FASTEST
 import android.hardware.SensorManager.SENSOR_DELAY_NORMAL
 import android.net.TrafficStats
 import android.os.BatteryManager
@@ -98,6 +97,8 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
                 "org.sagebionetworks.research.MindKind.BackgroundData"
         public const val DATA_USAGE_RECEIVER_ACTION =
                 "org.sagebionetworks.research.MindKind.DataUsageReceiver"
+        public const val AMBIENT_LIGHT_WORKER_ACTION =
+                "org.sagebionetworks.research.MindKind.AmbientLightWorker"
 
         private const val TASK_IDENTIFIER = SageTaskIdentifier.BACKGROUND_DATA
         private const val FOREGROUND_NOTIFICATION_ID = 100
@@ -192,10 +193,17 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
         // Setup daily wifi & charger upload worker
         WorkUtils.enqueueDailyWorkNetwork(this,
                 BridgeUploadWorker::class.java, BridgeUploadWorker.periodicWorkName)
+
         // Setup data usage worker
         if (dataToTrack.contains(SageTaskIdentifier.DataUsage)) {
             WorkUtils.enqueueHourlyWork(this,
-                    DataUsageWorker::class.java, DataUsageWorker.periodicWorkName)
+                    DataUsageWorker::class.java,
+                    DataUsageWorker.periodicWorkName)
+        }
+        if (dataToTrack.contains(SageTaskIdentifier.AmbientLight)) {
+            WorkUtils.enqueueFastestWorker(this,
+                    AmbientLightWorker::class.java,
+                    AmbientLightWorker.periodicWorkName)
         }
 
         isServiceRunning = true
@@ -223,14 +231,6 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
             }
         }
         registerReceiver(receiver, filter)
-
-        // Register for ambient light callbacks
-        if (dataToTrack.contains(SageTaskIdentifier.AmbientLight)) {
-            sensorManager = getSystemService(SENSOR_SERVICE) as? SensorManager
-            sensorManager?.getDefaultSensor(Sensor.TYPE_LIGHT)?.let {
-                sensorManager?.registerListener(this, it, SENSOR_DELAY_NORMAL)
-            }
-        }
 
         LocalBroadcastManager.getInstance(this).registerReceiver(
                 uploadDataReceiver, IntentFilter(ACTIVITY_UPLOAD_DATA_ACTION))
@@ -367,6 +367,10 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
             writeDataUsageToDatabase()
         }
 
+        if (intent?.action == AMBIENT_LIGHT_WORKER_ACTION) {
+            writeAmbientLightToDatabase()
+        }
+
         return START_STICKY
     }
 
@@ -472,19 +476,38 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
         writeBackgroundDataToRoom(backgroundData)
     }
 
+    fun writeAmbientLightToDatabase() {
+        if (!dataToTrack.contains(SageTaskIdentifier.DataUsage)) {
+            // User did not consent to have this tracked
+            return
+        }
+
+        // Unfortunately, android doesn't provide a way to directly read the
+        // ambient light sensor, so let's register for callbacks,
+        // and wait for the first one, write to db, and then stop listening.
+        // See the onSensorChanged function below.
+        sensorManager = getSystemService(SENSOR_SERVICE) as? SensorManager
+        sensorManager?.getDefaultSensor(Sensor.TYPE_LIGHT)?.let {
+            sensorManager?.registerListener(this, it, SENSOR_DELAY_NORMAL)
+        }
+    }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-        // No-op needed
+        // No-op needed for ambient light sensor
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
-        if(event?.sensor?.type == Sensor.TYPE_LIGHT) {
-            val intensity = event?.values?.firstOrNull() ?: run { return }
+        val sensorEvent = event ?: run { return }
+        if(sensorEvent.sensor?.type == Sensor.TYPE_LIGHT) {
+            val intensity = sensorEvent.values?.firstOrNull() ?: run { return }
             writeBackgroundDataToRoom(BackgroundDataEntity(
                     date = LocalDateTime.now(),
                     dataType = SageTaskIdentifier.AmbientLight,
                     uploaded = false,
                     data = intensity.toString()))
+
+            // We got our measurement, unregister listener
+            sensorManager?.unregisterListener(this)
         }
     }
 
