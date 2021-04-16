@@ -77,6 +77,27 @@ open class ConversationSurveyActivity: AppCompatActivity() {
 
         recycler_view_conversation.addItemDecoration(SpacesItemDecoration(resources.getDimensionPixelSize(R.dimen.converation_recycler_spacing)))
 
+        recycler_view_conversation.addOnScrollListener(object: RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                logInfo("onScrollStateChanged(): $newState")
+                if(newState == RecyclerView.SCROLL_STATE_DRAGGING) {
+                    button_container.visibility = View.GONE
+                    gradient.visibility = View.GONE
+                    scroll_arrow.visibility = View.VISIBLE
+                }
+            }
+        })
+
+        scroll_arrow.setOnClickListener {
+            val adapter = recycler_view_conversation.adapter as ConversationAdapter
+            button_container.visibility = View.VISIBLE
+            gradient.visibility = View.VISIBLE
+            scroll_arrow.visibility = View.GONE
+            recycler_view_conversation.smoothScrollToPosition(adapter.itemCount)
+            //adapter.notifyDataSetChanged()
+        }
+
         intent.extras?.getString(extraConversationId)?.let {
             val conversation = ConversationGsonHelper.createGson()
                     .fromJson(it, ConversationSurvey::class.java)
@@ -84,13 +105,16 @@ open class ConversationSurveyActivity: AppCompatActivity() {
             // Setup the view model and start the conversation
             viewModel.initConversation(conversation)
             val adapter = ConversationAdapter(this, arrayListOf(), object: ConversationAdapterListener {
-                override fun onConversationClicked(stepIdentifier: String) {
+                override fun onConversationClicked(stepIdentifier: String, answer: String?) {
                     var step: ConversationStep? = findStep(conversation, stepIdentifier)
                     if(step != null) {
+                        button_container.visibility = View.VISIBLE
+                        gradient.visibility = View.VISIBLE
+                        scroll_arrow.visibility = View.GONE
                         val index = findIndex(conversation, step)
                         val isLastItem = index >= conversation.steps.size
                         viewModel.itemCount--
-                        showQuestion(step, isLastItem, false)
+                        showQuestion(step, answer, isLastItem, false)
                     }
                  }
 
@@ -135,7 +159,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         }
 
         val isLastItem = viewModel.itemCount >= steps.size
-        showQuestion(step, isLastItem, true)
+        showQuestion(step, null, isLastItem, true)
 
         viewModel.itemCount++
         if(scroll) {
@@ -144,7 +168,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
 
     }
 
-    private fun showQuestion(step: ConversationStep, isLastItem: Boolean, scroll: Boolean) {
+    private fun showQuestion(step: ConversationStep, answer: String?, isLastItem: Boolean, scroll: Boolean) {
         var hasQuestions = true
 
         when(step.type) {
@@ -153,11 +177,11 @@ open class ConversationSurveyActivity: AppCompatActivity() {
             ConversationStepType.singleChoiceInt.type ->
                 handleSingleChoice(step as? ConversationSingleChoiceIntFormStep, scroll)
             ConversationStepType.integer.type ->
-                handleIntegerInput(step as? ConversationIntegerFormStep, scroll)
+                handleIntegerInput(step as? ConversationIntegerFormStep, answer, scroll)
             ConversationStepType.text.type ->
-                handleTextInput(step as? ConversationTextFormStep, scroll)
+                handleTextInput(step as? ConversationTextFormStep, answer, scroll)
             ConversationStepType.timeOfDay.type ->
-                handleTimeOfDayInput(step as? ConversationTimeOfDayStep, scroll)
+                handleTimeOfDayInput(step as? ConversationTimeOfDayStep, answer, scroll)
             ConversationStepType.gif.type -> {
                 handleGifInput(step as? GifStep)
             }
@@ -275,11 +299,14 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         }
     }
 
-    private fun handleIntegerInput(intStep: ConversationIntegerFormStep?, scroll: Boolean) {
+    private fun handleIntegerInput(intStep: ConversationIntegerFormStep?, answer: String?, scroll: Boolean) {
         val step = intStep ?: run { return }
 
         button_container.removeAllViews()
         var counter = 0
+        if(answer != null) {
+            counter = Integer.parseInt(answer)
+        }
 
         (this.layoutInflater.inflate(R.layout.integer_input,
                 button_container, false) as? ViewGroup)?.let { vg ->
@@ -288,17 +315,18 @@ open class ConversationSurveyActivity: AppCompatActivity() {
             val posView = vg.integer_positive
             val curView = vg.integer_current
 
+            curView.text = counter.toString()
             applyBounds(step.min, step.max, counter, negView, posView)
 
             negView.setOnClickListener { _ ->
                 counter--
-                vg.integer_current.text = counter.toString()
+                curView.text = counter.toString()
                 applyBounds(step.min, step.max, counter, negView, posView)
             }
 
             posView.setOnClickListener { _ ->
                 counter++
-                vg.integer_current.text = counter.toString()
+                curView.text = counter.toString()
                 applyBounds(step.min, step.max, counter, negView, posView)
             }
             button_container.addView(vg)
@@ -344,7 +372,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         }
     }
 
-    private fun handleTextInput(textStep: ConversationTextFormStep?, scroll: Boolean) {
+    private fun handleTextInput(textStep: ConversationTextFormStep?, answer: String?, scroll: Boolean) {
         val step = textStep ?: run { return }
         button_container.removeAllViews()
 
@@ -354,6 +382,9 @@ open class ConversationSurveyActivity: AppCompatActivity() {
             val inputView = vg.text_input
             inputView?.maxLines = 4
             inputView?.hint = step.placeholderText
+            if(answer != null) {
+                inputView?.setText(answer)
+            }
             button_container.addView(vg)
 
             (this.layoutInflater.inflate(R.layout.conversation_material_button,
@@ -378,7 +409,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         }
     }
 
-    private fun handleTimeOfDayInput(timeStep: ConversationTimeOfDayStep?, scroll: Boolean) {
+    private fun handleTimeOfDayInput(timeStep: ConversationTimeOfDayStep?, answer: String?, scroll: Boolean) {
         val step = timeStep ?: run { return }
         button_container.removeAllViews()
 
@@ -387,20 +418,25 @@ open class ConversationSurveyActivity: AppCompatActivity() {
 
             it.text = step.buttonTitle
 
+            // For localization support, switch to whatever clock the user is using
+            val textFormatter = if (is24HourFormat(baseContext)) {
+                SimpleDateFormat("H:mm", Locale.US)
+            } else {
+                SimpleDateFormat("h:mm aa", Locale.US)
+            }
+
             val activity = this
             it.setOnClickListener {
-                val dialog = ConversationTimeOfDayDialog()
+                var input: Date? = null
+                if(answer != null) {
+                    input = textFormatter.parse(answer)
+                }
+                val dialog = ConversationTimeOfDayDialog(input)
                 val callback = object: ConversationTimeOfDayDialog.Callback {
                     override fun onDateSelected(d: Date) {
                         disableAllButtons()
                         logInfo("Received date callback: $d")
 
-                        // For localization support, switch to whatever clock the user is using
-                        val textFormatter = if (is24HourFormat(baseContext)) {
-                            SimpleDateFormat("H:mm", Locale.US)
-                        } else {
-                            SimpleDateFormat("h:mm aa", Locale.US)
-                        }
                         // Answer format should always be the same length and format for researchers
                         val answerFormatter = SimpleDateFormat("hh:mm aa", Locale.US)
 

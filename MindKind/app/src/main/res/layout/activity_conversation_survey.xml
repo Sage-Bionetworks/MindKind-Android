@@ -87,6 +87,19 @@
             android:background="@drawable/gradient"
             android:layout_above="@id/button_container"/>
 
+        <ImageButton
+            android:id="@+id/scroll_arrow"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/ic_expand_more"
+            android:tint="@color/white"
+            android:background="@drawable/scroll_arrow"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="20dp"
+            android:scaleType="fitXY"
+            android:visibility="gone"/>
+
         <LinearLayout
             android:id="@+id/button_container"
             android:layout_width="match_parent"

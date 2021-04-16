@@ -27,7 +27,7 @@ data class ConversationItem(
         val gifUrl: String? = null)
 
 public interface ConversationAdapterListener {
-    fun onConversationClicked(stepIdentifier: String)
+    fun onConversationClicked(stepIdentifier: String, answer: String?)
 }
 
 class ConversationAdapter(
@@ -79,7 +79,7 @@ class ConversationAdapter(
         // TODO: for now allow long press on both question and answer
         //if(item.isQuestion) {
             viewHolder.itemView.setOnLongClickListener {
-                listener.onConversationClicked(item.stepIdentifier)
+                listener.onConversationClicked(item.stepIdentifier, findAnswer(item.stepIdentifier))
                 currentIdentifier = item.stepIdentifier
                 notifyDataSetChanged()
                 true
@@ -157,6 +157,18 @@ class ConversationAdapter(
         }
 
         return found != null
+    }
+
+    private fun findAnswer(stepIdentifier: String): String? {
+        val found =  dataSet.find {
+            it.stepIdentifier == stepIdentifier && !it.isQuestion
+        }
+
+        if (found != null) {
+            return found.text
+        } else {
+            return null
+        }
     }
 
     private fun updateOrInsertItem(item: ConversationItem) {
