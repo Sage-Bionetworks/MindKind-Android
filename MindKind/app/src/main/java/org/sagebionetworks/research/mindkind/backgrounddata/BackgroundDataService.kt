@@ -234,9 +234,6 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
 
         LocalBroadcastManager.getInstance(this).registerReceiver(
                 uploadDataReceiver, IntentFilter(ACTIVITY_UPLOAD_DATA_ACTION))
-
-        // Some events need to be tracked immediately
-        recordStartupBackgroundData()
     }
 
     override fun onDestroy() {
@@ -263,10 +260,6 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
         override fun onReceive(context: Context, intent: Intent) {
             uploadDataToBridge()
         }
-    }
-
-    private fun recordStartupBackgroundData() {
-        writeDataUsageToDatabase()
     }
 
     /**

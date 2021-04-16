@@ -118,7 +118,7 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
             val intent = Intent(this, SettingsActivity::class.java)
             intent.putExtra(SettingsActivity.extraSettingsId, "Settings")
             startActivity(intent)
-            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
         }
 
         refreshServiceButtonState()

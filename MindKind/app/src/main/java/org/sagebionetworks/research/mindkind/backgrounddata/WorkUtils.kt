@@ -46,13 +46,9 @@ public class WorkUtils {
                               workerClass: Class<out ListenableWorker?>,
                               periodicWorkName: String) {
 
-            val constraint: Constraints = Constraints.Builder()
-                    .build()
-
             val workRequest: PeriodicWorkRequest = PeriodicWorkRequest.Builder(
                     workerClass, PeriodicWorkRequest.MIN_PERIODIC_INTERVAL_MILLIS,
                     TimeUnit.MILLISECONDS)
-                    .setConstraints(constraint)
                     .build()
 
             val workManager: WorkManager = WorkManager.getInstance(context)

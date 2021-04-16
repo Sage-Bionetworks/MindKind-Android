@@ -4,35 +4,29 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.util.Log
-import androidx.work.Worker
-import androidx.work.WorkerParameters
+import android.widget.Toast
+import androidx.work.*
 import org.sagebionetworks.research.mindkind.BuildConfig
+import java.util.concurrent.TimeUnit
 
-public class DataUsageWorker(ctx: Context, params: WorkerParameters) : BackgroundDataWorker(ctx, params) {
-    override val periodicWorkName: String = "DataUsageWorker"
-    override val intentActionName: String = BackgroundDataService.DATA_USAGE_RECEIVER_ACTION
-}
-
-abstract class BackgroundDataWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, params) {
+public class DataUsageWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, params) {
 
     companion object {
-        public val LOG_TAG = BackgroundDataWorker::class.java.simpleName
+        public val LOG_TAG = DataUsageWorker::class.java.simpleName
+        public val periodicWorkName = "DataUsageWorker"
     }
-
-    abstract val periodicWorkName: String
-    abstract val intentActionName: String
 
     override fun doWork(): Result {
 
         if (BuildConfig.DEBUG) {
-            Log.d(LOG_TAG, "Background data worker invoked $periodicWorkName")
+            Log.d(LOG_TAG, "Data usage worker initiated")
         }
 
         val ctx = this.applicationContext
 
         // Request that background data service record mobile data usage
         val intent = Intent(ctx, BackgroundDataService::class.java)
-        intent.action = intentActionName
+        intent.action = BackgroundDataService.DATA_USAGE_RECEIVER_ACTION
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             ctx.startForegroundService(intent)
