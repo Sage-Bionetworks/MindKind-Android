@@ -9,6 +9,7 @@ import android.text.format.DateFormat.is24HourFormat
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.TranslateAnimation
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.children
@@ -81,21 +82,27 @@ open class ConversationSurveyActivity: AppCompatActivity() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
                 logInfo("onScrollStateChanged(): $newState")
-                if(newState == RecyclerView.SCROLL_STATE_DRAGGING) {
-                    button_container.visibility = View.GONE
-                    gradient.visibility = View.GONE
-                    scroll_arrow.visibility = View.VISIBLE
+                if(newState == RecyclerView.SCROLL_STATE_DRAGGING &&
+                        (recyclerView.canScrollVertically(-1) )) {
+                    if(scroll_arrow.visibility == View.GONE) {
+                        hideButtonContainer()
+                        recyclerView.adapter?.notifyDataSetChanged()
+                    }
+                } else if (newState==RecyclerView.SCROLL_STATE_IDLE &&
+                        (!recyclerView.canScrollVertically(1) && recyclerView.canScrollVertically(-1))) {
+                    if(scroll_arrow.visibility == View.VISIBLE) {
+                        val adapter = recycler_view_conversation.adapter as ConversationAdapter
+                        showButtonContainer()
+                        recycler_view_conversation.smoothScrollToPosition(adapter.itemCount)
+                    }
                 }
             }
         })
 
         scroll_arrow.setOnClickListener {
             val adapter = recycler_view_conversation.adapter as ConversationAdapter
-            button_container.visibility = View.VISIBLE
-            gradient.visibility = View.VISIBLE
-            scroll_arrow.visibility = View.GONE
+            showButtonContainer()
             recycler_view_conversation.smoothScrollToPosition(adapter.itemCount)
-            //adapter.notifyDataSetChanged()
         }
 
         intent.extras?.getString(extraConversationId)?.let {
@@ -108,9 +115,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
                 override fun onConversationClicked(stepIdentifier: String, answer: String?) {
                     var step: ConversationStep? = findStep(conversation, stepIdentifier)
                     if(step != null) {
-                        button_container.visibility = View.VISIBLE
-                        gradient.visibility = View.VISIBLE
-                        scroll_arrow.visibility = View.GONE
+                        showButtonContainer()
                         val index = findIndex(conversation, step)
                         val isLastItem = index >= conversation.steps.size
                         viewModel.itemCount--
@@ -129,6 +134,36 @@ open class ConversationSurveyActivity: AppCompatActivity() {
             adapter.preloadGifs(gifSteps)
 
         }
+    }
+
+    fun View.slideDown(duration: Int = 500) {
+        visibility = View.VISIBLE
+        val animate = TranslateAnimation(0f, 0f, 0f, this.height.toFloat())
+        animate.duration = duration.toLong()
+        animate.fillAfter = true
+        this.visibility = View.GONE
+        this.startAnimation(animate)
+    }
+
+    fun View.slideUp(duration: Int = 500) {
+        visibility = View.VISIBLE
+        val animate = TranslateAnimation(0f, 0f, this.height.toFloat(), 0f)
+        animate.duration = duration.toLong()
+        animate.fillAfter = true
+        this.startAnimation(animate)
+    }
+
+    private fun hideButtonContainer() {
+        button_container.slideDown(250)
+        gradient.visibility = View.GONE
+        scroll_arrow.visibility = View.VISIBLE
+        scroll_arrow.bringToFront()
+    }
+
+    private fun showButtonContainer() {
+        button_container.slideUp(5)
+        gradient.visibility = View.VISIBLE
+        scroll_arrow.visibility = View.GONE
     }
 
     private fun findStep(conversation: ConversationSurvey, stepIdentifier: String) : ConversationStep? {

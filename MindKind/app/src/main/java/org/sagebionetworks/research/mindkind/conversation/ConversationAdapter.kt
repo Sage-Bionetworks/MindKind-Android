@@ -160,15 +160,9 @@ class ConversationAdapter(
     }
 
     private fun findAnswer(stepIdentifier: String): String? {
-        val found =  dataSet.find {
+        return dataSet.find {
             it.stepIdentifier == stepIdentifier && !it.isQuestion
-        }
-
-        if (found != null) {
-            return found.text
-        } else {
-            return null
-        }
+        }?.text
     }
 
     private fun updateOrInsertItem(item: ConversationItem) {
@@ -198,8 +192,17 @@ class ConversationAdapter(
     }
 
     open fun addGif(stepId: String, backupText: String, gifUrl: String) {
-        dataSet.add(ConversationItem(stepId, backupText, false, gifUrl))
-        notifyItemInserted(dataSet.size)
+        Log.d(LOG_TAG, "addGif(): $stepId")
+        var item = ConversationItem(stepId, backupText, false, gifUrl)
+
+        val found =  dataSet.find {
+            it.stepIdentifier == item.stepIdentifier
+        }
+
+        if(found == null) {
+            dataSet.add(item)
+            notifyItemInserted(dataSet.size)
+        }
     }
 
     inner class GifLoaderListener(val stepIdentifier: String): RequestListener<Drawable> {
