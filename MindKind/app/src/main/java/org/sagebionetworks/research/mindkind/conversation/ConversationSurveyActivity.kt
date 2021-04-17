@@ -119,7 +119,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
                         val index = findIndex(conversation, step)
                         val isLastItem = index >= conversation.steps.size
                         viewModel.itemCount--
-                        showQuestion(step, answer, isLastItem, false)
+                        showQuestion(step, answer, isLastItem, true)
                     }
                  }
 
