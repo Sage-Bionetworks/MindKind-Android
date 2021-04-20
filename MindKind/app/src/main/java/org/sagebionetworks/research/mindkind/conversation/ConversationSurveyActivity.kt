@@ -86,14 +86,6 @@ open class ConversationSurveyActivity: AppCompatActivity() {
                         (recyclerView.canScrollVertically(-1) )) {
                     if(scroll_arrow.visibility == View.GONE) {
                         hideButtonContainer()
-                        recyclerView.adapter?.notifyDataSetChanged()
-                    }
-                } else if (newState==RecyclerView.SCROLL_STATE_IDLE &&
-                        (!recyclerView.canScrollVertically(1) && recyclerView.canScrollVertically(-1))) {
-                    if(scroll_arrow.visibility == View.VISIBLE) {
-                        val adapter = recycler_view_conversation.adapter as ConversationAdapter
-                        showButtonContainer()
-                        recycler_view_conversation.smoothScrollToPosition(adapter.itemCount)
                     }
                 }
             }
@@ -103,6 +95,8 @@ open class ConversationSurveyActivity: AppCompatActivity() {
             val adapter = recycler_view_conversation.adapter as ConversationAdapter
             showButtonContainer()
             recycler_view_conversation.smoothScrollToPosition(adapter.itemCount)
+            viewModel.itemCount--
+            addQuestion(true)
         }
 
         intent.extras?.getString(extraConversationId)?.let {
@@ -118,8 +112,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
                         showButtonContainer()
                         val index = findIndex(conversation, step)
                         val isLastItem = index >= conversation.steps.size
-                        viewModel.itemCount--
-                        showQuestion(step, answer, isLastItem, true)
+                        showQuestion(step, answer, isLastItem, false)
                     }
                  }
 
@@ -140,7 +133,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         visibility = View.VISIBLE
         val animate = TranslateAnimation(0f, 0f, 0f, this.height.toFloat())
         animate.duration = duration.toLong()
-        animate.fillAfter = true
+        animate.fillAfter = false
         this.visibility = View.GONE
         this.startAnimation(animate)
     }
@@ -149,7 +142,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         visibility = View.VISIBLE
         val animate = TranslateAnimation(0f, 0f, this.height.toFloat(), 0f)
         animate.duration = duration.toLong()
-        animate.fillAfter = true
+        animate.fillAfter = false
         this.startAnimation(animate)
     }
 
@@ -246,13 +239,17 @@ open class ConversationSurveyActivity: AppCompatActivity() {
 
         if(scroll) {
             recycler_view_conversation.smoothScrollToPosition(adapter.itemCount)
+
+            handler?.postDelayed({
+                addQuestion(scroll)
+            }, DELAY)
+        } else {
+            // this is edit
+            hideButtonContainer()
         }
 
         viewModel.addAnswer(step, value)
 
-        handler?.postDelayed({
-            addQuestion(scroll)
-        }, DELAY)
     }
 
     private fun handleInstructionItem(instructionStep: ConversationInstructionStep?, scroll: Boolean): Boolean {

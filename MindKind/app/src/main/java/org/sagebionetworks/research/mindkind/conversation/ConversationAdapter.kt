@@ -140,8 +140,9 @@ class ConversationAdapter(
         if(findExistingQuestion(item)) {
             if(!question) {
                 updateOrInsertItem(item)
+            } else {
+                currentIdentifier = dataSet.last().stepIdentifier
             }
-            currentIdentifier = dataSet.last().stepIdentifier
         } else {
             dataSet.add(ConversationItem(stepId, message, question))
             currentIdentifier = stepId
@@ -181,6 +182,7 @@ class ConversationAdapter(
                 val question = dataSet.find { it.stepIdentifier == item.stepIdentifier && it.isQuestion }
                 dataSet.add(dataSet.indexOf(question) + 1, item)
             }
+            currentIdentifier = dataSet.last().stepIdentifier
         }
 
     }
