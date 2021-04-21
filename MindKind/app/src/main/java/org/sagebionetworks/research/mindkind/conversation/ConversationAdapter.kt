@@ -27,7 +27,7 @@ data class ConversationItem(
         val gifUrl: String? = null)
 
 public interface ConversationAdapterListener {
-    fun onConversationClicked(stepIdentifier: String)
+    fun onConversationClicked(stepIdentifier: String, answer: String?)
 }
 
 class ConversationAdapter(
@@ -79,7 +79,7 @@ class ConversationAdapter(
         // TODO: for now allow long press on both question and answer
         //if(item.isQuestion) {
             viewHolder.itemView.setOnLongClickListener {
-                listener.onConversationClicked(item.stepIdentifier)
+                listener.onConversationClicked(item.stepIdentifier, findAnswer(item.stepIdentifier))
                 currentIdentifier = item.stepIdentifier
                 notifyDataSetChanged()
                 true
@@ -140,8 +140,9 @@ class ConversationAdapter(
         if(findExistingQuestion(item)) {
             if(!question) {
                 updateOrInsertItem(item)
+            } else {
+                currentIdentifier = dataSet.last().stepIdentifier
             }
-            currentIdentifier = dataSet.last().stepIdentifier
         } else {
             dataSet.add(ConversationItem(stepId, message, question))
             currentIdentifier = stepId
@@ -157,6 +158,12 @@ class ConversationAdapter(
         }
 
         return found != null
+    }
+
+    private fun findAnswer(stepIdentifier: String): String? {
+        return dataSet.find {
+            it.stepIdentifier == stepIdentifier && !it.isQuestion
+        }?.text
     }
 
     private fun updateOrInsertItem(item: ConversationItem) {
@@ -175,6 +182,7 @@ class ConversationAdapter(
                 val question = dataSet.find { it.stepIdentifier == item.stepIdentifier && it.isQuestion }
                 dataSet.add(dataSet.indexOf(question) + 1, item)
             }
+            currentIdentifier = dataSet.last().stepIdentifier
         }
 
     }
@@ -186,8 +194,17 @@ class ConversationAdapter(
     }
 
     open fun addGif(stepId: String, backupText: String, gifUrl: String) {
-        dataSet.add(ConversationItem(stepId, backupText, false, gifUrl))
-        notifyItemInserted(dataSet.size)
+        Log.d(LOG_TAG, "addGif(): $stepId")
+        var item = ConversationItem(stepId, backupText, false, gifUrl)
+
+        val found =  dataSet.find {
+            it.stepIdentifier == item.stepIdentifier
+        }
+
+        if(found == null) {
+            dataSet.add(item)
+            notifyItemInserted(dataSet.size)
+        }
     }
 
     inner class GifLoaderListener(val stepIdentifier: String): RequestListener<Drawable> {

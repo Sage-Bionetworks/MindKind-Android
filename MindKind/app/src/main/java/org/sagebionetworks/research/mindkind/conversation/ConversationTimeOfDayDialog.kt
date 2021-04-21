@@ -16,7 +16,7 @@ import org.sagebionetworks.research.mindkind.R
 import java.text.DateFormat
 import java.util.*
 
-class ConversationTimeOfDayDialog : BottomSheetDialogFragment() {
+class ConversationTimeOfDayDialog(val input: Date?) : BottomSheetDialogFragment() {
 
     private val LOG_TAG = this::class.java.canonicalName
 
@@ -46,6 +46,9 @@ class ConversationTimeOfDayDialog : BottomSheetDialogFragment() {
         }
 
         var cal = Calendar.getInstance()
+        if(input != null) {
+            cal.time = input
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             picker.hour = cal.get(Calendar.HOUR_OF_DAY)
             picker.minute = cal.get(Calendar.MINUTE)
