@@ -38,6 +38,25 @@ public class WorkUtils {
         }
 
         /**
+         * Schedule work at the fastest possible interval available to the system
+         * @param context can be app, activity, or service
+         * @param periodWorkName name of the worker to be referenced later when cancelling
+         */
+        fun enqueueFastestWorker(context: Context,
+                              workerClass: Class<out ListenableWorker?>,
+                              periodicWorkName: String) {
+
+            val workRequest: PeriodicWorkRequest = PeriodicWorkRequest.Builder(
+                    workerClass, PeriodicWorkRequest.MIN_PERIODIC_INTERVAL_MILLIS,
+                    TimeUnit.MILLISECONDS)
+                    .build()
+
+            val workManager: WorkManager = WorkManager.getInstance(context)
+            workManager.enqueueUniquePeriodicWork(periodicWorkName,
+                    ExistingPeriodicWorkPolicy.REPLACE, workRequest)
+        }
+
+        /**
          * Work will be enqueued immediately and if this function has been called before,
          * It will keep the original work request, so we don't upload too frequently.
          * It will not have an initial delay.
