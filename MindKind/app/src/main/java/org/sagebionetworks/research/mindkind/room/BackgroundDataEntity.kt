@@ -36,7 +36,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.room.*
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
-import org.threeten.bp.LocalDateTime
+import org.threeten.bp.ZonedDateTime
 
 /**
  * The BackgroundDataEntity contains a piece of data that was collected from the user
@@ -53,7 +53,7 @@ data class BackgroundDataEntity(
          */
         @Expose
         @ColumnInfo(index = true)
-        var date: LocalDateTime? = null,
+        var date: ZonedDateTime? = null,
         /**
          * @property dataType of the background data
          */
