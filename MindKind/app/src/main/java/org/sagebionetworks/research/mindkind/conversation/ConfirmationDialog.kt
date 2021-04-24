@@ -16,7 +16,7 @@ class ConfirmationDialog : DialogFragment() {
 
     companion object {
 
-        private val LOG_TAG = this::class.java.canonicalName
+        private val LOG_TAG = ConfirmationDialog::class.java.canonicalName
         const val TAG = "ConfirmationDialog"
 
         private const val KEY_TITLE = "KEY_TITLE"
@@ -36,17 +36,20 @@ class ConfirmationDialog : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         Log.d(LOG_TAG, "onCreateDialog()")
+
         // creating the fullscreen dialog
-        val dialog = activity?.let { Dialog(it) }
-        dialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog?.setContentView(R.layout.dialog_confirmation)
-        dialog?.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialog.window!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+        val dialog = Dialog(requireActivity())
+
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.dialog_confirmation)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
         dialog.setCancelable(false)
 
-        var view = dialog.findViewById<View>(R.id.confirmation_container)
-        setupView(view)
-        setupClickListeners(view)
+        dialog.findViewById<View>(R.id.confirmation_container)?.let {
+            setupView(it)
+            setupClickListeners(it)
+        }
 
         return dialog
     }

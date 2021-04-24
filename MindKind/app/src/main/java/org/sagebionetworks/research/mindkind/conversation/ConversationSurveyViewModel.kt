@@ -94,11 +94,7 @@ open class ConversationSurveyViewModel(private val taskResultUploader: TaskResul
     }
 
     fun hasAnswers(): Boolean {
-        return if(answersLiveData.value == null) {
-            false
-        } else {
-            answersLiveData.value?.size!! > 0
-        }
+        return (answersLiveData.value?.size ?: 0) > 0
     }
 
     /**
