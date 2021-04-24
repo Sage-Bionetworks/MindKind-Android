@@ -93,6 +93,14 @@ open class ConversationSurveyViewModel(private val taskResultUploader: TaskResul
         }
     }
 
+    fun hasAnswers(): Boolean {
+        return if(answersLiveData.value == null) {
+            false
+        } else {
+            answersLiveData.value?.size!! > 0
+        }
+    }
+
     /**
      * Complete the conversation and upload it to bridge
      * @return live data to monitor for changes

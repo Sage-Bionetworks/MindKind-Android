@@ -98,4 +98,8 @@
     <string name="withdraw_title">Hi %1$s,\n You have been enrolled in the mPower2 Study since %2$s</string>
     <string name="withdraw_details">You can withdraw from the study if you no longer want to be involved. Please note that you will be logged out of your account and no further data will be collected.</string>
 
+    <string name="conversation_confirmation_title">Exit Survey.</string>
+    <string name="conversation_confirmation_message">If you exit the survey, all your data will not be saved.</string>
+    <string name="conversation_confirmation_continue"><u>Continue</u></string>
+    <string name="conversation_confirmation_quit">Exit Survey</string>
 </resources>

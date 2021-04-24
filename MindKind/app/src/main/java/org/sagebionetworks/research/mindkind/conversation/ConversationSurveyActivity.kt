@@ -68,8 +68,19 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         viewModel = ViewModelProvider(this,
                 ConversationSurveyViewModel.Factory(taskResultUploader)).get()
 
+        var fm = supportFragmentManager
         back_button.setOnClickListener {
-            finish()
+            if(viewModel.hasAnswers()) {
+                val dialog = ConfirmationDialog.newInstance(getString(R.string.conversation_confirmation_title),
+                        getString(R.string.conversation_confirmation_message))
+                dialog.show(fm, ConfirmationDialog.TAG)
+                dialog.setActionListener(View.OnClickListener {
+                    logInfo("Action listener")
+                    finish()
+                })
+            } else {
+                finish()
+            }
         }
 
         val llm = LinearLayoutManager(this)
