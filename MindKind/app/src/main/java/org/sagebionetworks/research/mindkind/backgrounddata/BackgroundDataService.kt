@@ -74,11 +74,10 @@ import org.sagebionetworks.research.mindkind.room.BackgroundDataTypeConverters
 import org.sagebionetworks.research.mindkind.room.MindKindDatabase
 import org.sagebionetworks.research.mindkind.util.NoLimitRateLimiter
 import org.sagebionetworks.research.mindkind.util.RateLimiter
-import org.sagebionetworks.research.sageresearch.extensions.toInstant
 import org.sagebionetworks.research.sageresearch_app_sdk.TaskResultUploader
 import org.threeten.bp.Instant
 import org.threeten.bp.LocalDateTime
-import org.threeten.bp.ZoneId
+import org.threeten.bp.ZonedDateTime
 import java.io.File
 import java.io.FileOutputStream
 import java.util.*
@@ -274,8 +273,7 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
 
         // Upload all the data from the background data table
         subscribeCompletableAsync(Completable.fromAction {
-            val data =
-                    database.backgroundDataDao().getData(false)
+            val data = database.backgroundDataDao().getData(false)
 
             if (data.isEmpty()) {
                 return@fromAction
@@ -317,9 +315,9 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
                                  backgroundData: List<BackgroundDataEntity>): TaskResultBase {
 
         val startTime = backgroundData.firstOrNull()?.date
-                ?.toInstant(ZoneId.systemDefault()) ?: Instant.now()
+                ?.toInstant() ?: Instant.now()
         val endTime = backgroundData.lastOrNull()?.date
-                ?.toInstant(ZoneId.systemDefault()) ?: Instant.now()
+                ?.toInstant() ?: Instant.now()
 
         val json = BackgroundDataTypeConverters().gsonExposeOnly.toJson(backgroundData)
         val folderPath = cacheDir.absolutePath + File.separator + taskIdentifier
@@ -450,7 +448,7 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
             return
         }
 
-        val now = LocalDateTime.now()
+        val now = ZonedDateTime.now()
         val backgroundData = mutableListOf<BackgroundDataEntity>()
         mapOf(
             "totalRx" to TrafficStats.getTotalRxBytes(),
@@ -494,7 +492,7 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
         if(sensorEvent.sensor?.type == Sensor.TYPE_LIGHT) {
             val intensity = sensorEvent.values?.firstOrNull() ?: run { return }
             writeBackgroundDataToRoom(BackgroundDataEntity(
-                    date = LocalDateTime.now(),
+                    date = ZonedDateTime.now(),
                     dataType = SageTaskIdentifier.AmbientLight,
                     uploaded = false,
                     data = intensity.toString()))
@@ -512,10 +510,11 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
                 return
             }
 
-            val now = LocalDateTime.now()
+            val now = ZonedDateTime.now()
+            val localNow = LocalDateTime.now()
 
             // Check if we should rate-limit this data type
-            if (rateLimiterFor(dataType).shouldLimit(now)) {
+            if (rateLimiterFor(dataType).shouldLimit(localNow)) {
                 return
             }
 

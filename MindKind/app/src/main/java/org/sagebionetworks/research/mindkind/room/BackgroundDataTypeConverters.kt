@@ -35,12 +35,22 @@ package org.sagebionetworks.research.mindkind.room
 
 import androidx.room.TypeConverter
 import com.google.gson.GsonBuilder
+import com.google.gson.TypeAdapter
+import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonWriter
 import org.joda.time.DateTime
 import org.sagebionetworks.bridge.rest.gson.ByteArrayToBase64TypeAdapter
 import org.sagebionetworks.bridge.rest.gson.DateTimeTypeAdapter
 import org.sagebionetworks.bridge.rest.gson.LocalDateTypeAdapter
 import org.sagebionetworks.research.sageresearch.dao.room.*
 import org.threeten.bp.*
+import org.threeten.bp.chrono.IsoChronology
+import org.threeten.bp.format.DateTimeFormatter
+import org.threeten.bp.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
+import org.threeten.bp.format.DateTimeFormatterBuilder
+import org.threeten.bp.format.ResolverStyle
+import org.threeten.bp.temporal.ChronoField
+import java.io.IOException
 
 open class BackgroundDataTypeConverters {
 
@@ -53,12 +63,24 @@ open class BackgroundDataTypeConverters {
             .registerTypeAdapter(org.joda.time.LocalDate::class.java, LocalDateTypeAdapter())
             .registerTypeAdapter(DateTime::class.java, DateTimeTypeAdapter())
             .registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeAdapter())
-            .registerTypeAdapter(ZonedDateTime::class.java, ZonedDateTimeAdapter())
+            .registerTypeAdapter(ZonedDateTime::class.java, ConsistentZonedDateTimeAdapter())
             .registerTypeAdapter(LocalDate::class.java, LocalDateAdapter())
             .registerTypeAdapter(Instant::class.java, InstantAdapter())
 
     val gson = gsonBuilder.create()
     val gsonExposeOnly = gsonBuilder.excludeFieldsWithoutExposeAnnotation().create()
+
+    @TypeConverter
+    fun fromZonedDateTimeString(value: String?): ZonedDateTime? {
+        val valueChecked = value ?: return null
+        return ZonedDateTime.parse(valueChecked)
+    }
+
+    @TypeConverter
+    fun fromZonedDateTime(value: ZonedDateTime?): String? {
+        val valueChecked = value ?: return null
+        return valueChecked.toString()
+    }
 
     @TypeConverter
     fun fromLocalDateString(value: String?): LocalDate? {
@@ -106,5 +128,40 @@ open class BackgroundDataTypeConverters {
     fun fromLocalTimeStamp(value: LocalTime?): Long? {
         val valueChecked = value ?: return null
         return valueChecked.toNanoOfDay()
+    }
+}
+
+/**
+ * 'ConsistentZonedDateTimeAdapter' is used to encode ZonedDateTimes into a consistent
+ * format for parsing by Synapse Research team.
+ *
+ * Unfortunately, the default DateTimeFormatter.ISO_OFFSET_DATE has a variable length
+ * and is therefore not great for consistent parsing by the research team
+ */
+class ConsistentZonedDateTimeAdapter : TypeAdapter<ZonedDateTime>() {
+
+    companion object {
+        val formatter = DateTimeFormatterBuilder()
+                .parseCaseInsensitive()
+                .appendPattern("yyyy-MM-dd")
+                .appendLiteral("T")
+                .appendPattern("HH:mm:ss.SSS")
+                .appendOffsetId()
+                .toFormatter().withChronology(IsoChronology.INSTANCE)
+    }
+
+    @Throws(IOException::class)
+    override fun read(reader: JsonReader): ZonedDateTime {
+        val src = reader.nextString()
+        return ZonedDateTime.from(formatter.parse(src))
+    }
+
+    @Throws(IOException::class)
+    override fun write(writer: JsonWriter, date: ZonedDateTime?) {
+        date?.let {
+            writer.value(formatter.format(it))
+        } ?: run {
+            writer.nullValue()
+        }
     }
 }
