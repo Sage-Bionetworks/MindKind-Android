@@ -3,24 +3,16 @@ package org.sagebionetworks.research.mindkind.settings
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.graphics.Rect
 import android.os.Bundle
-import android.os.Handler
 import android.util.Log
-import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.ItemDecoration
 import dagger.android.AndroidInjection
-import kotlinx.android.synthetic.main.activity_conversation_survey.back_button
 import kotlinx.android.synthetic.main.activity_settings.*
 import org.sagebionetworks.research.mindkind.R
-import org.sagebionetworks.research.mindkind.conversation.ConversationSurveyActivity
 
 open class SettingsActivity: AppCompatActivity() {
 

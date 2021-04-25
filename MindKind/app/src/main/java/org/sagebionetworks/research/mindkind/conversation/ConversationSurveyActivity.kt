@@ -3,6 +3,7 @@ package org.sagebionetworks.research.mindkind.conversation
 import android.content.Context
 import android.content.Intent
 import android.graphics.Rect
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.text.format.DateFormat.is24HourFormat
@@ -14,6 +15,7 @@ import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.children
 import androidx.lifecycle.*
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
@@ -27,6 +29,7 @@ import org.sagebionetworks.research.sageresearch_app_sdk.TaskResultUploader
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
+import kotlin.math.roundToInt
 
 open class ConversationSurveyActivity: AppCompatActivity() {
 
@@ -69,7 +72,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
                 ConversationSurveyViewModel.Factory(taskResultUploader)).get()
 
         var fm = supportFragmentManager
-        back_button.setOnClickListener {
+        close_button.setOnClickListener {
             if(viewModel.hasAnswers()) {
                 val dialog = ConfirmationDialog.newInstance(getString(R.string.conversation_confirmation_title),
                         getString(R.string.conversation_confirmation_message))
@@ -109,6 +112,15 @@ open class ConversationSurveyActivity: AppCompatActivity() {
             viewModel.itemCount--
             addQuestion(true)
         }
+
+        viewModel.progressLiveData.observe(this, Observer { progress ->
+            val newProgress = ((progress ?: 0f) * 100).roundToInt()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                conversation_progress_bar.setProgress(newProgress, true)
+            } else {
+                conversation_progress_bar.progress = newProgress
+            }
+        })
 
         intent.extras?.getString(extraConversationId)?.let {
             val conversation = ConversationGsonHelper.createGson()
