@@ -88,27 +88,12 @@ class ConversationAdapter(
 
         (viewHolder as? ChatViewHolder)?.let {
             it.textView.text = dataSet[position].text
-
-            val type = getItemViewType(position)
-            // handle fade
-            var resources = viewHolder.container.resources
-            if(item.stepIdentifier != currentIdentifier) {
-                val textColor = ResourcesCompat.getColor(resources, R.color.black_overlay, null)
-                viewHolder.textView.setTextColor(textColor)
-                if(type == 0) {
-                    viewHolder.container.setBackgroundResource(R.drawable.reply_background_fade)
+            it.container.alpha =
+                if (item.stepIdentifier != currentIdentifier) {
+                    0.45f
                 } else {
-                    viewHolder.container.setBackgroundResource(R.drawable.question_background_fade)
+                    1.0f
                 }
-            } else {
-                val textColor = ResourcesCompat.getColor(resources, R.color.black, null)
-                viewHolder.textView.setTextColor(textColor)
-                if(type == 0) {
-                    viewHolder.container.setBackgroundResource(R.drawable.reply_background)
-                } else {
-                    viewHolder.container.setBackgroundResource(R.drawable.question_background)
-                }
-            }
         }
 
         (viewHolder as? GifViewHolder)?.let {
