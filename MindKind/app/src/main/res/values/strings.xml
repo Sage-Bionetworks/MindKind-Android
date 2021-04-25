@@ -83,6 +83,7 @@
         <item>Sat</item>
     </string-array>
 
+    <string name="close_description">Close Conversation</string>
     <string name="time_picker_ok_button">Ok</string>
     <string name="time_picker_cancel_button"><u>Cancel</u></string>
     <string name="text_input_submit_button">Submit</string>

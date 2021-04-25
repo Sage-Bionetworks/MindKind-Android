@@ -26,6 +26,9 @@ open class ConversationSurveyViewModel(private val taskResultUploader: TaskResul
     private val startTimeMap = mutableMapOf<String, Instant>()
     private val answersLiveData = MutableLiveData<ArrayList<AnswerResultBase<Any>>>()
 
+    // Get updates about the user's progress through the conversation
+    public val progressLiveData = MutableLiveData<Float>()
+
     private val conversationSurvey: MutableLiveData<ConversationSurvey> by lazy {
         return@lazy MutableLiveData<ConversationSurvey>()
     }
@@ -67,6 +70,13 @@ open class ConversationSurveyViewModel(private val taskResultUploader: TaskResul
      */
     fun userShown(stepId: String) {
         startTimeMap[stepId] = Instant.now()
+
+        // Update progress
+        val steps = conversationSurvey.value?.steps ?: run {
+            progressLiveData.postValue(0.0f)
+            return
+        }
+        progressLiveData.postValue(startTimeMap.size.toFloat() / steps.size.toFloat())
     }
 
     /**
