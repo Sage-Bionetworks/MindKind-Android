@@ -49,6 +49,7 @@ import android.hardware.SensorManager.SENSOR_DELAY_NORMAL
 import android.net.TrafficStats
 import android.os.BatteryManager
 import android.os.Build
+import android.os.Handler
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -183,7 +184,18 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
 
     // Battery changed broadcast receiver is very noisy, so rate limit it every 1 hour
     private val batteryChangedLimiter = createHourRateLimit(1.0)
-    private val ambientLightChangedLimiter = createMinuteRateLimit(5)
+
+    // Service main thread handler
+    private val handler = Handler()
+
+    // The ambient light runnable
+    private var ambientLightValues = ArrayList<Float>()
+    private var ambientLightKickoffTime: Long? = null
+    private val ambientLightDuration = 1000L * 10L // 10 seconds
+    private val ambientLightFreq = 1000L * 60L * 2 // 2 minutes
+    private val ambientLightRunnable = Runnable() {
+        kickOffAmbientLightUpdates()
+    }
 
     override fun onCreate() {
         Log.d(TAG, "onCreate")
@@ -200,9 +212,7 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
                     DataUsageWorker.periodicWorkName)
         }
         if (dataToTrack.contains(SageTaskIdentifier.AmbientLight)) {
-            WorkUtils.enqueueFastestWorker(this,
-                    AmbientLightWorker::class.java,
-                    AmbientLightWorker.periodicWorkName)
+            handler.post(ambientLightRunnable)
         }
 
         isServiceRunning = true
@@ -244,6 +254,7 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
         stopForeground(true)
 
         sensorManager?.unregisterListener(this)
+        handler.removeCallbacks(ambientLightRunnable)
 
         isServiceRunning = false
 
@@ -359,7 +370,7 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
         }
 
         if (intent?.action == AMBIENT_LIGHT_WORKER_ACTION) {
-            writeAmbientLightToDatabase()
+            kickOffAmbientLightUpdates()
         }
 
         return START_STICKY
@@ -419,7 +430,7 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
      * Writes background data to room asynchronously
      * @param backgroundData to add to room
      */
-    fun writeBackgroundDataToRoom(backgroundData: List<BackgroundDataEntity>) {
+    private fun writeBackgroundDataToRoom(backgroundData: List<BackgroundDataEntity>) {
         backgroundData.forEach {
             Log.d(TAG, "Writing ${it.dataType} ${it.subType ?: ""} ${it.data}")
         }
@@ -442,7 +453,7 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
         writeBackgroundDataToRoom(listOf(backgroundData))
     }
 
-    fun writeDataUsageToDatabase() {
+    private fun writeDataUsageToDatabase() {
         if (!dataToTrack.contains(SageTaskIdentifier.DataUsage)) {
             // User did not consent to have this tracked
             return
@@ -467,7 +478,7 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
         writeBackgroundDataToRoom(backgroundData)
     }
 
-    fun writeAmbientLightToDatabase() {
+    private fun kickOffAmbientLightUpdates() {
         if (!dataToTrack.contains(SageTaskIdentifier.DataUsage)) {
             // User did not consent to have this tracked
             return
@@ -475,10 +486,13 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
 
         // Unfortunately, android doesn't provide a way to directly read the
         // ambient light sensor, so let's register for callbacks,
-        // and wait for the first one, write to db, and then stop listening.
+        // grab all we can in ten seconds, write to db, and then stop listening.
         // See the onSensorChanged function below.
         sensorManager = getSystemService(SENSOR_SERVICE) as? SensorManager
         sensorManager?.getDefaultSensor(Sensor.TYPE_LIGHT)?.let {
+            ambientLightValues.clear()
+            ambientLightKickoffTime = null
+            sensorManager?.unregisterListener(this) // make sure we don't register twice
             sensorManager?.registerListener(this, it, SENSOR_DELAY_NORMAL)
         }
     }
@@ -491,14 +505,26 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
         val sensorEvent = event ?: run { return }
         if(sensorEvent.sensor?.type == Sensor.TYPE_LIGHT) {
             val intensity = sensorEvent.values?.firstOrNull() ?: run { return }
-            writeBackgroundDataToRoom(BackgroundDataEntity(
-                    date = ZonedDateTime.now(),
-                    dataType = SageTaskIdentifier.AmbientLight,
-                    uploaded = false,
-                    data = intensity.toString()))
+            val now = System.currentTimeMillis()
 
-            // We got our measurement, unregister listener
-            sensorManager?.unregisterListener(this)
+            // Set initial value of kick off time if necessary
+            val ambientLightTimeNotNull = ambientLightKickoffTime ?: System.currentTimeMillis()
+            ambientLightKickoffTime = ambientLightTimeNotNull
+            ambientLightValues.add(intensity)
+
+            if ((now - ambientLightTimeNotNull) > ambientLightDuration) {
+                // Write data to room
+                writeBackgroundDataToRoom(BackgroundDataEntity(
+                        date = ZonedDateTime.now(),
+                        dataType = SageTaskIdentifier.AmbientLight,
+                        uploaded = false,
+                        data = ambientLightValues.joinToString(", ")))
+
+                // We got our measurements, unregister listener
+                sensorManager?.unregisterListener(this)
+                // Register for next round of ambient light sensor sampling
+                handler.postDelayed(ambientLightRunnable, ambientLightFreq)
+            }
         }
     }
 
