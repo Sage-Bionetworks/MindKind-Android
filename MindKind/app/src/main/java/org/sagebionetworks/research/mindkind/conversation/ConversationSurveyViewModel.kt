@@ -46,7 +46,7 @@ open class ConversationSurveyViewModel(private val taskResultUploader: TaskResul
 
     private val compositeDisposable = CompositeDisposable()
 
-    public var itemCount: Int = 0
+    public var itemCount: Int = -1
 
     fun initConversation(conversation: ConversationSurvey) {
         conversationSurvey.value = conversation
@@ -56,6 +56,14 @@ open class ConversationSurveyViewModel(private val taskResultUploader: TaskResul
         return conversationSurvey
     }
 
+    fun getCurrentStep(): ConversationStep? {
+        val steps = conversationSurvey.value?.steps ?: run { return null }
+        if (itemCount >= 0 && itemCount < steps.size) {
+            return steps[itemCount]
+        }
+        return null
+    }
+
     /**
      * @param step the step within the conversation to look for an input field
      * @return the input field for input field step
@@ -63,6 +71,51 @@ open class ConversationSurveyViewModel(private val taskResultUploader: TaskResul
     fun conversationTitles(): List<String>? {
         val conversation = conversationSurvey.value ?: run { return null }
         return conversation.steps.map { it.title }
+    }
+
+    /**
+     * Go to the next step in the conversation
+     */
+    fun goToNextStep() {
+        val conversation = conversationSurvey.value ?: run {
+            // End of conversation
+            return
+        }
+
+        if (itemCount < 0) {
+            itemCount = 0
+            return
+        }
+
+        val lastStep = conversation.steps[itemCount]
+
+        itemCount++ // go to next step in the list
+
+        // Check for next step conditionals
+        val ifAnsweredConditonalSplit = lastStep.ifUserAnswers?.split(", skip to ") ?: run {
+            return
+        }
+        // Must have format [Answer] skip to [Step Identifier]
+        if (ifAnsweredConditonalSplit.size < 2) {
+            return
+        }
+
+        // Check conditional to see if we need to skip to anywhere
+        val lastAnswer = stringAnswerForStep(lastStep.identifier) ?: run {
+            return // No answer to compare to
+        }
+
+        if (lastAnswer == ifAnsweredConditonalSplit.firstOrNull()) {
+            val newNextStep = stepWith(ifAnsweredConditonalSplit.lastOrNull()) ?: run {
+                return
+            }
+            val nextStepIdx = conversationSurvey.value?.steps?.indexOf(newNextStep) ?: run {
+                return // Can't find the step
+            }
+            if (nextStepIdx >= 0) {
+                itemCount = nextStepIdx
+            }
+        }
     }
 
     /**
@@ -105,6 +158,22 @@ open class ConversationSurveyViewModel(private val taskResultUploader: TaskResul
 
     fun hasAnswers(): Boolean {
         return (answersLiveData.value?.size ?: 0) > 0
+    }
+
+    fun stepWith(identifier: String?): ConversationStep? {
+        return conversationSurvey.value?.steps?.firstOrNull {
+            it.identifier == identifier
+        }
+    }
+
+    fun stringAnswerForStep(identifier: String): String? {
+        return answersLiveData.value?.firstOrNull {
+            it.identifier == identifier
+        }?.answer?.toString()
+    }
+
+    fun isOnLastStep(): Boolean {
+        return ((conversationSurvey.value?.steps?.size ?: 1) - 1) == itemCount
     }
 
     /**

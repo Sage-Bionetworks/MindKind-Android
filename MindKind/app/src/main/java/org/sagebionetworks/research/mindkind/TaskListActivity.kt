@@ -185,19 +185,6 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
 
     fun startTask(jsonResourceName: String?) {
         val fileName = jsonResourceName ?: run { return }
-        val json = stringFromJsonAsset(fileName) ?: run { return }
-        ConversationSurveyActivity.start(this, json)
-    }
-
-    fun stringFromJsonAsset(fileName: String): String? {
-        val assetPath = "task/$fileName.json"
-        val inputStream = InputStreamReader(this.assets.open(assetPath), StandardCharsets.UTF_8)
-        val r = BufferedReader(inputStream)
-        val total = StringBuilder()
-        var line: String? = null
-        while (r.readLine().also({ line = it }) != null) {
-            total.append(line).append('\n')
-        }
-        return total.toString()
+        ConversationSurveyActivity.start(this, jsonResourceName)
     }
 }
