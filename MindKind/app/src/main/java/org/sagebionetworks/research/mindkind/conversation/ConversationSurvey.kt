@@ -1,8 +1,12 @@
 package org.sagebionetworks.research.mindkind.conversation
 
+import android.content.Context
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import org.sagebionetworks.research.domain.RuntimeTypeAdapterFactory
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.nio.charset.StandardCharsets
 
 class ConversationGsonHelper {
     companion object {
@@ -10,6 +14,42 @@ class ConversationGsonHelper {
             return GsonBuilder()
                     .registerTypeAdapterFactory(getStepTypeAdapterFactory())
                     .create()
+        }
+
+        fun stringFromJsonAsset(context: Context, fileName: String): String? {
+            val assetPath = "task/$fileName.json"
+            val inputStream = InputStreamReader(context.assets.open(assetPath), StandardCharsets.UTF_8)
+            val r = BufferedReader(inputStream)
+            val total = StringBuilder()
+            var line: String? = null
+            while (r.readLine().also({ line = it }) != null) {
+                total.append(line).append('\n')
+            }
+            return total.toString()
+        }
+
+        /**
+         * @param context can be app, activity, or fragment
+         * @param jsonFilename json filename without the ".json" file extension
+         * @return a parsed ConversationSurvey that has all it's nested steps expanded
+         */
+        fun createSurvey(context: Context, jsonFilename: String): ConversationSurvey? {
+            val gson = createGson()
+            val json = stringFromJsonAsset(context, jsonFilename)
+            val conversation = gson.fromJson(json, ConversationSurvey::class.java)
+
+            val newSteps = mutableListOf<ConversationStep>()
+            conversation.steps.forEach {
+                val nestedStep = (it as? NestedStep) ?: run {
+                    newSteps.add(it)
+                    return@forEach
+                }
+                val nestedJson = stringFromJsonAsset(context, nestedStep.filename)
+                val nestedConversation = gson.fromJson(nestedJson, ConversationSurvey::class.java)
+                newSteps.addAll(nestedConversation.steps)
+            }
+
+            return conversation.copy(steps = newSteps)
         }
 
         private fun getStepTypeAdapterFactory(): RuntimeTypeAdapterFactory<ConversationStep> {
@@ -27,6 +67,8 @@ class ConversationGsonHelper {
                             ConversationStepType.timeOfDay.type)
                     .registerSubtype(GifStep::class.java,
                             ConversationStepType.gif.type)
+                    .registerSubtype(NestedStep::class.java,
+                            ConversationStepType.nested.type)
         }
     }
 }
@@ -105,11 +147,20 @@ data class GifStep(
         override val optional: Boolean? = true,
         val gifUrl: String): ConversationStep()
 
+data class NestedStep(
+        override val identifier: String,
+        override val type: String,
+        override val title: String,
+        override val buttonTitle: String,
+        override val optional: Boolean? = true,
+        val filename: String): ConversationStep()
+
 public enum class ConversationStepType(val type: String) {
     instruction("instruction"),
     singleChoiceInt("singleChoice.integer"),
     timeOfDay("timeOfDay"),
     text("text"),
     integer("integer"),
-    gif("gif")
+    gif("gif"),
+    nested("nested")
 }

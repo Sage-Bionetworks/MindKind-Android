@@ -20,6 +20,11 @@
       "max": 9
     },
     {
+      "identifier": "PlaygroundNested",
+      "type": "nested",
+      "filename": "PlaygroundNested"
+    },
+    {
       "identifier": "time_selector",
       "type": "timeOfDay",
       "title": "When did you fall asleep last night?",

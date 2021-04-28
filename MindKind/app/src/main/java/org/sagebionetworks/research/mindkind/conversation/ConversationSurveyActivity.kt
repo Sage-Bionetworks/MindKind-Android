@@ -1,6 +1,7 @@
 package org.sagebionetworks.research.mindkind.conversation
 
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Rect
 import android.os.Build
@@ -12,6 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.TranslateAnimation
 import android.widget.LinearLayout
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.children
 import androidx.lifecycle.*
@@ -123,8 +125,15 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         })
 
         intent.extras?.getString(extraConversationId)?.let {
-            val conversation = ConversationGsonHelper.createGson()
-                    .fromJson(it, ConversationSurvey::class.java)
+
+            val conversation = ConversationGsonHelper.createSurvey(this, it) ?: run {
+                AlertDialog.Builder(this)
+                        .setMessage(R.string.conversation_error_msg)
+                        .setNeutralButton(R.string.rsb_ok) { dialog, which ->
+                            finish()
+                        }.show()
+                return
+            }
 
             // Setup the view model and start the conversation
             viewModel.initConversation(conversation)
