@@ -55,17 +55,26 @@ class ConversationGsonHelper {
         private fun getStepTypeAdapterFactory(): RuntimeTypeAdapterFactory<ConversationStep> {
             return RuntimeTypeAdapterFactory
                     .of<ConversationStep>(ConversationStep::class.java, "type")
-                    .registerSubtype(ConversationInstructionStep::class.java,
+                    .registerSubtype(
+                            ConversationInstructionStep::class.java,
                             ConversationStepType.instruction.type)
-                    .registerSubtype(ConversationSingleChoiceIntFormStep::class.java,
+                    .registerSubtype(
+                            ConversationSingleChoiceIntFormStep::class.java,
                             ConversationStepType.singleChoiceInt.type)
-                    .registerSubtype(ConversationIntegerFormStep::class.java,
+                    .registerSubtype(
+                            ConversationSingleChoiceStringFormStep::class.java,
+                            ConversationStepType.singleChoiceString.type)
+                    .registerSubtype(
+                            ConversationIntegerFormStep::class.java,
                             ConversationStepType.integer.type)
-                    .registerSubtype(ConversationTextFormStep::class.java,
+                    .registerSubtype(
+                            ConversationTextFormStep::class.java,
                             ConversationStepType.text.type)
-                    .registerSubtype(ConversationTimeOfDayStep::class.java,
+                    .registerSubtype(
+                            ConversationTimeOfDayStep::class.java,
                             ConversationStepType.timeOfDay.type)
-                    .registerSubtype(GifStep::class.java,
+                    .registerSubtype(
+                            GifStep::class.java,
                             ConversationStepType.gif.type)
                     .registerSubtype(NestedStep::class.java,
                             ConversationStepType.nested.type)
@@ -86,6 +95,7 @@ abstract class ConversationStep {
     abstract val title: String
     abstract val buttonTitle: String
     abstract val optional: Boolean?
+    abstract val ifUserAnswers: String?
 }
 
 data class ConversationInstructionStep(
@@ -94,6 +104,7 @@ data class ConversationInstructionStep(
         override val title: String,
         override val buttonTitle: String,
         override val optional: Boolean? = true,
+        override val ifUserAnswers: String? = null,
         val continueAfterDelay: Boolean? = false
 ): ConversationStep()
 
@@ -104,6 +115,7 @@ data class ConversationTextFormStep(
         override val buttonTitle: String,
         val maxCharacters: Int,
         val placeholderText: String,
+        override val ifUserAnswers: String? = null,
         override val optional: Boolean? = true): ConversationStep()
 
 data class ConversationIntegerFormStep(
@@ -114,6 +126,7 @@ data class ConversationIntegerFormStep(
         val min: Int,
         val max: Int,
         var maxLines: Int = 4,
+        override val ifUserAnswers: String? = null,
         override val optional: Boolean? = true): ConversationStep()
 
 data class ConversationTimeOfDayStep(
@@ -122,6 +135,7 @@ data class ConversationTimeOfDayStep(
         override val title: String,
         override val buttonTitle: String,
         val defaultTime: String,
+        override val ifUserAnswers: String? = null,
         override val optional: Boolean? = true): ConversationStep()
 
 data class ConversationSingleChoiceIntFormStep(
@@ -129,9 +143,18 @@ data class ConversationSingleChoiceIntFormStep(
         override val type: String,
         override val title: String,
         override val buttonTitle: String,
-        val inputFieldId: String,
-        var buttonText: String,
         val choices: List<IntegerConversationInputFieldChoice>,
+        override val ifUserAnswers: String? = null,
+        override val optional: Boolean? = true
+): ConversationStep()
+
+data class ConversationSingleChoiceStringFormStep(
+        override val identifier: String,
+        override val type: String,
+        override val title: String,
+        override val buttonTitle: String,
+        val choices: List<StringConversationInputFieldChoice>,
+        override val ifUserAnswers: String? = null,
         override val optional: Boolean? = true
 ): ConversationStep()
 
@@ -139,12 +162,17 @@ data class IntegerConversationInputFieldChoice(
         val text: String,
         val value: Int)
 
+data class StringConversationInputFieldChoice(
+        val text: String,
+        val value: String)
+
 data class GifStep(
         override val identifier: String,
         override val type: String,
         override val title: String,
         override val buttonTitle: String,
         override val optional: Boolean? = true,
+        override val ifUserAnswers: String? = null,
         val gifUrl: String): ConversationStep()
 
 data class NestedStep(
@@ -153,11 +181,13 @@ data class NestedStep(
         override val title: String,
         override val buttonTitle: String,
         override val optional: Boolean? = true,
+        override val ifUserAnswers: String? = null,
         val filename: String): ConversationStep()
 
 public enum class ConversationStepType(val type: String) {
     instruction("instruction"),
     singleChoiceInt("singleChoice.integer"),
+    singleChoiceString("singleChoice.string"),
     timeOfDay("timeOfDay"),
     text("text"),
     integer("integer"),

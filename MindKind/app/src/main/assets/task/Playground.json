@@ -20,6 +20,16 @@
       "max": 9
     },
     {
+      "identifier": "skipToStepTest",
+      "type": "singleChoice.string",
+      "title": "Do you have time to do the nested json?",
+      "ifUserAnswers": "No, skip to time_selector",
+      "choices": [
+        { "text": "Yes", "value": "Yes" },
+        { "text": "No",  "value": "No" }
+      ]
+    },
+    {
       "identifier": "PlaygroundNested",
       "type": "nested",
       "filename": "PlaygroundNested"
@@ -39,6 +49,17 @@
       "maxCharacters": 100,
       "placeholderText": "Write something here..",
       "maxLines": 4
+    },
+    {
+      "identifier": "sleeping",
+      "type": "singleChoice.integer",
+      "title": "Do you have trouble falling or staying asleep, or sleeping too much?",
+      "choices": [
+        { "text": "Not at all",               "value": 0 },
+        { "text": "Several days",             "value": 1 },
+        { "text": "More than half the days",  "value": 2 },
+        { "text": "Nearly every day",         "value": 3 }
+      ]
     },
     {
       "identifier": "reward",

@@ -1,7 +1,6 @@
 package org.sagebionetworks.research.mindkind.conversation
 
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Rect
 import android.os.Build
@@ -144,7 +143,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
                         showButtonContainer()
                         val index = findIndex(conversation, step)
                         val isLastItem = index >= conversation.steps.size
-                        showQuestion(step, answer, isLastItem, false)
+                        showBottomInputView(step, answer, isLastItem, false)
                     }
                  }
 
@@ -200,42 +199,35 @@ open class ConversationSurveyActivity: AppCompatActivity() {
     }
 
     private fun addQuestion(scroll: Boolean) {
-        val conversation = viewModel.getConversationSurvey().value ?: run { return }
-        val steps = conversation.steps
+        viewModel.goToNextStep()
 
-        val count = steps.size
-        logInfo("Count: ${viewModel.itemCount} - $count")
-        if(viewModel.itemCount > (steps.size-1)) {
+        val currentStep = viewModel.getCurrentStep() ?: run {
             viewModel.completeConversation()
             return
         }
 
-        val step = steps[viewModel.itemCount]
-        val shouldAddItem = (step.type != ConversationStepType.gif.type)
-
         val adapter = recycler_view_conversation.adapter as ConversationAdapter
-        if (shouldAddItem) {
-            adapter.addItem(step.identifier, step.title, true)
+        if (currentStep.type != ConversationStepType.gif.type) {
+            adapter.addItem(currentStep.identifier, currentStep.title, true)
         }
 
-        val isLastItem = viewModel.itemCount >= steps.size
-        showQuestion(step, null, isLastItem, true)
+        showBottomInputView(currentStep, null, viewModel.isOnLastStep(), true)
 
-        viewModel.itemCount++
         if(scroll) {
             recycler_view_conversation.smoothScrollToPosition(adapter.itemCount)
         }
-
     }
 
-    private fun showQuestion(step: ConversationStep, answer: String?, isLastItem: Boolean, scroll: Boolean) {
+    private fun showBottomInputView(step: ConversationStep, answer: String?, isLastItem: Boolean, scroll: Boolean) {
         var hasQuestions = true
 
         when(step.type) {
             ConversationStepType.instruction.type ->
                 hasQuestions = !handleInstructionItem(step as? ConversationInstructionStep, scroll)
             ConversationStepType.singleChoiceInt.type ->
-                handleSingleChoice(step as? ConversationSingleChoiceIntFormStep, scroll)
+                handleIntSingleChoice(step as? ConversationSingleChoiceIntFormStep, scroll)
+            ConversationStepType.singleChoiceString.type ->
+                handleStringSingleChoice(step as? ConversationSingleChoiceStringFormStep, scroll)
             ConversationStepType.integer.type ->
                 handleIntegerInput(step as? ConversationIntegerFormStep, answer, scroll)
             ConversationStepType.text.type ->
@@ -313,7 +305,35 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         return instructionStep.continueAfterDelay ?: false
     }
 
-    private fun handleSingleChoice(choiceIntFormStep: ConversationSingleChoiceIntFormStep?, scroll: Boolean) {
+    private fun handleStringSingleChoice(choiceStringFormStep: ConversationSingleChoiceStringFormStep?, scroll: Boolean) {
+        val step = choiceStringFormStep ?: run { return }
+        val choices = step.choices
+        button_container.removeAllViews()
+
+        choices.forEach { c ->
+            (this.layoutInflater.inflate(R.layout.conversation_material_button,
+                    button_container, false) as? MaterialButton)?.let {
+
+                it.text = c.text
+
+                it.setOnClickListener {
+                    addAnswer(step, c.text, c.value, scroll)
+                    disableAllButtons()
+                }
+
+                val llp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT)
+                llp.bottomMargin = resources.getDimensionPixelSize(R.dimen.conversation_button_margin)
+                button_container.addView(it, llp)
+            }
+        }
+
+        if(step.optional != false) {
+            addSkipButton(step, scroll)
+        }
+    }
+
+    private fun handleIntSingleChoice(choiceIntFormStep: ConversationSingleChoiceIntFormStep?, scroll: Boolean) {
         val step = choiceIntFormStep ?: run { return }
         val choices = step.choices
         button_container.removeAllViews()
