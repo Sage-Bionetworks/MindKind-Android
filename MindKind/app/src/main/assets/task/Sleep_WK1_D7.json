@@ -1,0 +1,38 @@
+{
+  "identifier": "1S_W1_D7",
+  "type": "conversationSurvey",
+  "taskIdentifier": "1S_W1_D7",
+  "schemaIdentifier": "1S_W1_D7",
+  "daytype": "D_LQ",
+  "QuestionSet": "S7",
+  "steps": [
+    {
+      "identifier": "1S_W1_D7_Intro",
+      "type": "instruction",
+      "title": "OK, today is a big day, when we ask you a few more questions than usual. Think of these questions as a way to think about how you are doing. Consider this a starting point to compare how you are doing now to how you are doing later in the project.  Tomorrow, we will be able to show you how you rated your sleep and your feelings over the week."
+    },
+    {
+      "identifier": "M_Insomnia_Severity_Index",
+      "type": "measure"
+    },
+    {
+      "identifier": "M_PHQ9",
+      "type": "measure"
+    },
+    {
+      "identifier": "M_GAD7",
+      "type": "measure"
+    },
+    {
+      "identifier": "completion",
+      "type": "instruction",
+      "title": "A big thank you for doing this. Enjoy the rest of your day!  Completing these surveys helps us get a sense of what your day is like. Over time, these questions may be useful for you, too, as you think about your mood and sleep!"
+    },
+     {
+      "identifier": "GIPHY_DISPLAY",
+      "type": "giphy_display",
+      "title": "W00t w00t.... This title will show in chat if the user does not have internet",
+      "gifUrl": "https://media.giphy.com/media/HmWdvnwNNc6wo/giphy.gif"
+      }  
+  ]
+}

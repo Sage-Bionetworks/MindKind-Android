@@ -1,0 +1,24 @@
+{
+  "identifier": "PlaygroundNested",
+  "type": "conversationSurvey",
+  "taskIdentifier": "PlaygroundNested",
+  "schemaIdentifier": "PlaygroundNested",
+  "steps": [
+    {
+      "identifier": "introNested",
+      "type": "instruction",
+      "title": "Nested Test",
+      "buttonTitle": "Let's begin",
+      "optional": false
+    },
+    {
+      "identifier": "text_entryNested",
+      "type": "text",
+      "title": "Tell us about you (nested).",
+      "buttonTitle": "Let's journal",
+      "maxCharacters": 100,
+      "placeholderText": "Write something here..",
+      "maxLines": 4
+    }
+  ]
+}

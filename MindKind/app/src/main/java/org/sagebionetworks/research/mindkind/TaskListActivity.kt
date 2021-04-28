@@ -79,6 +79,24 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
             TaskItem("Patient Health Questionaire",
                     "Ready to start your day.",
                     "GAD7"),
+            TaskItem("Sleep Week1 Day 1",
+                    "Sleep survey",
+                    "Sleep_WK1_D1"),
+            TaskItem("Sleep Week1 Day 2",
+                    "Sleep survey",
+                    "Sleep_WK1_D2"),
+            TaskItem("Sleep Week1 Day 3",
+                    "Sleep survey",
+                    "Sleep_WK1_D3"),
+            TaskItem("Sleep Week1 Day 4",
+                    "Sleep survey",
+                    "Sleep_WK1_D4"),
+            TaskItem("Sleep Week1 Day 5",
+                    "Sleep survey",
+                    "Sleep_WK1_D5"),
+            TaskItem("Sleep Week1 Day 6",
+                    "Sleep survey",
+                    "Sleep_WK1_D6"),
             TaskItem("Playground",
                     "Ready to start your day.",
                     "Playground"))
@@ -167,19 +185,6 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
 
     fun startTask(jsonResourceName: String?) {
         val fileName = jsonResourceName ?: run { return }
-        val json = stringFromJsonAsset(fileName) ?: run { return }
-        ConversationSurveyActivity.start(this, json)
-    }
-
-    fun stringFromJsonAsset(fileName: String): String? {
-        val assetPath = "task/$fileName.json"
-        val inputStream = InputStreamReader(this.assets.open(assetPath), StandardCharsets.UTF_8)
-        val r = BufferedReader(inputStream)
-        val total = StringBuilder()
-        var line: String? = null
-        while (r.readLine().also({ line = it }) != null) {
-            total.append(line).append('\n')
-        }
-        return total.toString()
+        ConversationSurveyActivity.start(this, jsonResourceName)
     }
 }

@@ -1,0 +1,78 @@
+{
+  "identifier": "1S_W1_D6",
+  "type": "conversationSurvey",
+  "taskIdentifier": "1S_W1_D6",
+  "schemaIdentifier": "1S_W1_D6",
+  "daytype": "D_S_S",
+  "QuestionSet": "SS",
+  "steps": [
+    {
+      "identifier": "1S_W1_D6_Intro",
+      "type": "instruction",
+      "title": "Nice to see you again. Ready to answer some questions about your day?"
+    },
+    {
+      "identifier": "Q1_Likert_Mood",
+      "type": "singleChoice.integer",
+      "title": "Pick the number that describes how you felt today?",
+      "choices": [
+        { "text": "Worst Ever"  ,               "value": 0 },
+        { "text": "Bad Mood"    ,               "value": 1 },
+        { "text": "Average"     ,               "value": 2 },
+        { "text": "Good Mood"   ,               "value": 3 },
+        { "text": "Best Ever"   ,               "value": 4 }
+      ]
+    },
+    {
+      "identifier": "Q2_Fall_Asleep_Time?",
+      "type": "timeOfDay",
+      "title": "When did you fall asleep last night?",
+      "buttonTitle": "Submit Time",
+      "defaultTime": "10:00 pm"
+    },
+    {
+      "identifier": "Q3_Wake_Up_Time",
+      "type": "timeOfDay",
+      "title": "When did you wake up this morning?",
+      "buttonTitle": "Submit Time", 
+      "defaultTime": "7:00 am"
+    },
+    {
+      "identifier": "Q4_Wake_up_number",
+      "type": "integer",
+      "title": "How many times did you wake up last night?",
+      "buttonTitle": "Ok",
+      "min": 0,
+      "max": 12
+    },
+    {
+      "identifier": "Q5_Rested",
+      "type": "singleChoice.integer",
+      "title": "Pick the number that describes how you felt today?",
+      "choices": [
+        { "text": "Not At All"  ,               "value": 0 },
+        { "text": "Not Very"    ,               "value": 1 },
+        { "text": "Neutral"     ,               "value": 2 },
+        { "text": "Somewhat"    ,               "value": 3 },
+        { "text": "Very Much"   ,               "value": 4 }
+      ]
+    },
+    {
+      "identifier": "Q6_Sleep_Importance",
+      "type": "singleChoice.integer",
+      "title": "How important is a good night's sleep  for your mood?",
+      "choices": [
+        { "text": "Not At All"  ,               "value": 0 },
+        { "text": "Not Very"    ,               "value": 1 },
+        { "text": "Neutral"     ,               "value": 2 },
+        { "text": "Somewhat"    ,               "value": 3 },
+        { "text": "Very Much"   ,               "value": 4 }
+      ]
+    },
+    {
+      "identifier": "completion",
+      "type": "instruction",
+      "title": "Awesome work, you are almost done with week 1. If you have any questions, please reach out here ***ADDD EMAIL****"
+    }
+  ]
+}    
