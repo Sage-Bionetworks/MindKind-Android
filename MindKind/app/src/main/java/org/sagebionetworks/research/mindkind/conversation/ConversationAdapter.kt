@@ -27,7 +27,7 @@ data class ConversationItem(
         val gifUrl: String? = null)
 
 public interface ConversationAdapterListener {
-    fun onConversationClicked(stepIdentifier: String, answer: String?)
+    fun onConversationClicked(stepIdentifier: String, answer: String?, position: Int)
 }
 
 class ConversationAdapter(
@@ -79,7 +79,7 @@ class ConversationAdapter(
         // TODO: for now allow long press on both question and answer
         //if(item.isQuestion) {
             viewHolder.itemView.setOnLongClickListener {
-                listener.onConversationClicked(item.stepIdentifier, findAnswer(item.stepIdentifier))
+                listener.onConversationClicked(item.stepIdentifier, findAnswer(item.stepIdentifier), position)
                 currentIdentifier = item.stepIdentifier
                 notifyDataSetChanged()
                 true

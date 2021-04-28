@@ -137,13 +137,14 @@ open class ConversationSurveyActivity: AppCompatActivity() {
             // Setup the view model and start the conversation
             viewModel.initConversation(conversation)
             val adapter = ConversationAdapter(this, arrayListOf(), object: ConversationAdapterListener {
-                override fun onConversationClicked(stepIdentifier: String, answer: String?) {
+                override fun onConversationClicked(stepIdentifier: String, answer: String?, position: Int) {
                     var step: ConversationStep? = findStep(conversation, stepIdentifier)
                     if(step != null) {
                         showButtonContainer()
                         val index = findIndex(conversation, step)
                         val isLastItem = index >= conversation.steps.size
                         showBottomInputView(step, answer, isLastItem, false)
+                        recycler_view_conversation.scrollToPosition(position+1)
                     }
                  }
 
