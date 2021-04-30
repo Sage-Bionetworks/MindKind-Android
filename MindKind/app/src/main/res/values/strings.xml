@@ -43,6 +43,8 @@
     <string name="title_profile">Profile</string>
     <string name="title_activity_external_id_sign_in">Sign in</string>
 
+    <string name="content_desc_butterflies">Butterflies</string>
+
     <string name="set_reminder">Set reminder</string>
     <string name="do_not_send_me_reminders">Do not send me reminders</string>
     <string name="reminder_message">Let\'s set a Reminder for your Study Bursts</string>
