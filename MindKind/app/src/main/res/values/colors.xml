@@ -45,6 +45,7 @@
     <color name="light_text">#6C7489</color>
     <color name="divider_color">@color/ocean100</color>
     <color name="settings_heading_background">#82CACD</color>
+    <color name="grey">#757575</color>
 
     <!-- Sage Colors -->
     <color name="colorPrimary">@color/sageResearchPrimary</color>
@@ -64,5 +65,8 @@
     <color name="question_background_fade">#83F9BF92</color>
     <color name="reply_background">#A1CEF6</color>
     <color name="reply_background_fade">#B3A1CEF6</color>
+
+    <color name="button_color_disabled">#DDDDDD</color>
+    <color name="button_text_color_disabled">#747983</color>
 
 </resources>

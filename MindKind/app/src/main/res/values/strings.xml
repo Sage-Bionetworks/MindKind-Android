@@ -104,4 +104,12 @@
     <string name="conversation_confirmation_message">If you exit the survey, all your data will not be saved.</string>
     <string name="conversation_confirmation_continue"><u>Continue</u></string>
     <string name="conversation_confirmation_quit">Exit Survey</string>
+
+    <string name="registration_header_subtext">Study</string>
+    <string name="registration_title">Let\'s get started</string>
+    <string name="registration_message">Please enter your phone number so we can see if you have an existing account.\n\nIf you have not already signed up, you can register using the link below.</string>
+    <string name="registration_continue">Continue</string>
+    <string name="registration_link"><u>Need to Register?</u></string>
+    <string name="registration_learn_link"><u>Learn More</u></string>
+    <string name="registration_hint">Phone Number</string>
 </resources>
