@@ -51,5 +51,10 @@
       <option name="name" value="maven4" />
       <option name="url" value="https://dl.bintray.com/sage-bionetworks/research-stack/" />
     </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven3" />
+      <option name="name" value="maven3" />
+      <option name="url" value="https://sagebionetworks.jfrog.io/artifactory/mobile-sdks/" />
+    </remote-repository>
   </component>
 </project>
