@@ -123,4 +123,6 @@
     <string name="welcome_3_message">Be sure to keep up on the Daily Surveys called "Dailies"!</string>
     <string name="welcome_4_title">Your Data Can Make a Difference</string>
     <string name="welcome_4_message">Protecting your data is very important to us.  Your data will only be used for this study.</string>
+    <string name="welcome_accept">Accept</string>
+    <string name="welcome_cancel"><u>No Thanks</u></string>
 </resources>
