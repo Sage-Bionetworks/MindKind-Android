@@ -133,10 +133,8 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
         }
 
         gear.setOnClickListener {
-            // TODO: remove this
-            val intent = Intent(this, WelcomeActivity::class.java)
-            //val intent = Intent(this, SettingsActivity::class.java)
-            //intent.putExtra(SettingsActivity.extraSettingsId, "Settings")
+            val intent = Intent(this, SettingsActivity::class.java)
+            intent.putExtra(SettingsActivity.extraSettingsId, "Settings")
             startActivity(intent)
             overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
         }
