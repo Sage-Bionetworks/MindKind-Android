@@ -55,7 +55,7 @@ class EntryActivity : AppCompatActivity() {
         super.onResume()
 
         if (authManager.userSessionInfo?.isAuthenticated != true) {
-            startActivity(Intent(this, ExternalIdSignInActivity::class.java))
+            startActivity(Intent(this, RegistrationActivity::class.java))
         } else {
             startActivity(Intent(this, TaskListActivity::class.java))
         }

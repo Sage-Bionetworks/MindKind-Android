@@ -1,7 +1,7 @@
 /*
  * BSD 3-Clause License
  *
- * Copyright 2018  Sage Bionetworks. All rights reserved.
+ * Copyright 2021  Sage Bionetworks. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -30,17 +30,15 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.sagebionetworks.research.mindkind
+package org.sagebionetworks.research.mpower
 
 import android.annotation.SuppressLint
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import android.app.AlertDialog.Builder
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Build.VERSION_CODES
 import android.os.Bundle
-import androidx.annotation.AnyThread
-import androidx.annotation.RequiresApi
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.INVISIBLE
@@ -51,9 +49,12 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.annotation.AnyThread
+import androidx.annotation.RequiresApi
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import dagger.android.support.AndroidSupportInjection
 import dagger.android.support.DaggerFragment
-import kotlinx.android.synthetic.main.web_consent_fragment.consent_webview
 import kotlinx.android.synthetic.main.web_consent_fragment.view.consent_webview
 import org.json.JSONObject
 import org.sagebionetworks.bridge.android.access.BridgeAccessState
@@ -61,7 +62,8 @@ import org.sagebionetworks.bridge.android.access.BridgeAccessViewModel
 import org.sagebionetworks.bridge.android.access.Resource
 import org.sagebionetworks.bridge.android.access.Resource.Status
 import org.sagebionetworks.bridge.rest.model.SharingScope
-import org.sagebionetworks.research.mindkind.sageresearch.R
+import org.sagebionetworks.research.mindkind.EntryActivity
+import org.sagebionetworks.research.mindkind.R
 import org.slf4j.LoggerFactory
 import javax.inject.Inject
 
@@ -77,12 +79,17 @@ class WebConsentFragment : DaggerFragment() {
 
     private lateinit var bridgeAccessViewModel: BridgeAccessViewModel
 
+    private lateinit var webView: WebView
+
+    private var isLoading = false
+
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
 
         // same scope as BridgeAccessFragment to get same instance
-        bridgeAccessViewModel = ViewModelProviders.of(requireActivity(), bridgeAccessViewModelFactory)
+        bridgeAccessViewModel = ViewModelProviders.of(
+                requireActivity(), bridgeAccessViewModelFactory)
                 .get(BridgeAccessViewModel::class.java)
     }
 
@@ -90,7 +97,8 @@ class WebConsentFragment : DaggerFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?): View? {
         val fragmentLayout = inflater.inflate(R.layout.web_consent_fragment, container, false)
-        fragmentLayout.consent_webview.webViewClient = object : WebViewClient() {
+        webView = fragmentLayout.consent_webview
+        webView.webViewClient = object : WebViewClient() {
 
             override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
                 super.onPageStarted(view, url, favicon)
@@ -116,25 +124,29 @@ class WebConsentFragment : DaggerFragment() {
             }
         }
 
-        fragmentLayout.consent_webview.settings.javaScriptEnabled = true
-        fragmentLayout.consent_webview.addJavascriptInterface(this, "AndroidJsBridge")
+        webView.settings.javaScriptEnabled = true
+        webView.addJavascriptInterface(this, "AndroidJsBridge")
 
-        val consentUrl = resources.getString(R.string.web_consent_url)
+        val consentUrl = "https://staging.wtgmhdc.synapse.org/"
         LOGGER.debug("Using consent url {}", consentUrl)
-        fragmentLayout.consent_webview.loadUrl(consentUrl)
+        webView.loadUrl(consentUrl)
 
         return fragmentLayout
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        bridgeAccessViewModel.bridgeAccessStatus.observe(this, Observer { onConsentUploadState(it) })
+        bridgeAccessViewModel.bridgeAccessStatus.observe(
+                viewLifecycleOwner, Observer { onConsentUploadState(it) })
     }
 
     @JavascriptInterface
     @AnyThread
     @Suppress("unused")
     fun consentsToResearch(jsonString: String) {
+        if (isLoading) {
+            return
+        }
         val jsonObject = JSONObject(jsonString)
         bridgeAccessViewModel.consentsToResearch(
                 jsonObject.getString("name"),
@@ -142,11 +154,11 @@ class WebConsentFragment : DaggerFragment() {
     }
 
     fun onWebViewLoading() {
-        consent_webview?.visibility = INVISIBLE
+        webView.visibility = INVISIBLE
     }
 
     fun onWebViewLoadingFinished() {
-        consent_webview?.visibility = VISIBLE
+        webView.visibility = VISIBLE
     }
 
     fun onWebViewReceiveError(url: String?, errorCode: Int, description: String?) {
@@ -154,9 +166,24 @@ class WebConsentFragment : DaggerFragment() {
     }
 
     fun onConsentLoading() {
+        isLoading = true
     }
 
-    fun onConsentError() {
+    fun onConsentError(errorMessage: String?) {
+        Builder(context)
+                .setTitle(R.string.consent_error_title)
+                .setMessage(errorMessage)
+                .setPositiveButton(R.string.rsb_BUTTON_OK, null)
+                .show()
+        isLoading = false
+    }
+
+    fun onConsentSuccess() {
+        val intent = Intent(context, EntryActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        startActivity(intent)
+        activity?.finish()
+        isLoading = false
     }
 
     fun onConsentUploadState(state: Resource<BridgeAccessState>?) {
@@ -165,13 +192,13 @@ class WebConsentFragment : DaggerFragment() {
         state?.let {
             when {
                 it.status == Status.LOADING -> {
-
-                }
-                it.status == Status.ERROR -> {
-
+                    onConsentLoading()
                 }
                 it.status == Status.SUCCESS -> {
-
+                    onConsentSuccess()
+                }
+                else -> { // it.status == Status.ERROR
+                    onConsentError(state.message)
                 }
             }
         }
