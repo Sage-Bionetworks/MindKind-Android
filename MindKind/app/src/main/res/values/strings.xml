@@ -128,4 +128,17 @@
     <string name="registration_sms_message">We sent you a link to verify your identity via SMS text message to</string>
     <string name="registration_phone_error">The phone number you entered is not valid. Please enter a valid phone number.</string>
 
+    <!-- Welcome onboarding strings -->
+
+    <string name="welcome_1_title">Welcome to the MindKind Study!</string>
+    <string name="welcome_1_message">Your personal experiences will help make a positive improvement for young people across the world.</string>
+    <string name="welcome_2_title">How to Talk with MindKind</string>
+    <string name="welcome_2_message">You can respond to MindKind surveys just like a normal text conversation!</string>
+    <string name="welcome_3_title">Your Feedback Matters</string>
+    <string name="welcome_3_message">Be sure to keep up on the Daily Surveys called "Dailies"!</string>
+    <string name="welcome_4_title">Your Data Can Make a Difference</string>
+    <string name="welcome_4_message">Protecting your data is very important to us.  Your data will only be used for this study.</string>
+    <string name="welcome_accept">Accept</string>
+    <string name="welcome_cancel"><u>No Thanks</u></string>
+
 </resources>

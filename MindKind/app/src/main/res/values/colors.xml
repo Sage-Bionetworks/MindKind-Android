@@ -68,5 +68,6 @@
 
     <color name="button_color_disabled">#DDDDDD</color>
     <color name="button_text_color_disabled">#747983</color>
+    <color name="welcome_bullet_disabled">#717989</color>
 
 </resources>
