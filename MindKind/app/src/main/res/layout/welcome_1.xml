@@ -64,13 +64,14 @@
         android:layout_marginTop="300dp"/>
 
     <ImageView
-        android:layout_width="307dp"
-        android:layout_height="326dp"
+        android:id="@+id/welcome_wing"
+        android:layout_width="497dp"
+        android:layout_height="314dp"
         android:paddingLeft="0dp"
-        android:src="@drawable/welcome_1_heart"
+        android:src="@drawable/onboarding_wing_0"
         android:contentDescription="@string/content_desc_butterflies"
         android:layout_marginTop="-6dp"
-        android:layout_marginLeft="143dp"/>
+        android:layout_marginLeft="0dp"/>
 
     <ImageView
         android:id="@+id/welcome_butterflies"
@@ -82,7 +83,7 @@
         android:layout_marginTop="18dp"
         android:layout_marginLeft="76dp"/>
 
-    <ImageView
+    <!--ImageView
         android:id="@+id/welcome_lines"
         android:layout_width="241dp"
         android:layout_height="242dp"
@@ -91,6 +92,6 @@
         android:contentDescription="@string/content_desc_butterflies"
         android:layout_marginTop="92dp"
         android:layout_marginLeft="191dp"
-        app:tint="@color/white"/>
+        app:tint="@color/white"/-->
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

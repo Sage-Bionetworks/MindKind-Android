@@ -53,6 +53,7 @@ open class WelcomeActivity: AppCompatActivity() {
 
         val pageTransformer: ParallaxPageTransformer = ParallaxPageTransformer()
                 .addViewToParallax(ParallaxPageTransformer.ParallaxTransformInformation(R.id.welcome_butterflies, 2.0f, 2.0f))
+                .addViewToParallax(ParallaxPageTransformer.ParallaxTransformInformation(R.id.welcome_wing, 2.0f, 2.0f))
 
          viewPager.setPageTransformer(true, pageTransformer) //set page transformer
 

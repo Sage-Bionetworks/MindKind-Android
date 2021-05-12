@@ -89,13 +89,14 @@
     </LinearLayout>
 
     <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:id="@+id/welcome_wing"
+        android:layout_width="497dp"
+        android:layout_height="314dp"
         android:paddingLeft="0dp"
-        android:src="@drawable/welcome_4_heart"
+        android:src="@drawable/onboarding_wing_3"
         android:contentDescription="@string/content_desc_butterflies"
         android:layout_marginTop="0dp"
-        android:layout_marginLeft="0dp"
+        android:layout_marginLeft="-100dp"
         android:scaleType="fitXY"/>
 
     <ImageView
@@ -108,7 +109,7 @@
         android:layout_marginTop="135dp"
         android:layout_marginLeft="200dp"/>
 
-    <ImageView
+    <!--ImageView
         android:id="@+id/welcome_lines"
         android:layout_width="174dp"
         android:layout_height="242dp"
@@ -117,6 +118,6 @@
         android:contentDescription="@string/content_desc_butterflies"
         android:layout_marginTop="78dp"
         android:layout_marginLeft="-67dp"
-        app:tint="@color/white"/>
+        app:tint="@color/white"/-->
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
