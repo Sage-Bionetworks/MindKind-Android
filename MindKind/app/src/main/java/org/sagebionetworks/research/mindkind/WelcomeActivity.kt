@@ -23,7 +23,6 @@ open class WelcomeActivity: AppCompatActivity() {
         fun logInfo(msg: String) {
             Log.i(WelcomeActivity::class.simpleName, msg)
         }
-
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,8 +30,10 @@ open class WelcomeActivity: AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_welcome)
-        val bullet = resources.getDrawable(R.drawable.welcome_bullet)
-        val activeBullet = resources.getDrawable(R.drawable.welcome_bullet_active)
+        val bullet = ResourcesCompat.getDrawable(
+                resources, R.drawable.welcome_bullet, null)
+        val activeBullet = ResourcesCompat.getDrawable(
+                resources, R.drawable.welcome_bullet_active, null)
 
         viewPager.adapter = WelcomeAdapter(this)
         viewPager.addOnPageChangeListener(object: ViewPager.OnPageChangeListener {
@@ -52,11 +53,12 @@ open class WelcomeActivity: AppCompatActivity() {
         })
 
         val pageTransformer: ParallaxPageTransformer = ParallaxPageTransformer()
-                .addViewToParallax(ParallaxPageTransformer.ParallaxTransformInformation(R.id.welcome_butterflies, 2.0f, 2.0f))
-                .addViewToParallax(ParallaxPageTransformer.ParallaxTransformInformation(R.id.welcome_wing, 2.0f, 2.0f))
+                .addViewToParallax(ParallaxPageTransformer.ParallaxTransformInformation(
+                        R.id.welcome_butterflies, 2.0f, 2.0f))
+                .addViewToParallax(ParallaxPageTransformer.ParallaxTransformInformation(
+                        R.id.welcome_wing, 1.0f, 1.0f))
 
          viewPager.setPageTransformer(true, pageTransformer) //set page transformer
-
 
         val container: ViewGroup = findViewById<View>(R.id.welcome_bullet_container) as ViewGroup
         val padding = resources.getDimension(R.dimen.welcome_bullet_padding).toInt()
@@ -71,7 +73,6 @@ open class WelcomeActivity: AppCompatActivity() {
             img.setPadding(padding, padding, padding, padding)
             container.addView(img)
         }
-
     }
 
     class WelcomeAdapter(private val mContext: Context) : PagerAdapter() {
@@ -84,17 +85,11 @@ open class WelcomeActivity: AppCompatActivity() {
         }
 
         override fun instantiateItem(collection: ViewGroup, position: Int): Any {
-            var resId: Int = 0
-            when(position) {
-                0 ->
-                    resId = R.layout.welcome_1
-                1 ->
-                    resId = R.layout.welcome_2
-                2 ->
-                    resId = R.layout.welcome_3
-                3 ->
-                    resId = R.layout.welcome_4
-
+            val resId = when(position) {
+                0 -> R.layout.welcome_1
+                1 -> R.layout.welcome_2
+                2 -> R.layout.welcome_3
+                else /*3*/ -> R.layout.welcome_4
             }
             val inflater = LayoutInflater.from(mContext)
             val layout = inflater.inflate(resId, collection, false) as ViewGroup
@@ -105,7 +100,5 @@ open class WelcomeActivity: AppCompatActivity() {
         override fun destroyItem(collection: ViewGroup, position: Int, view: Any) {
             collection.removeView(view as View)
         }
-
     }
-
 }

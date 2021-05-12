@@ -90,13 +90,12 @@
 
     <ImageView
         android:id="@+id/welcome_wing"
-        android:layout_width="497dp"
-        android:layout_height="314dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
         android:paddingLeft="0dp"
         android:src="@drawable/onboarding_wing_3"
         android:contentDescription="@string/content_desc_butterflies"
-        android:layout_marginTop="0dp"
-        android:layout_marginLeft="-100dp"
         android:scaleType="fitXY"/>
 
     <ImageView
