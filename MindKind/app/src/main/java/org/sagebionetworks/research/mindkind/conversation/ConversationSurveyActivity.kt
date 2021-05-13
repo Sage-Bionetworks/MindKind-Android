@@ -2,6 +2,7 @@ package org.sagebionetworks.research.mindkind.conversation
 
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Rect
 import android.os.Build
 import android.os.Bundle
@@ -26,7 +27,9 @@ import kotlinx.android.synthetic.main.activity_conversation_survey.*
 import kotlinx.android.synthetic.main.integer_input.view.*
 import kotlinx.android.synthetic.main.text_input.view.*
 import org.sagebionetworks.research.mindkind.R
+import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService
 import org.sagebionetworks.research.sageresearch_app_sdk.TaskResultUploader
+import org.threeten.bp.LocalDateTime
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -38,6 +41,8 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         const val extraConversationId = "EXTRA_CONVERSATION_SURVEY"
         const val DELAY = 1000L
 
+        const val completedDateKey = "ConverstaionCompletedDate"
+
         fun logInfo(msg: String) {
             Log.i(ConversationSurveyActivity::class.simpleName, msg)
         }
@@ -48,6 +53,8 @@ open class ConversationSurveyActivity: AppCompatActivity() {
             baseCtx.startActivity(intent)
         }
     }
+
+    private val sharedPrefs = BackgroundDataService.createSharedPrefs(this)
 
     var handler: Handler? = null
 
@@ -161,6 +168,11 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         }
     }
 
+    fun completeConversation() {
+        viewModel.completeConversation()
+        sharedPrefs.edit().putString(completedDateKey, LocalDateTime.now().toString()).apply()
+    }
+
     fun View.slideDown(duration: Int = 500) {
         visibility = View.VISIBLE
         val animate = TranslateAnimation(0f, 0f, 0f, this.height.toFloat())
@@ -203,7 +215,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         viewModel.goToNextStep()
 
         val currentStep = viewModel.getCurrentStep() ?: run {
-            viewModel.completeConversation()
+            completeConversation()
             return
         }
 
@@ -252,7 +264,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         }
 
         if (isLastItem) {
-            viewModel.completeConversation()
+            completeConversation()
         }
     }
 
