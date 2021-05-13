@@ -36,11 +36,10 @@ package org.sagebionetworks.research.mindkind.backgrounddata
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.NotificationManager.IMPORTANCE_LOW
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.app.NotificationManager.*
+import android.app.PendingIntent
+import android.app.PendingIntent.FLAG_UPDATE_CURRENT
+import android.content.*
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -69,6 +68,8 @@ import org.sagebionetworks.research.domain.result.implementations.TaskResultBase
 import org.sagebionetworks.research.mindkind.R
 import org.sagebionetworks.research.mindkind.R.drawable
 import org.sagebionetworks.research.mindkind.R.string
+import org.sagebionetworks.research.mindkind.TaskListActivity
+import org.sagebionetworks.research.mindkind.conversation.ConversationSurveyActivity
 import org.sagebionetworks.research.mindkind.research.SageTaskIdentifier
 import org.sagebionetworks.research.mindkind.room.BackgroundDataEntity
 import org.sagebionetworks.research.mindkind.room.BackgroundDataTypeConverters
@@ -79,6 +80,7 @@ import org.sagebionetworks.research.sageresearch_app_sdk.TaskResultUploader
 import org.threeten.bp.Instant
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZonedDateTime
+import org.threeten.bp.temporal.ChronoUnit
 import java.io.File
 import java.io.FileOutputStream
 import java.util.*
@@ -100,9 +102,20 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
         public const val AMBIENT_LIGHT_WORKER_ACTION =
                 "org.sagebionetworks.research.MindKind.AmbientLightWorker"
 
+        public const val SHOW_ENGAGEMENT_NOTIFICATION_ACTION =
+                "org.sagebionetworks.research.MindKind.ShowEngagementNotification"
+
         private const val TASK_IDENTIFIER = SageTaskIdentifier.BACKGROUND_DATA
         private const val FOREGROUND_NOTIFICATION_ID = 100
         private const val JSON_MIME_CONTENT_TYPE = "application/json"
+
+        private const val FOREGROUND_CHANNEL_ID = "MindKind Passive Data"
+        private const val ENGAGEMENT_CHANNEL_ID = "MindKind Engagement"
+
+        private const val ENGAGEMENT_REQUEST_CODE = 2314
+        // The number of days without answers a conversation survey that triggers
+        // and engagement notification
+        private const val ENGAGEMENT_TRIGGER_DAYS = 14
 
         // True when this service is running, false otherwise
         public var isServiceRunning = false
@@ -131,7 +144,13 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
                 else -> "error"
             }
         }
+
+        fun createSharedPrefs(context: Context): SharedPreferences {
+            return context.getSharedPreferences("Mindkind", MODE_PRIVATE)
+        }
     }
+
+    private lateinit var sharedPrefs: SharedPreferences
 
     private val typeConverters = BackgroundDataTypeConverters()
     lateinit var database: MindKindDatabase
@@ -201,6 +220,9 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
         Log.d(TAG, "onCreate")
         super.onCreate()
 
+        // Used for local data storage
+        sharedPrefs = createSharedPrefs(this)
+
         // Setup daily wifi & charger upload worker
         WorkUtils.enqueueDailyWorkNetwork(this,
                 BridgeUploadWorker::class.java, BridgeUploadWorker.periodicWorkName)
@@ -216,6 +238,9 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
         }
 
         isServiceRunning = true
+
+        createNotificationChannel()
+        createEngagementNotificationChannel()
         startForeground()
 
         database = Room.databaseBuilder(this,
@@ -243,6 +268,12 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
 
         LocalBroadcastManager.getInstance(this).registerReceiver(
                 uploadDataReceiver, IntentFilter(ACTIVITY_UPLOAD_DATA_ACTION))
+
+        // If this is our first time running, mark a starting point for convo complete date
+        if (!sharedPrefs.contains(ConversationSurveyActivity.completedDateKey)) {
+            sharedPrefs.edit().putString(ConversationSurveyActivity.completedDateKey,
+                    LocalDateTime.now().toString()).apply()
+        }
     }
 
     override fun onDestroy() {
@@ -373,18 +404,23 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
             kickOffAmbientLightUpdates()
         }
 
+        if (intent?.action == SHOW_ENGAGEMENT_NOTIFICATION_ACTION) {
+            checkLastConversationCompleteDate(true)
+        }
+
+        checkLastConversationCompleteDate()
+
         return START_STICKY
     }
 
     private fun startForeground() {
-        createNotificationChannel()
-        val notification = createNotification(
+        val notification = createForegroundNotification(
                 "Monitoring for data changes.  We only collect data you have consented to sharing.")
         startForeground(FOREGROUND_NOTIFICATION_ID, notification)
     }
 
-    private fun createNotification(text: String? = null): Notification {
-        return Builder(this, getString(string.foreground_channel_id))
+    private fun createForegroundNotification(text: String? = null): Notification {
+        return Builder(this, FOREGROUND_CHANNEL_ID)
                 .setContentText(text ?: "")
                 .setSmallIcon(
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
@@ -394,23 +430,51 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
                 .build()
     }
 
-    private fun updateNotification(text: String) {
-        (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
-                .notify(FOREGROUND_NOTIFICATION_ID, createNotification(text))
-    }
-
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             // Create the NotificationChannel
             val title = getString(string.foreground_channel_title)
             val desc = getString(string.foreground_channel_desc)
             val importance = NotificationManager.IMPORTANCE_LOW
-            val mChannel = NotificationChannel(getString(string.foreground_channel_id), title, importance)
+            val mChannel = NotificationChannel(FOREGROUND_CHANNEL_ID, title, importance)
             mChannel.description = desc
             mChannel.importance = IMPORTANCE_LOW
             // Register the channel with the system; can't change importance or other behaviors after this
             (getSystemService(NOTIFICATION_SERVICE) as NotificationManager).createNotificationChannel(mChannel)
         }
+    }
+
+    private fun createEngagementNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // Create the NotificationChannel
+            val title = getString(string.foreground_channel_engagement_title)
+            val desc = getString(string.foreground_channel_engagement_desc)
+            val importance = NotificationManager.IMPORTANCE_LOW
+            val mChannel = NotificationChannel(ENGAGEMENT_CHANNEL_ID, title, importance)
+            mChannel.description = desc
+            mChannel.importance = IMPORTANCE_DEFAULT
+            // Register the channel with the system; can't change importance or other behaviors after this
+            (getSystemService(NOTIFICATION_SERVICE) as NotificationManager).createNotificationChannel(mChannel)
+        }
+    }
+
+    private fun createEngagementNotification(text: String? = null): Notification {
+
+        val intent = Intent(this, TaskListActivity::class.java)
+        intent.action = SHOW_ENGAGEMENT_NOTIFICATION_ACTION
+        val pendingIntent = PendingIntent.getActivity(
+                this, ENGAGEMENT_REQUEST_CODE,
+                intent, FLAG_UPDATE_CURRENT)
+
+        return Builder(this, ENGAGEMENT_CHANNEL_ID)
+                .setContentText(text ?: "")
+                .setSmallIcon(
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                            drawable.ic_launcher_foreground else R.mipmap.ic_launcher)
+                .setStyle(NotificationCompat.BigTextStyle()
+                        .bigText(text ?: ""))
+                .setContentIntent(pendingIntent)
+                .build()
     }
 
     /**
@@ -443,6 +507,8 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
         subscribeCompletableAsync(completable,
                 "Successfully saved BackgroundData to room",
                 "Failed to save BackgroundData to room")
+
+        checkLastConversationCompleteDate()
     }
 
     /**
@@ -525,6 +591,22 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
                 // Register for next round of ambient light sensor sampling
                 handler.postDelayed(ambientLightRunnable, ambientLightFreq)
             }
+        }
+    }
+
+    private fun checkLastConversationCompleteDate(debugForceShow: Boolean = false) {
+        val lastConversationCompleteStr = sharedPrefs.getString(
+                ConversationSurveyActivity.completedDateKey, null) ?: run {
+            return
+        }
+        val lastConvoDate = LocalDateTime.parse(lastConversationCompleteStr)
+        val daysFromLastConvo = ChronoUnit.DAYS.between(lastConvoDate, LocalDateTime.now())
+        if (daysFromLastConvo >= ENGAGEMENT_TRIGGER_DAYS || debugForceShow) {
+            val notification = createEngagementNotification(
+                    getString(string.engagement_notification_title))
+
+            val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.notify(ENGAGEMENT_REQUEST_CODE, notification)
         }
     }
 

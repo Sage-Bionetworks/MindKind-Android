@@ -61,9 +61,15 @@
     <string name="reminder_notification_channel_title">mPower Reminders</string>
     <string name="reminder_notification_channel_desc">mPower reminders help you remember to log your data</string>
 
-    <string name="foreground_channel_id">MindKind Passive Data</string>
     <string name="foreground_channel_title">MindKind Passive Data Collection</string>
     <string name="foreground_channel_desc">The MindKind Study needs a foreground notification to allow our study app to be notified when your data changes.</string>
+
+    <string name="foreground_channel_engagement_title">MindKind Engagement</string>
+    <string name="foreground_channel_engagement_desc">The MindKind Study uses notifications to keep the user engaged.</string>
+
+    <!-- Engagement Notification -->
+    <string name="engagement_alert_message">Would you like to answer a few questions about why you have stopped?”</string>
+    <string name="engagement_notification_title">It looks like you are no longer actively participating in the MindKind Study.</string>
 
     <string-array name="days_of_the_week">
         <item>Sunday</item>
@@ -125,4 +131,5 @@
     <string name="welcome_4_message">Protecting your data is very important to us.  Your data will only be used for this study.</string>
     <string name="welcome_accept">Accept</string>
     <string name="welcome_cancel"><u>No Thanks</u></string>
+
 </resources>
