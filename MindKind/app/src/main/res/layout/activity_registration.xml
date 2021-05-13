@@ -97,18 +97,14 @@
                 android:textColor="@color/dark_text"
                 android:textSize="18sp"/>
 
-            <TextView
-                android:id="@+id/registration_more"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/registration_learn_link"
-                android:layout_gravity="center_horizontal"
-                android:gravity="center_horizontal"
-                style="@style/TextAppearance.Sage.Settings.Header"
-                android:layout_marginHorizontal="40dp"
-                android:layout_marginVertical="16dp"
-                android:textColor="@color/dark_text"
-                android:textSize="18sp"/>
+            <com.google.android.material.button.MaterialButton
+                style="@style/Sage.MaterialButton.UnderlinedBorderless"
+                android:id="@+id/join_button"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:textSize="16sp"
+                android:text="@string/registration_link"/>
+
         </LinearLayout>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -118,9 +114,10 @@
             android:layout_marginTop="32dp"
             android:layout_marginStart="32dp"
             android:layout_marginEnd="32dp"
-            android:textColorHint="@color/grey"
             android:hint="@string/registration_hint"
-            app:boxBackgroundMode="outline">
+            android:textColorHint="@color/appLightGray"
+            app:boxBackgroundMode="filled"
+            app:boxBackgroundColor="@color/white">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/phone_number_text_input"
@@ -132,12 +129,20 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <LinearLayout
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
+            android:indeterminate="true"
+            android:visibility="invisible"/>
+
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/white"
-            android:orientation="vertical"
-            android:gravity="bottom"
             android:padding="32dp">
 
             <com.google.android.material.button.MaterialButton
@@ -146,17 +151,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="54dp"
                 android:textSize="16sp"
-                android:text="@string/rsb_submit"/>
+                android:text="@string/rsb_submit"
+                android:layout_gravity="bottom"/>
 
-            <com.google.android.material.button.MaterialButton
-                style="@style/Sage.MaterialButton.UnderlinedBorderless"
-                android:id="@+id/confirmation_continue"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:textSize="16sp"
-                android:text="@string/registration_link"/>
-
-        </LinearLayout>
+        </FrameLayout>
 
     </LinearLayout>
 
@@ -167,5 +165,11 @@
         android:src="@drawable/ic_registration_butterflies"
         android:contentDescription="@string/content_desc_butterflies"
         android:layout_marginTop="40dp"/>
+
+    <FrameLayout
+        android:id="@+id/web_consent_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

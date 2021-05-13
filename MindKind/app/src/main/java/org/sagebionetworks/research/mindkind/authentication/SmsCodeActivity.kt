@@ -1,7 +1,8 @@
-package org.sagebionetworks.research.mpower.authentication
+package org.sagebionetworks.research.mindkind
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.text.Editable
@@ -11,7 +12,6 @@ import android.view.View
 import androidx.annotation.MainThread
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -27,10 +27,6 @@ import org.sagebionetworks.bridge.rest.exceptions.ConsentRequiredException
 import org.sagebionetworks.bridge.rest.exceptions.InvalidEntityException
 import org.sagebionetworks.bridge.rest.model.Phone
 import org.sagebionetworks.bridge.rest.model.SignUp
-import org.sagebionetworks.research.mindkind.EntryActivity
-import org.sagebionetworks.research.mindkind.PhoneSignUpViewModel
-import org.sagebionetworks.research.mindkind.R
-import org.sagebionetworks.research.mpower.WebConsentFragment
 import org.sagebionetworks.researchstack.backbone.DataResponse
 import org.slf4j.LoggerFactory
 import rx.subscriptions.CompositeSubscription
@@ -53,8 +49,6 @@ open class SmsCodeActivity : AppCompatActivity() {
     @JvmField
     @Inject
     var factory: SmsCodeViewModel.Factory? = null
-    
-    var consentFragment: WebConsentFragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
@@ -141,19 +135,9 @@ open class SmsCodeActivity : AppCompatActivity() {
 
         viewModel.isConsentRequired.observe(this, Observer { isConsentRequired: Boolean? ->
             if (isConsentRequired == true) {
-                web_consent_container.visibility = View.VISIBLE
-                var fragment: Fragment? = consentFragment
-                if (fragment == null) {
-                    consentFragment = WebConsentFragment.newInstance()
-                    fragment = consentFragment
-                }
-                fragment?.let {
-                    val manager = supportFragmentManager
-                    val transaction = manager.beginTransaction()
-                    transaction.add(R.id.web_consent_container, it, "WebConsentFragment")
-                    transaction.addToBackStack(null)
-                    transaction.commit()
-                }
+                val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(
+                        "https://staging.wtgmhdc.synapse.org/elgibility"))
+                startActivity(browserIntent)
             } else {
                 web_consent_container.visibility = View.GONE
             }

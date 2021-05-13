@@ -119,7 +119,7 @@
     <string name="registration_title">Let\'s get started</string>
     <string name="registration_message">Please enter your phone number so we can see if you have an existing account.\n\nIf you have not already signed up, you can register using the link below.</string>
     <string name="registration_continue">Continue</string>
-    <string name="registration_link"><u>Need to Register?</u></string>
+    <string name="registration_link"><u>JOIN</u></string>
     <string name="registration_learn_link"><u>Learn More</u></string>
     <string name="registration_hint">Phone Number</string>
     <string name="registration_link_sent">Your link is on its way!</string>

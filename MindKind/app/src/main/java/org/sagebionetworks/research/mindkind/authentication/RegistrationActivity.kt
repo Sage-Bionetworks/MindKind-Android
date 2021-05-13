@@ -2,6 +2,7 @@ package org.sagebionetworks.research.mindkind
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.telephony.TelephonyManager
 import android.text.Editable
@@ -9,28 +10,32 @@ import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import androidx.annotation.MainThread
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.google.common.base.Strings
 import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.activity_external_id_sign_in.*
+import kotlinx.android.synthetic.main.activity_external_id_sign_in.progressBar
 import kotlinx.android.synthetic.main.activity_registration.*
+import kotlinx.android.synthetic.main.activity_registration.submit_button
+import kotlinx.android.synthetic.main.activity_registration.web_consent_container
+import kotlinx.android.synthetic.main.activity_sms_code.*
 import org.sagebionetworks.bridge.android.manager.AuthenticationManager
 import org.sagebionetworks.bridge.researchstack.ApiUtils
 import org.sagebionetworks.bridge.rest.exceptions.InvalidEntityException
 import org.sagebionetworks.bridge.rest.model.Phone
-import org.sagebionetworks.bridge.rest.model.SignUp
-import org.sagebionetworks.research.mindkind.R
-import org.sagebionetworks.research.mpower.authentication.SmsCodeActivity
+import org.sagebionetworks.bridge.rest.model.SignIn
+import org.sagebionetworks.bridge.rest.model.UserSessionInfo
 import org.sagebionetworks.researchstack.backbone.DataResponse
 import org.slf4j.LoggerFactory
 import rx.subscriptions.CompositeSubscription
 import java.util.*
 import javax.inject.Inject
-import kotlin.collections.ArrayList
 
 open class RegistrationActivity: AppCompatActivity() {
 
@@ -59,20 +64,25 @@ open class RegistrationActivity: AppCompatActivity() {
                 ViewModelProvider(this, phoneSignUpFactory)
                         .get(PhoneSignUpViewModel::class.java)
 
-        viewModel.getIsSignedUpLiveData().observe(this, Observer { isSignedUp: Boolean ->
-            if (isSignedUp) {
+        handleIntent(intent)?.let {
+            // Store token in view model
+            viewModel.deepLinkeToken = it
+        }
+
+        viewModel.getIsSignedUpLiveData().observe(this, { signInSuccess: Boolean ->
+            if (signInSuccess) {
                 val phoneNumber = viewModel.phoneNumber
                 startActivity(SmsCodeActivity.create(this, phoneNumber))
                 overridePendingTransition(R.anim.enter, R.anim.exit)
             }
         })
 
-        viewModel.getIsSignedUpLiveData().observe(this, Observer { isSignedUp: Boolean ->
+        viewModel.getIsSignedUpLiveData().observe(this, { isSignedUp: Boolean ->
             if (isSignedUp) {
                 progressBar?.visibility = View.INVISIBLE
             }
         })
-        viewModel.isLoadingLiveData.observe(this, Observer { isLoading: Boolean? ->
+        viewModel.isLoadingLiveData.observe(this, { isLoading: Boolean? ->
             progressBar?.visibility = if (isLoading == true) {
                 View.VISIBLE
             } else {
@@ -85,7 +95,7 @@ open class RegistrationActivity: AppCompatActivity() {
 
         submit_button.isEnabled = false
         submit_button.alpha = 0.33f
-        viewModel.isPhoneNumberValid.observe(this, Observer { isValid: Boolean? ->
+        viewModel.isPhoneNumberValid.observe(this, { isValid: Boolean? ->
             submit_button.isEnabled = isValid ?: false
             submit_button.alpha = if (isValid == true) {
                 1.0f
@@ -106,11 +116,40 @@ open class RegistrationActivity: AppCompatActivity() {
             }
         })
 
-        confirmation_continue.setOnClickListener {
-
+        join_button.setOnClickListener {
+            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(
+                    "https://staging.wtgmhdc.synapse.org/eligibility "))
+            startActivity(browserIntent)
         }
 
         phoneSignUpViewModel = viewModel
+    }
+
+    open fun handleIntent(intent: Intent): String? {
+        val appLinkAction = intent.action
+        val appLinkData = intent.data
+        if (Intent.ACTION_VIEW == appLinkAction && appLinkData != null) {
+            // We came in via a link! Let's do something with it
+            val token = appLinkData.lastPathSegment
+            Log.d(TAG, "Deep link intercepted by app with token $token")
+            return token
+        }
+        return null
+    }
+
+    override fun onResume() {
+        super.onResume()
+        web_consent_container.visibility = View.GONE
+    }
+
+    fun onErrorMessage(errorMessage: String?) {
+        if (Strings.isNullOrEmpty(errorMessage)) {
+            return
+        }
+        AlertDialog.Builder(this)
+                .setTitle(R.string.consent_error_title)
+                .setNeutralButton(R.string.rsb_ok, null)
+                .create().show()
     }
 }
 
@@ -163,6 +202,8 @@ public class PhoneSignUpViewModel @MainThread constructor(
             isPhoneNumberValidLiveData.postValue(value.isNotEmpty())
         }
 
+    var deepLinkeToken: String? = null
+
     fun getIsSignedUpLiveData(): LiveData<Boolean> {
         return isSignedUpLiveData
     }
@@ -173,8 +214,6 @@ public class PhoneSignUpViewModel @MainThread constructor(
      */
     fun signInPhone(context: Context) {
 
-        val phoneErrorMsg = context.getString(R.string.registration_phone_error)
-
         LOGGER.debug("signUpPhone $phoneNumber")
         if (Strings.isNullOrEmpty(phoneNumber)) {
             LOGGER.warn("Cannot sign in with null or empty phone number")
@@ -184,6 +223,13 @@ public class PhoneSignUpViewModel @MainThread constructor(
         }
 
         val regionCode = phoneRegion(context)
+
+        deepLinkeToken?.let {
+            signInWithAuthToken(context, it, regionCode, phoneNumber)
+            return
+        }
+
+        val phoneErrorMsg = context.getString(R.string.registration_phone_error)
 
         compositeSubscription.add(
                 authenticationManager.requestPhoneSignIn(regionCode, phoneNumber)
@@ -205,6 +251,29 @@ public class PhoneSignUpViewModel @MainThread constructor(
                             isSignedUpLiveData.postValue(false)
                             errorMessageMutableLiveData.postValue(error.message)
                         })
+    }
+
+    fun signInWithAuthToken(context: Context, authToken: String, regionCode: String, number: String) {
+        val phoneErrorMsg = context.getString(R.string.registration_phone_error)
+        compositeSubscription.add(
+                authenticationManager.signInViaPhoneLink(regionCode, number, authToken)
+                .doOnSubscribe {
+                    isLoadingMutableLiveData.postValue(true)
+                }
+                .doAfterTerminate {
+                    isLoadingMutableLiveData.postValue(false)
+                }
+                .subscribe({ response: UserSessionInfo? ->
+                    isSignedUpLiveData.postValue(true)
+                }) { error: Throwable ->
+                    // 400 is the response for an invalid phone number
+                    if (error is InvalidEntityException) {
+                        errorMessageMutableLiveData.postValue(phoneErrorMsg)
+                        return@subscribe
+                    }
+                    isSignedUpLiveData.postValue(false)
+                    errorMessageMutableLiveData.postValue(error.message)
+                })
     }
 
     override fun onCleared() {

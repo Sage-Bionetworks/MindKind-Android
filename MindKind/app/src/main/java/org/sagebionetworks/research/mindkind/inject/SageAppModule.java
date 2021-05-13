@@ -33,6 +33,7 @@
 package org.sagebionetworks.research.mindkind.inject;
 
 import org.sagebionetworks.research.mindkind.RegistrationActivity;
+import org.sagebionetworks.research.mindkind.SmsCodeActivity;
 import org.sagebionetworks.research.mindkind.WelcomeActivity;
 import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService;
 import org.sagebionetworks.research.mindkind.conversation.ConversationSurveyActivity;
@@ -62,4 +63,7 @@ public abstract class SageAppModule {
 
     @ContributesAndroidInjector
     abstract WelcomeActivity contributeWelcomeActivity();
+
+    @ContributesAndroidInjector
+    abstract SmsCodeActivity contributeSmsCodeActivity();
 }
