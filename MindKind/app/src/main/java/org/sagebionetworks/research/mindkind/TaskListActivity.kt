@@ -39,24 +39,23 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.app.ActivityCompat.OnRequestPermissionsResultCallback
 import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.activity_conversation_survey.*
-import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService
-import org.sagebionetworks.research.mindkind.conversation.ConversationSurveyActivity
-import org.sagebionetworks.research.sageresearch.dao.room.AppConfigRepository
-import org.sagebionetworks.research.sageresearch.dao.room.ReportRepository
-import java.io.BufferedReader
-import java.io.InputStreamReader
-import java.nio.charset.StandardCharsets
-import javax.inject.Inject
-
 import kotlinx.android.synthetic.main.activity_task_list.*
+import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService
+import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService.Companion.SHOW_ENGAGEMENT_NOTIFICATION_ACTION
+import org.sagebionetworks.research.mindkind.conversation.ConversationSurveyActivity
 import org.sagebionetworks.research.mindkind.conversation.SpacesItemDecoration
 import org.sagebionetworks.research.mindkind.settings.SettingsActivity
+import org.sagebionetworks.research.sageresearch.dao.room.AppConfigRepository
+import org.sagebionetworks.research.sageresearch.dao.room.ReportRepository
+import javax.inject.Inject
 
 /**
  * A simple [Fragment] subclass that shows a list of the available surveys and tasks for the app
@@ -111,7 +110,7 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
         taskRecyclerView.layoutManager = llm
 
         taskRecyclerView.addItemDecoration(SpacesItemDecoration(resources.getDimensionPixelSize(R.dimen.converation_recycler_spacing)))
-        val adapter = TaskAdapter(taskItems, object: TaskAdapterListener {
+        val adapter = TaskAdapter(taskItems, object : TaskAdapterListener {
             override fun onTaskClicked(jsonResourceName: String?) {
                 startTask(jsonResourceName)
             }
@@ -143,6 +142,11 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
 
         // Auto-start background data collector
         startBackgroundDataService()
+
+        // Did we enter this screen from the engagement notification?
+        if (intent.action == SHOW_ENGAGEMENT_NOTIFICATION_ACTION) {
+            showEngagementMessage()
+        }
     }
 
     @Override
@@ -186,5 +190,15 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
     fun startTask(jsonResourceName: String?) {
         val fileName = jsonResourceName ?: run { return }
         ConversationSurveyActivity.start(this, jsonResourceName)
+    }
+
+    fun showEngagementMessage() {
+        MaterialAlertDialogBuilder(this)
+                .setMessage(R.string.engagement_alert_message)
+                .setPositiveButton(R.string.rsb_BOOL_YES) { _, _ ->
+                    // TODO: mdephillips 5/13/21 send them to withdrawal
+                }
+                .setNegativeButton(R.string.rsb_BOOL_NO, null)
+                .show()
     }
 }
