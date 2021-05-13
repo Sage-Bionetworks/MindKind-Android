@@ -55,6 +55,32 @@
         </activity>
 
         <activity
+            android:name=".RegistrationActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan"
+            tools:ignore="LockedOrientationActivity" >
+
+            <tools:validation testUrl="https://sagebionetworks.org/Mindkind/sage-mindkind/auth/TOKEN" />
+
+            <intent-filter
+                android:autoVerify="true"
+                tools:targetApi="m">
+
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="sagebionetworks.org"
+                    android:pathPrefix="/Mindkind/sage-mindkind/auth"
+                    android:scheme="https" />
+
+            </intent-filter>
+
+        </activity>
+
+        <activity
             android:name=".authentication.ExternalIdSignInActivity"
             android:label="@string/title_activity_external_id_sign_in"
             android:screenOrientation="portrait"
@@ -74,9 +100,10 @@
             tools:ignore="LockedOrientationActivity" />
 
         <activity
-            android:name=".RegistrationActivity"
+            android:name=".SmsCodeActivity"
+            android:label="@string/title_activity_external_id_sign_in"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustPan"
+            android:windowSoftInputMode="adjustResize"
             tools:ignore="LockedOrientationActivity" />
 
         <activity
