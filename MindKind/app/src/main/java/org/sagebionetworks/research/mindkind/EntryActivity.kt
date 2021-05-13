@@ -55,11 +55,10 @@ class EntryActivity : AppCompatActivity() {
         super.onResume()
 
         if (authManager.userSessionInfo?.isAuthenticated != true) {
-            startActivity(Intent(this, RegistrationActivity::class.java))
+            startActivity(Intent(this, WelcomeActivity::class.java))
         } else {
             startActivity(Intent(this, TaskListActivity::class.java))
         }
-        overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
         finish()
     }
 }

@@ -69,18 +69,18 @@
         android:orientation="vertical"
         android:layout_gravity="bottom"
         android:layout_margin="60dp">
+
         <com.google.android.material.button.MaterialButton
             style="@style/Sage.MaterialButton.Rounded"
-            android:id="@+id/confirmation_quit"
+            android:id="@+id/confirmation_continue"
             android:layout_width="match_parent"
-            android:layout_height="64dp"
+            android:layout_height="54dp"
             android:text="@string/welcome_accept"
-            android:layout_marginTop="30dp"
-            android:enabled="false"/>
+            android:layout_marginTop="30dp"/>
 
         <com.google.android.material.button.MaterialButton
             style="@style/Sage.MaterialButton.UnderlinedBorderless"
-            android:id="@+id/confirmation_continue"
+            android:id="@+id/confirmation_quit"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:textSize="16sp"

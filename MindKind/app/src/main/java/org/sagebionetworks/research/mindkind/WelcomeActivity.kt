@@ -1,6 +1,7 @@
 package org.sagebionetworks.research.mindkind
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -13,6 +14,9 @@ import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
 import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.activity_welcome.*
+import kotlinx.android.synthetic.main.welcome_4.view.*
+import org.sagebionetworks.research.mindkind.R2.id.confirmation_continue
+import org.sagebionetworks.research.mindkind.R2.id.confirmation_quit
 
 open class WelcomeActivity: AppCompatActivity() {
 
@@ -75,7 +79,16 @@ open class WelcomeActivity: AppCompatActivity() {
         }
     }
 
-    class WelcomeAdapter(private val mContext: Context) : PagerAdapter() {
+    fun onQuitClicked() {
+        finish()
+    }
+
+    fun onContinueClicked() {
+        startActivity(Intent(this, RegistrationActivity::class.java))
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
+    }
+
+    inner class WelcomeAdapter(private val mContext: Context) : PagerAdapter() {
         override fun isViewFromObject(view: View, `object`: Any): Boolean {
             return view === `object`
         }
@@ -93,6 +106,16 @@ open class WelcomeActivity: AppCompatActivity() {
             }
             val inflater = LayoutInflater.from(mContext)
             val layout = inflater.inflate(resId, collection, false) as ViewGroup
+
+            if (resId == R.layout.welcome_4) {
+                layout.confirmation_quit.setOnClickListener {
+                    onQuitClicked()
+                }
+                layout.confirmation_continue.setOnClickListener {
+                    onContinueClicked()
+                }
+            }
+
             collection.addView(layout)
             return layout
         }
