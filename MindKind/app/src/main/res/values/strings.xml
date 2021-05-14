@@ -123,7 +123,7 @@
     <!-- Phone registration -->
     <string name="registration_header_subtext">Study</string>
     <string name="registration_title">Let\'s get started</string>
-    <string name="registration_message">If you have not already signed up, you can register using the link below.</string>
+    <string name="registration_message">Please enter the phone number you used to sign up. We ask so we can verify it\'s you and get you started!\n\nIf you have not already signed up you can join using the link below.</string>
     <string name="registration_continue">Continue</string>
     <string name="registration_link"><u>JOIN</u></string>
     <string name="registration_learn_link"><u>Learn More</u></string>
