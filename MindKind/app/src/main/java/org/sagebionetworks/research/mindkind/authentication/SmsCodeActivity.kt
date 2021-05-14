@@ -146,7 +146,7 @@ open class SmsCodeActivity : AppCompatActivity() {
         smsCodeViewModel = viewModel
     }
 
-    fun onErrorMessage(errorMessage: String?) {
+    private fun onErrorMessage(errorMessage: String?) {
         if (Strings.isNullOrEmpty(errorMessage)) {
             return
         }
@@ -156,9 +156,11 @@ open class SmsCodeActivity : AppCompatActivity() {
                 .create().show()
     }
 
-    fun returnToEntryActivity() {
+    private fun returnToEntryActivity() {
         val intent = Intent(this, EntryActivity::class.java)
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
+                Intent.FLAG_ACTIVITY_CLEAR_TASK or
+                Intent.FLAG_ACTIVITY_CLEAR_TOP)
         startActivity(intent)
         finish()
     }
