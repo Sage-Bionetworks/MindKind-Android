@@ -78,6 +78,9 @@ class ConversationGsonHelper {
                             ConversationStepType.gif.type)
                     .registerSubtype(NestedStep::class.java,
                             ConversationStepType.nested.type)
+                    .registerSubtype(
+                            ConversationSingleChoiceWheelStringStep::class.java,
+                            ConversationStepType.singleChoiceWheelString.type)
         }
     }
 }
@@ -116,7 +119,9 @@ data class ConversationTextFormStep(
         val maxCharacters: Int,
         val placeholderText: String,
         override val ifUserAnswers: String? = null,
-        override val optional: Boolean? = true): ConversationStep()
+        override val optional: Boolean? = true,
+        val maxLines: Int?,
+        val inputType: String?): ConversationStep()
 
 data class ConversationIntegerFormStep(
         override val identifier: String,
@@ -158,6 +163,16 @@ data class ConversationSingleChoiceStringFormStep(
         override val optional: Boolean? = true
 ): ConversationStep()
 
+data class ConversationSingleChoiceWheelStringStep(
+        override val identifier: String,
+        override val type: String,
+        override val title: String,
+        override val buttonTitle: String,
+        val choices: List<String>,
+        override val ifUserAnswers: String? = null,
+        override val optional: Boolean? = true
+): ConversationStep()
+
 data class IntegerConversationInputFieldChoice(
         val text: String,
         val value: Int)
@@ -188,6 +203,7 @@ public enum class ConversationStepType(val type: String) {
     instruction("instruction"),
     singleChoiceInt("singleChoice.integer"),
     singleChoiceString("singleChoice.string"),
+    singleChoiceWheelString("singleChoice.wheel.string"),
     timeOfDay("timeOfDay"),
     text("text"),
     integer("integer"),
