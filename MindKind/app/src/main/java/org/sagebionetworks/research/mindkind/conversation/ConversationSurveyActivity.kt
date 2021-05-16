@@ -58,7 +58,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         }
     }
 
-    private val sharedPrefs = BackgroundDataService.createSharedPrefs(this)
+    private var sharedPrefs: SharedPreferences? = null
 
     var handler: Handler? = null
 
@@ -79,6 +79,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         setContentView(R.layout.activity_conversation_survey)
 
         handler = Handler()
+        sharedPrefs = BackgroundDataService.createSharedPrefs(this)
 
         viewModel = ViewModelProvider(this,
                 ConversationSurveyViewModel.Factory(taskResultUploader)).get()
@@ -174,7 +175,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
 
     fun completeConversation() {
         viewModel.completeConversation()
-        sharedPrefs.edit().putString(completedDateKey, LocalDateTime.now().toString()).apply()
+        sharedPrefs?.edit()?.putString(completedDateKey, LocalDateTime.now().toString())?.apply()
     }
 
     fun View.slideDown(duration: Int = 500) {
