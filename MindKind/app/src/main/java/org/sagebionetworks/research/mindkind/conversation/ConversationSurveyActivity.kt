@@ -7,17 +7,20 @@ import android.graphics.Rect
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.text.InputType
 import android.text.format.DateFormat.is24HourFormat
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.TranslateAnimation
 import android.widget.LinearLayout
+import android.widget.NumberPicker
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.children
-import androidx.lifecycle.*
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.get
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
@@ -25,6 +28,7 @@ import com.google.android.material.button.MaterialButton
 import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.activity_conversation_survey.*
 import kotlinx.android.synthetic.main.integer_input.view.*
+import kotlinx.android.synthetic.main.number_picker.view.*
 import kotlinx.android.synthetic.main.text_input.view.*
 import org.sagebionetworks.research.mindkind.R
 import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService
@@ -245,6 +249,8 @@ open class ConversationSurveyActivity: AppCompatActivity() {
                 handleIntegerInput(step as? ConversationIntegerFormStep, answer, scroll)
             ConversationStepType.text.type ->
                 handleTextInput(step as? ConversationTextFormStep, answer, scroll)
+            ConversationStepType.singleChoiceWheelString.type ->
+                handleWheelStringInput(step as? ConversationSingleChoiceWheelStringStep, answer, scroll)
             ConversationStepType.timeOfDay.type ->
                 handleTimeOfDayInput(step as? ConversationTimeOfDayStep, answer, scroll)
             ConversationStepType.gif.type -> {
@@ -374,6 +380,46 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         }
     }
 
+    private fun handleWheelStringInput(choiceIntFormStep: ConversationSingleChoiceWheelStringStep?, answer: String?, scroll: Boolean) {
+        val step = choiceIntFormStep ?: run { return }
+        val choices = step.choices
+        button_container.removeAllViews()
+
+        (this.layoutInflater.inflate(R.layout.number_picker,
+                button_container, false) as? NumberPicker)?.let {
+
+            it.displayedValues = choices.toTypedArray()
+            it.wrapSelectorWheel = false
+            it.maxValue = 0
+            it.maxValue = choices.size - 1
+            if (answer != null) {
+                it.value = choices.indexOf(answer)
+            }
+
+            button_container.addView(it)
+        }
+
+        (this.layoutInflater.inflate(R.layout.conversation_material_button,
+                button_container, false) as? MaterialButton)?.let {
+
+            it.text = step.buttonTitle
+            it.setOnClickListener {
+                var numberPicker = button_container.number_picker
+                var select = numberPicker.value
+                addAnswer(step, choices[select], choices[select], scroll)
+                disableAllButtons()
+            }
+            val llp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT)
+            llp.bottomMargin = resources.getDimensionPixelSize(R.dimen.conversation_button_margin)
+            button_container.addView(it, llp)
+        }
+
+        if(step.optional != false) {
+            addSkipButton(step, scroll)
+        }
+    }
+
     private fun addSkipButton(step: ConversationStep, scroll: Boolean) {
         (this.layoutInflater.inflate(R.layout.conversation_button_unfilled,
                 button_container, false) as? MaterialButton)?.let {
@@ -477,11 +523,19 @@ open class ConversationSurveyActivity: AppCompatActivity() {
                 button_container, false) as? ViewGroup)?.let { vg ->
 
             val inputView = vg.text_input
-            inputView?.maxLines = 4
+            if(step.maxLines != null) {
+                inputView?.maxLines = step.maxLines
+            }
+
+            if(step.inputType == "integer") {
+                inputView?.inputType = InputType.TYPE_CLASS_NUMBER
+            }
+
             inputView?.hint = step.placeholderText
             if(answer != null) {
                 inputView?.setText(answer)
             }
+
             button_container.addView(vg)
 
             (this.layoutInflater.inflate(R.layout.conversation_material_button,

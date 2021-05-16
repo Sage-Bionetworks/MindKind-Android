@@ -20,6 +20,13 @@
       "max": 9
     },
     {
+      "identifier": "question_single_choice_wheel",
+      "type": "singleChoice.wheel.string",
+      "title": "What's your favorite number when counting by 5's?",
+      "choices": ["a", "b", "c", "d", "e"],
+      "buttonTitle": "Ok"
+    },
+    {
       "identifier": "skipToStepTest",
       "type": "singleChoice.string",
       "title": "Do you have time to do the nested json?",
@@ -49,6 +56,16 @@
       "maxCharacters": 100,
       "placeholderText": "Write something here..",
       "maxLines": 4
+    },
+    {
+      "identifier": "text_entry_age",
+      "type": "text",
+      "title": "How old are you?",
+      "buttonTitle": "Ok",
+      "maxCharacters": 3,
+      "placeholderText": "Age",
+      "maxLines": 1,
+      "inputType": "integer"
     },
     {
       "identifier": "sleeping",

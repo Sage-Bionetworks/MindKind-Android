@@ -113,6 +113,12 @@
         <item name="android:colorControlNormal">@color/reply_background</item>
     </style>
 
+    <style name="ConversationNumberPicker" parent="">
+        <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:colorControlNormal">@color/reply_background</item>
+    </style>
+
     <style name="TextAppearance.Sage.Settings"/>
     <style name="TextAppearance.Sage.Settings.Header">
         <item name="android:textSize">18sp</item>
