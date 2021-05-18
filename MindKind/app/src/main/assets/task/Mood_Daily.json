@@ -7,7 +7,7 @@
     {
       "identifier": "Mood_Daily",
       "type": "singleChoice.integer",
-      "title": "Pick the number that describes how you felt today",
+      "title": "Pick the response that describes how you felt today",
       "choices": [
         { "text": "Worst Ever"  ,               "value": 1 },
         { "text": "Bad Mood"    ,               "value": 2 },

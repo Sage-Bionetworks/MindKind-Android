@@ -18,8 +18,8 @@
           { "text": "None"        ,               "value": 0 },
           { "text": "Mild"        ,               "value": 1 },
           { "text": "Moderate"    ,               "value": 2 },
-          { "text": "Sever"       ,               "value": 3 },
-          { "text": "Very Sever"  ,               "value": 4 }
+          { "text": "Severe"       ,              "value": 3 },
+          { "text": "Very severe"  ,              "value": 4 }
         ]
       },
       {
@@ -30,8 +30,8 @@
           { "text": "None"        ,               "value": 0 },
           { "text": "Mild"        ,               "value": 1 },
           { "text": "Moderate"    ,               "value": 2 },
-          { "text": "Sever"       ,               "value": 3 },
-          { "text": "Very Sever"  ,               "value": 4 }
+          { "text": "Severe"       ,              "value": 3 },
+          { "text": "Very severe"  ,              "value": 4 }
         ]
       },
       {
@@ -42,8 +42,8 @@
           { "text": "None"        ,               "value": 0 },
           { "text": "Mild"        ,               "value": 1 },
           { "text": "Moderate"    ,               "value": 2 },
-          { "text": "Sever"       ,               "value": 3 },
-          { "text": "Very Sever"  ,               "value": 4 }
+          { "text": "Severe"       ,              "value": 3 },
+          { "text": "Very severe"  ,              "value": 4 }
         ]
       },
       {

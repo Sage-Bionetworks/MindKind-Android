@@ -26,6 +26,7 @@
           "1S_Greet",
           "Mood_Daily",
           "1S_Daily",
+          "All_Journal",
           "1S_Depart"
       ]
     },
@@ -38,7 +39,8 @@
           "1S_Greet",
           "1S_ISI",
           "BL_GAD7_Full",
-          "BL_PHQ9_FULL"
+          "BL_PHQ9_FULL",
+          "1S_Depart"
       ]
     }
   ]

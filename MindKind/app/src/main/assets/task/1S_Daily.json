@@ -29,7 +29,7 @@
     {
       "identifier": "1S_Daily_Rested",
       "type": "singleChoice.integer",
-      "title": "Pick the number that describes how rested you felt today?",
+      "title": "Pick the response that describes how rested you felt today?",
       "choices": [
         { "text": "Not At All"  ,               "value": 0 },
         { "text": "Not Very"    ,               "value": 1 },
