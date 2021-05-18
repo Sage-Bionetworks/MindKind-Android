@@ -22,9 +22,24 @@
     {
       "identifier": "question_single_choice_wheel",
       "type": "singleChoice.wheel.string",
-      "title": "What's your favorite number when counting by 5's?",
-      "choices": ["a", "b", "c", "d", "e"],
+      "title": "What is your reason for withdrawing?",
+      "choices": [
+        "I no longer have the time",
+        "This was not what I thought I was signing up for ",
+        "I found the questions too personal",
+        "Prefer not to say",
+        "Other"],
       "buttonTitle": "Ok"
+    },
+    {
+      "identifier": "text_entry_age",
+      "type": "text",
+      "title": "How much time did you spend exercising today? (in minutes)",
+      "buttonTitle": "Ok",
+      "maxCharacters": 3,
+      "placeholderText": "Time (in minutes)",
+      "maxLines": 1,
+      "inputType": "integer"
     },
     {
       "identifier": "skipToStepTest",

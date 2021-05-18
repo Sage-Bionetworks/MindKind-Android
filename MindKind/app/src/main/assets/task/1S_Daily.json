@@ -1,44 +1,25 @@
 {
-  "identifier": "1S_W1_D4",
+  "identifier": "1S_Daily",
   "type": "conversationSurvey",
-  "taskIdentifier": "1S_W1_D4",
-  "schemaIdentifier": "1S_W1_D4",
-  "daytype": "D_S_S",
-  "QuestionSet": "SS",
+  "taskIdentifier": "1S_Daily",
+  "schemaIdentifier": "1S_Daily",
   "steps": [
     {
-      "identifier": "1S_W1_D4_Intro",
-      "type": "instruction",
-      "title": "Time once again for your daily check in."
-    },
-    {
-      "identifier": "Q1_Likert_Mood",
-      "type": "singleChoice.integer",
-      "title": "Pick the number that describes how you felt today?",
-      "choices": [
-        { "text": "Worst Ever"  ,               "value": 0 },
-        { "text": "Bad Mood"    ,               "value": 1 },
-        { "text": "Average"     ,               "value": 2 },
-        { "text": "Good Mood"   ,               "value": 3 },
-        { "text": "Best Ever"   ,               "value": 4 }
-      ]
-    },
-    {
-      "identifier": "Q2_Fall_Asleep_Time?",
+      "identifier": "1S_Daily_SleepTime",
       "type": "timeOfDay",
       "title": "When did you fall asleep last night?",
       "buttonTitle": "Submit Time",
       "defaultTime": "10:00 pm"
     },
     {
-      "identifier": "Q3_Wake_Up_Time",
+      "identifier": "1S_Daily_WakeTime",
       "type": "timeOfDay",
       "title": "When did you wake up this morning?",
       "buttonTitle": "Submit Time", 
       "defaultTime": "7:00 am"
     },
     {
-      "identifier": "Q4_Wake_up_number",
+      "identifier": "1S_Daily_WakeCount",
       "type": "integer",
       "title": "How many times did you wake up last night?",
       "buttonTitle": "Ok",
@@ -46,9 +27,9 @@
       "max": 12
     },
     {
-      "identifier": "Q5_Rested",
+      "identifier": "1S_Daily_Rested",
       "type": "singleChoice.integer",
-      "title": "Pick the number that describes how you felt today?",
+      "title": "Pick the number that describes how rested you felt today?",
       "choices": [
         { "text": "Not At All"  ,               "value": 0 },
         { "text": "Not Very"    ,               "value": 1 },
@@ -58,9 +39,9 @@
       ]
     },
     {
-      "identifier": "Q6_Sleep_Importance",
+      "identifier": "1S_Daily_Importance",
       "type": "singleChoice.integer",
-      "title": "How important is a good night's sleep  for your mood?",
+      "title": "How important is a good night's sleep for your mood?",
       "choices": [
         { "text": "Not At All"  ,               "value": 0 },
         { "text": "Not Very"    ,               "value": 1 },
@@ -68,11 +49,6 @@
         { "text": "Somewhat"    ,               "value": 3 },
         { "text": "Very Much"   ,               "value": 4 }
       ]
-    },
-    {
-      "identifier": "completion",
-      "type": "instruction",
-      "title": "Thank you! You are doing a great job helping us understand how sleep and feelings go together!"
     }
   ]
-}    
+}

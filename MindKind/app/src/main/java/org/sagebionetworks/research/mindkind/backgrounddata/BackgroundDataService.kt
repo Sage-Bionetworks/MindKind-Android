@@ -61,6 +61,7 @@ import io.reactivex.Completable
 import io.reactivex.Scheduler
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import org.joda.time.format.ISODateTimeFormat
 import org.sagebionetworks.bridge.android.manager.UploadManager
 import org.sagebionetworks.research.domain.Schema
 import org.sagebionetworks.research.domain.result.implementations.FileResultBase
@@ -107,7 +108,7 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
 
         private const val TASK_IDENTIFIER = SageTaskIdentifier.BACKGROUND_DATA
         private const val FOREGROUND_NOTIFICATION_ID = 100
-        private const val JSON_MIME_CONTENT_TYPE = "application/json"
+        public const val JSON_MIME_CONTENT_TYPE = "application/json"
 
         private const val FOREGROUND_CHANNEL_ID = "MindKind Passive Data"
         private const val ENGAGEMENT_CHANNEL_ID = "MindKind Engagement"
@@ -144,6 +145,9 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
                 else -> "error"
             }
         }
+
+        public const val studyStartDateKey = "StudyStartDate"
+        public val dateFormatter = ISODateTimeFormat.dateTime().withOffsetParsed()
 
         fun createSharedPrefs(context: Context): SharedPreferences {
             return context.getSharedPreferences("Mindkind", MODE_PRIVATE)
