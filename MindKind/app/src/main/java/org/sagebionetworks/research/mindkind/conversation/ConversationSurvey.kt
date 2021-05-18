@@ -294,10 +294,12 @@ public enum class ConversationStepType(val type: String) {
 }
 
 public enum class NestedGroupFrequency(val type: String) {
-    @SerializedName("daily")
-    daily("daily"),
+    // The order matters here, as it will be the priority in which each stomps the other
+    // Weekly is highest priority, then weekly random, then daily is the "default
     @SerializedName("weekly")
     weekly("weekly"),
     @SerializedName("weeklyRandom")
-    weeklyRandom("weeklyRandom")
+    weeklyRandom("weeklyRandom"),
+    @SerializedName("daily")
+    daily("daily"),
 }
