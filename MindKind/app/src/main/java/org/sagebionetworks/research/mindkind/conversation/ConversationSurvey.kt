@@ -1,6 +1,7 @@
 package org.sagebionetworks.research.mindkind.conversation
 
 import android.content.Context
+import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.annotations.SerializedName
@@ -14,6 +15,9 @@ import java.nio.charset.StandardCharsets
 
 class ConversationGsonHelper {
     companion object {
+
+        private val TAG = ConversationGsonHelper::class.java.simpleName
+
         fun createGson(): Gson {
             return GsonBuilder()
                     .registerTypeAdapterFactory(getStepTypeAdapterFactory())
@@ -68,6 +72,7 @@ class ConversationGsonHelper {
                     // Let's also use the schema identifier to track which specific
                     // nested group was the one we are doing today
                     conversationSchemaIdentifier = it.identifier
+                    Log.d(TAG, "Run ${conversation.identifier} w/ dataType $conversationSchemaIdentifier")
                 }
             }
 
