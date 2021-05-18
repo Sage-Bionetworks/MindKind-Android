@@ -98,8 +98,8 @@ class ConversationGsonHelper {
         }
 
         fun shouldInclude(step: NestedGroupStep, studyStartDate: DateTime, now: DateTime): Boolean {
-            val daysFromStart = Days.daysBetween(studyStartDate, now).days
-            val dayOfWeek = (daysFromStart % 7).toInt()
+            val daysFromStart = Days.daysBetween(studyStartDate.withTimeAtStartOfDay(), now).days
+            val dayOfWeek = (daysFromStart % 7)
             return when(step.frequency) {
                 NestedGroupFrequency.weekly -> dayOfWeek == step.startDay
                 NestedGroupFrequency.weeklyRandom -> dayOfWeek == (1..7).shuffled().first()
