@@ -41,7 +41,6 @@ import android.util.Log
 import android.view.View
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.app.ActivityCompat.OnRequestPermissionsResultCallback
 import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -50,14 +49,12 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.android.AndroidInjection
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_conversation_survey.*
 import kotlinx.android.synthetic.main.activity_task_list.*
-import org.joda.time.DateTime
-import org.joda.time.Weeks
 import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService
 import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService.Companion.SHOW_ENGAGEMENT_NOTIFICATION_ACTION
-import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService.Companion.studyDurationInWeeks
+import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService.Companion.isConversationComplete
 import org.sagebionetworks.research.mindkind.conversation.*
+import org.sagebionetworks.research.mindkind.research.SageTaskIdentifier
 import org.sagebionetworks.research.mindkind.settings.SettingsActivity
 import org.sagebionetworks.research.sageresearch.dao.room.AppConfigRepository
 import org.sagebionetworks.research.sageresearch.dao.room.ReportRepository
@@ -77,16 +74,6 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
     @Inject
     lateinit var appConfigRepo: AppConfigRepository
 
-    var taskItems = mutableListOf(
-            TaskItem("Sleep",
-                    "3 minutes",
-                    "Sleep"))
-
-    // Useful for development
-//          TaskItem("Playground",
-//                  "Ready to start your day.",
-//                  "Playground"))
-
     private val appConfigDisposable = CompositeDisposable()
 
     private lateinit var sharedPrefs: SharedPreferences
@@ -103,12 +90,24 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
         llm.orientation = LinearLayoutManager.VERTICAL
         taskRecyclerView.layoutManager = llm
 
+        val taskItems = mutableListOf(
+                TaskItem(SageTaskIdentifier.Sleep,
+                        "Sleep",
+                        "3 minutes",
+                        "Sleep",
+                        false))
+        // Useful for development
+//          TaskItem("Playground",
+//                  "Ready to start your day.",
+//                  "Playground"))
+
         taskRecyclerView.addItemDecoration(SpacesItemDecoration(resources.getDimensionPixelSize(R.dimen.converation_recycler_spacing)))
         val adapter = TaskAdapter(taskItems, object : TaskAdapterListener {
             override fun onTaskClicked(jsonResourceName: String?) {
                 startTask(jsonResourceName)
             }
         })
+
         taskRecyclerView.adapter = adapter
 
         buttonUploadData.visibility = View.GONE
@@ -163,7 +162,9 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
     @Override
     override fun onResume() {
         super.onResume()
+
         // Re-enables the disabled button
+        updateTaskItems()
         taskRecyclerView.adapter?.notifyDataSetChanged()
     }
 
@@ -173,6 +174,14 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
             buttonBackgroundData?.text = "Stop background data"
         } else {
             buttonBackgroundData?.text = "Start background data"
+        }
+    }
+
+    fun updateTaskItems() {
+        (taskRecyclerView.adapter as? TaskAdapter)?.let { taskAdapter ->
+            taskAdapter.dataSet.forEach {
+                it.isComplete = isConversationComplete(sharedPrefs, it.identifier)
+            }
         }
     }
 

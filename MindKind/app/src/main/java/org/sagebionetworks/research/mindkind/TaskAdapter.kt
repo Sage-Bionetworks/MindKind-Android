@@ -4,20 +4,23 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-data class TaskItem(
-        val title: String,
-        val label: String,
-        val jsonResourceName: String?)
+open class TaskItem(
+    val identifier: String,
+    val title: String,
+    val label: String,
+    val jsonResourceName: String?,
+    var isComplete: Boolean)
 
 public interface TaskAdapterListener {
     fun onTaskClicked(jsonResourceName: String?)
 }
 
 class TaskAdapter(
-        private val dataSet: MutableList<TaskItem>,
+        var dataSet: MutableList<TaskItem>,
         private val listener: TaskAdapterListener) :
         RecyclerView.Adapter<TaskAdapter.ViewHolder>() {
 
@@ -28,6 +31,7 @@ class TaskAdapter(
     open class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val title: TextView = view.findViewById(R.id.survey_detail_title)
         val label: TextView = view.findViewById(R.id.survey_detail_label)
+        val doneIcon: ImageView = view.findViewById(R.id.done_icon)
     }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): ViewHolder {
@@ -47,6 +51,7 @@ class TaskAdapter(
             it.isEnabled = false
             listener.onTaskClicked(item.jsonResourceName)
         }
+        viewHolder.doneIcon.visibility = if(item.isComplete) { View.VISIBLE } else { View.GONE }
     }
 
     override fun getItemCount() = dataSet.size

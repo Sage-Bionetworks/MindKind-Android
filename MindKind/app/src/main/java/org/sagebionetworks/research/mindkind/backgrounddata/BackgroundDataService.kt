@@ -33,6 +33,7 @@
 
 package org.sagebionetworks.research.mindkind.backgrounddata
 
+import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -150,6 +151,7 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
         }
 
         public const val studyStartDateKey = "StudyStartDate"
+        public const val completedTasksKey = "completeTasks"
         public val dateFormatter = ISODateTimeFormat.dateTime().withOffsetParsed()
 
         fun createSharedPrefs(context: Context): SharedPreferences {
@@ -167,6 +169,29 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
             val daysFromStart = Days.daysBetween(studyStartDate.withTimeAtStartOfDay(), now).days
             val dayOfWeek = (daysFromStart % 7) + 1
             return ProgressInStudy(week, dayOfWeek, daysFromStart)
+        }
+
+        fun isConversationComplete(sharedPreferences: SharedPreferences, identifier: String): Boolean {
+            val progress = progressInStudy(sharedPreferences)
+            sharedPreferences.getStringSet(completedTasksKey, null)?.let {
+                return it.contains("$identifier $progress")
+            }
+            return false
+        }
+
+        // We need the changes to be reflected immediately
+        @SuppressLint("ApplySharedPref")
+        fun markConversationComplete(sharedPreferences: SharedPreferences, identifier: String) {
+            val progress = progressInStudy(sharedPreferences)
+            val editPrefs = sharedPreferences.edit()
+            editPrefs.putString(ConversationSurveyActivity.completedDateKey, LocalDateTime.now().toString())
+
+            val prev = sharedPreferences.getStringSet(completedTasksKey, null)
+                    ?.toMutableSet() ?: mutableSetOf()
+            prev.add("$identifier $progress")
+            editPrefs.putStringSet(completedTasksKey, prev)
+
+            editPrefs.commit()
         }
     }
 
@@ -707,4 +732,9 @@ public data class ProgressInStudy(
         /**
          * @property daysFromStart of the study. Initial day is 1, not 0.
          */
-        val daysFromStart: Int)
+        val daysFromStart: Int) {
+
+    override fun toString(): String {
+        return "Week $week | Day $dayOfWeek"
+    }
+}

@@ -1,6 +1,7 @@
 package org.sagebionetworks.research.mindkind.conversation
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -198,8 +199,11 @@ open class ConversationSurveyViewModel(
      * Complete the conversation and upload it to bridge
      * @return live data to monitor for changes
      */
-    fun completeConversation() {
+    fun completeConversation(sharedPrefs: SharedPreferences) {
         val conversationId = conversationSurvey.value?.identifier ?: run { return }
+
+        BackgroundDataService.markConversationComplete(sharedPrefs, conversationId)
+
         val answers = answersLiveData.value ?: arrayListOf()
         val stepHistory = ArrayList(answers.sortedWith(compareBy { it.startTime }))
         val startTime = stepHistory.firstOrNull()?.startTime ?: Instant.now()

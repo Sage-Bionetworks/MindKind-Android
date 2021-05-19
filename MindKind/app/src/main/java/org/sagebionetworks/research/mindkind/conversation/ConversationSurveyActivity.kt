@@ -182,8 +182,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
     }
 
     private fun completeConversation() {
-        viewModel.completeConversation()
-        sharedPrefs.edit()?.putString(completedDateKey, LocalDateTime.now().toString())?.apply()
+        viewModel.completeConversation(sharedPrefs)
         finish()
     }
 

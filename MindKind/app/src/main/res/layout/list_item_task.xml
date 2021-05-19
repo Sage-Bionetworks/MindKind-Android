@@ -67,5 +67,15 @@
             android:paddingBottom="8dp"
             app:tint="@color/denim" />
 
+        <ImageView
+            android:id="@+id/done_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_done"
+            android:contentDescription="@string/rsb_done"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:paddingRight="8dp"/>
+
     </RelativeLayout>
 </com.google.android.material.card.MaterialCardView>
