@@ -34,8 +34,10 @@ package org.sagebionetworks.research.mindkind
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
@@ -46,12 +48,16 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.android.AndroidInjection
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_conversation_survey.*
 import kotlinx.android.synthetic.main.activity_task_list.*
+import org.joda.time.DateTime
+import org.joda.time.Weeks
 import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService
 import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService.Companion.SHOW_ENGAGEMENT_NOTIFICATION_ACTION
-import org.sagebionetworks.research.mindkind.conversation.ConversationSurveyActivity
-import org.sagebionetworks.research.mindkind.conversation.SpacesItemDecoration
+import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService.Companion.studyDurationInWeeks
+import org.sagebionetworks.research.mindkind.conversation.*
 import org.sagebionetworks.research.mindkind.settings.SettingsActivity
 import org.sagebionetworks.research.sageresearch.dao.room.AppConfigRepository
 import org.sagebionetworks.research.sageresearch.dao.room.ReportRepository
@@ -62,7 +68,7 @@ import javax.inject.Inject
  */
 class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback {
     companion object {
-        val logTag = TaskListActivity::class.simpleName
+        private val TAG = TaskListActivity::class.simpleName
     }
 
     @Inject
@@ -72,38 +78,26 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
     lateinit var appConfigRepo: AppConfigRepository
 
     var taskItems = mutableListOf(
-            TaskItem("GAD-7 Anxiety",
-                    "How are you feeling today.",
-                    "PHQ9"),
-            TaskItem("Patient Health Questionaire",
-                    "Ready to start your day.",
-                    "GAD7"),
-            TaskItem("Sleep Week1 Day 1",
-                    "Sleep survey",
-                    "Sleep_WK1_D1"),
-            TaskItem("Sleep Week1 Day 2",
-                    "Sleep survey",
-                    "Sleep_WK1_D2"),
-            TaskItem("Sleep Week1 Day 3",
-                    "Sleep survey",
-                    "Sleep_WK1_D3"),
-            TaskItem("Sleep Week1 Day 4",
-                    "Sleep survey",
-                    "Sleep_WK1_D4"),
-            TaskItem("Sleep Week1 Day 5",
-                    "Sleep survey",
-                    "Sleep_WK1_D5"),
-            TaskItem("Sleep Week1 Day 6",
-                    "Sleep survey",
-                    "Sleep_WK1_D6"),
-            TaskItem("Playground",
-                    "Ready to start your day.",
-                    "Playground"))
+            TaskItem("Sleep",
+                    "3 minutes",
+                    "Sleep"))
 
+    // Useful for development
+//          TaskItem("Playground",
+//                  "Ready to start your day.",
+//                  "Playground"))
+
+    private val appConfigDisposable = CompositeDisposable()
+
+    private lateinit var sharedPrefs: SharedPreferences
+
+    @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_task_list)
+
+        sharedPrefs = BackgroundDataService.createSharedPrefs(this)
 
         val llm = LinearLayoutManager(this)
         llm.orientation = LinearLayoutManager.VERTICAL
@@ -138,6 +132,13 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
             overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
         }
 
+        task_progress_bar.max = 12 * 7 // 12 weeks in the study
+        val progressInStudy = BackgroundDataService.progressInStudy(sharedPrefs)
+        task_progress_bar.progress = progressInStudy.daysFromStart
+        val weekStr = getString(R.string.week_x, progressInStudy.week.toString())
+        val dayStr = getString(R.string.day_x, progressInStudy.dayOfWeek.toString())
+        week_textview.text = "$weekStr | $dayStr"
+
         refreshServiceButtonState()
 
         // Auto-start background data collector
@@ -147,6 +148,16 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
         if (intent.action == SHOW_ENGAGEMENT_NOTIFICATION_ACTION) {
             showEngagementMessage()
         }
+
+        // Refresh the app config
+        appConfigDisposable.add(
+                appConfigRepo.appConfig.firstOrError()
+                .subscribeOn(Schedulers.io())
+                .subscribe({
+                    Log.i(TAG, "App config updated successfully")
+                }, {
+                    Log.w(TAG, "App config updated failed ${it.localizedMessage}")
+                }))
     }
 
     @Override

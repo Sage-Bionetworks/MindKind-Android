@@ -1,30 +1,42 @@
 package org.sagebionetworks.research.mindkind.conversation
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.google.common.base.Preconditions
+import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import org.sagebionetworks.research.domain.Schema
 import org.sagebionetworks.research.domain.result.AnswerResultType
 import org.sagebionetworks.research.domain.result.implementations.AnswerResultBase
+import org.sagebionetworks.research.domain.result.implementations.FileResultBase
 import org.sagebionetworks.research.domain.result.implementations.TaskResultBase
+import org.sagebionetworks.research.domain.result.interfaces.Result
+import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService
+import org.sagebionetworks.research.mindkind.room.BackgroundDataTypeConverters
+import org.sagebionetworks.research.sageresearch.dao.room.AppConfigRepository
 import org.sagebionetworks.research.sageresearch_app_sdk.TaskResultUploader
 import org.threeten.bp.Instant
+import java.io.File
+import java.io.FileOutputStream
 import java.util.*
 import javax.inject.Inject
 
-open class ConversationSurveyViewModel(private val taskResultUploader: TaskResultUploader) : ViewModel() {
+open class ConversationSurveyViewModel(
+        private val taskResultUploader: TaskResultUploader,
+        private val appConfigRepo: AppConfigRepository,
+        private val cacheDirAbsPath: String) : ViewModel() {
 
     companion object {
         private val TAG = ConversationSurveyViewModel::class.java.simpleName
     }
 
     private val startTimeMap = mutableMapOf<String, Instant>()
-    private val answersLiveData = MutableLiveData<ArrayList<AnswerResultBase<Any>>>()
+    private val answersLiveData = MutableLiveData<ArrayList<ConversationAnswer>>()
 
     // Get updates about the user's progress through the conversation
     public val progressLiveData = MutableLiveData<Float>()
@@ -33,14 +45,17 @@ open class ConversationSurveyViewModel(private val taskResultUploader: TaskResul
         return@lazy MutableLiveData<ConversationSurvey>()
     }
 
-    class Factory @Inject constructor(private val taskResultUploader: TaskResultUploader):
+    class Factory @Inject constructor(
+            private val taskResultUploader: TaskResultUploader,
+            private val appConfigRepo: AppConfigRepository,
+            private val cacheDirAbsPath: String):
             ViewModelProvider.Factory {
 
         // Suppress unchecked cast, pre-condition would catch it first anyways
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             Preconditions.checkArgument(modelClass.isAssignableFrom(ConversationSurveyViewModel::class.java))
-            return ConversationSurveyViewModel(taskResultUploader) as T
+            return ConversationSurveyViewModel(taskResultUploader, appConfigRepo, cacheDirAbsPath) as T
         }
     }
 
@@ -71,6 +86,11 @@ open class ConversationSurveyViewModel(private val taskResultUploader: TaskResul
     fun conversationTitles(): List<String>? {
         val conversation = conversationSurvey.value ?: run { return null }
         return conversation.steps.map { it.title }
+    }
+
+    fun conversationDataType(): String {
+        val conversation = conversationSurvey.value ?: run { return "" }
+        return conversation.schemaIdentifier ?: ""
     }
 
     /**
@@ -140,15 +160,13 @@ open class ConversationSurveyViewModel(private val taskResultUploader: TaskResul
         val endTime = Instant.now()
 
         (answer as? Int)?.let {
-            val answerResult: AnswerResultBase<Any> = AnswerResultBase(
-                    step.identifier, startTime, endTime, it, AnswerResultType.INTEGER)
-            answersLiveData += answerResult
+            answersLiveData += ConversationAnswer(
+                    step.identifier, startTime, endTime, AnswerResultType.INTEGER, it)
         }
 
         (answer as? String)?.let {
-            val answerResult: AnswerResultBase<Any> = AnswerResultBase(
-                    step.identifier, startTime, endTime, it, AnswerResultType.STRING)
-            answersLiveData += answerResult
+            answersLiveData += ConversationAnswer(
+                    step.identifier, startTime, endTime, AnswerResultType.STRING, it)
         }
 
         if (answersLiveData.value?.lastOrNull()?.identifier != step.identifier) {
@@ -183,25 +201,57 @@ open class ConversationSurveyViewModel(private val taskResultUploader: TaskResul
     fun completeConversation() {
         val conversationId = conversationSurvey.value?.identifier ?: run { return }
         val answers = answersLiveData.value ?: arrayListOf()
-        val stepHistory = answers.sortedWith(compareBy { it.startTime })
+        val stepHistory = ArrayList(answers.sortedWith(compareBy { it.startTime }))
         val startTime = stepHistory.firstOrNull()?.startTime ?: Instant.now()
         val endTime = Instant.now()
-        // TODO: mdephillips 3/12/21 get this revision from app config
-        val schema = Schema(conversationId, 1)
-        val taskResult = TaskResultBase(
-                conversationId, startTime, endTime,
-                UUID.randomUUID(), schema, stepHistory, listOf())
+        var schema = Schema(conversationId, 1)
 
-        // Upload the conversation result
+        // We want all the conversation answers to be in their own JSON file data.json
+        val json = BackgroundDataTypeConverters().gson.toJson(stepHistory)
+        val folderPath = "$cacheDirAbsPath${File.separator}conversation"
+        val folder = File(folderPath)
+        // Create folder to hold data file
+        if (!folder.exists()) {
+            folder.mkdir()
+        }
+
+        val file = File(folder, "data.json")
+        val stream = FileOutputStream(file)
+        try {
+            stream.write(json.toByteArray())
+        } finally {
+            stream.close()
+        }
+
+        val finalStepHistory = arrayListOf<Result>()
+        val jsonFileResult = FileResultBase("data",
+                startTime, endTime, BackgroundDataService.JSON_MIME_CONTENT_TYPE,
+                folderPath + File.separator + "data.json")
+        finalStepHistory.add(jsonFileResult)
+
+        // And the  answers map should have the dataType as it's own column in Synapse
+        finalStepHistory.add(AnswerResultBase("dataType", startTime, endTime,
+                conversationDataType(), AnswerResultType.STRING))
+
+        // Upload the conversation result after looking for the current revision
         compositeDisposable.add(
-                taskResultUploader.processTaskResult(taskResult)
-                        .subscribeOn(Schedulers.io())
-                        .subscribe({
-                            Log.i(TAG, "Conversation Upload Complete")
-                        }, {
-                            Log.w(TAG, "Conversation Upload Failed ${it.localizedMessage}")
-                            // Archive will upload eventually as we retry later
-                        }))
+                appConfigRepo.appConfig.firstOrError().flatMap { appConfig ->
+                    appConfig.schemaReferences.firstOrNull { it.id == conversationId }?.let {
+                        schema = Schema(it.id, it.revision.toInt())
+                    }
+                    val taskResult = TaskResultBase(
+                            conversationId, startTime, endTime,
+                            UUID.randomUUID(), schema, finalStepHistory, listOf())
+                    return@flatMap taskResultUploader.processTaskResult(taskResult)
+                            .andThen(Single.just(1L))
+                }
+                .subscribeOn(Schedulers.io())
+                .subscribe({
+                    Log.i(TAG, "Conversation Upload Complete")
+                }, {
+                    Log.w(TAG, "Conversation Upload Failed ${it.localizedMessage}")
+                    // Archive will upload eventually as we retry later
+                }))
     }
 
     /**
@@ -213,3 +263,10 @@ open class ConversationSurveyViewModel(private val taskResultUploader: TaskResul
         this.value = values
     }
 }
+
+public data class ConversationAnswer(
+    public val identifier: String,
+    public val startTime: Instant,
+    public val endTime: Instant,
+    public val type: String,
+    public val answer: Any)

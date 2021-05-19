@@ -1,0 +1,21 @@
+{
+  "identifier": "1S_Greet",
+  "type": "conversationSurvey",
+  "taskIdentifier": "1S_Greet",
+  "schemaIdentifier": "1S_Greet",
+  "steps": [
+    {
+      "identifier": "1S_Greet_Random",
+      "type": "instruction.random",
+      "title": "Will be replaced with one from the titleList",
+      "buttonTitle": "Begin",
+      "optional": false,
+      "titleList": [
+          "Hello, are you ready to answer some questions?",
+          "Hello hello hello, are you ready to answer some questions?",
+          "Hi, are you ready to answer some questions?",
+          "Hey, are you ready to answer some questions?"
+      ]
+    }
+  ]
+}

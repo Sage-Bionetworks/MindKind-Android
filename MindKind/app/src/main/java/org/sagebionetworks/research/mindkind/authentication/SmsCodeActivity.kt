@@ -1,7 +1,9 @@
 package org.sagebionetworks.research.mindkind
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
@@ -12,21 +14,23 @@ import android.view.View
 import androidx.annotation.MainThread
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.*
 import com.google.common.base.Strings
 import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.activity_external_id_sign_in.progressBar
 import kotlinx.android.synthetic.main.activity_sms_code.*
+import org.joda.time.DateTime
+import org.joda.time.format.ISODateTimeFormat
 import org.sagebionetworks.bridge.android.manager.AuthenticationManager
 import org.sagebionetworks.bridge.researchstack.ApiUtils
 import org.sagebionetworks.bridge.rest.exceptions.ConsentRequiredException
 import org.sagebionetworks.bridge.rest.exceptions.InvalidEntityException
 import org.sagebionetworks.bridge.rest.model.Phone
 import org.sagebionetworks.bridge.rest.model.SignUp
+import org.sagebionetworks.bridge.rest.model.UserSessionInfo
+import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService
+import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService.Companion.dateFormatter
+import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService.Companion.studyStartDateKey
 import org.sagebionetworks.researchstack.backbone.DataResponse
 import org.slf4j.LoggerFactory
 import rx.subscriptions.CompositeSubscription
@@ -44,16 +48,22 @@ open class SmsCodeActivity : AppCompatActivity() {
         }
     }
 
+    lateinit var sharedPrefs: SharedPreferences
+
     var smsCodeViewModel: SmsCodeViewModel? = null
 
     @JvmField
     @Inject
     var factory: SmsCodeViewModel.Factory? = null
 
+    // Save study start date immediately
+    @SuppressLint("ApplySharedPref")
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sms_code)
+
+        sharedPrefs = BackgroundDataService.createSharedPrefs(this)
 
         val smsCodeFactory = factory?.create() ?: run {
             Log.e(TAG, "Failed to create Phone sign up view model factory")
@@ -68,17 +78,18 @@ open class SmsCodeActivity : AppCompatActivity() {
             viewModel.phoneNumber = it
         }
 
-        viewModel.getIsSignedUpLiveData().observe(this, Observer { isSignedUp: Boolean ->
-            if (isSignedUp) {
+
+        viewModel.getIsSignedUpLiveData().observe(this, Observer { user ->
+            user?.let {
+                // Save study start date
+                val createdOnServerTimezone: DateTime = it.createdOn
+                val jsonString: String = dateFormatter.print(createdOnServerTimezone)
+                sharedPrefs.edit().putString(studyStartDateKey, jsonString).commit()
+                // Proceed to entry to re-evaluate bridge access
                 returnToEntryActivity()
             }
         })
 
-        viewModel.getIsSignedUpLiveData().observe(this, Observer { isSignedUp: Boolean ->
-            if (isSignedUp) {
-                progressBar?.visibility = View.INVISIBLE
-            }
-        })
         viewModel.isLoadingLiveData.observe(this, Observer { isLoading: Boolean? ->
             progressBar?.visibility = if (isLoading == true) {
                 View.VISIBLE
@@ -191,7 +202,7 @@ public class SmsCodeViewModel @MainThread constructor(
     private val errorMessageMutableLiveData: MutableLiveData<String?> = MutableLiveData()
     private val isSmsCodeValid: MutableLiveData<Boolean> = MutableLiveData()
     private val isLoadingMutableLiveData: MutableLiveData<Boolean> = MutableLiveData()
-    private val isSignedInLiveData: MutableLiveData<Boolean> = MutableLiveData()
+    private val isSignedInLiveData: MutableLiveData<UserSessionInfo?> = MutableLiveData()
     private val isConsentRequiredExceptionData: MutableLiveData<Boolean> = MutableLiveData()
     private val resendLinkEnabledData: MutableLiveData<Boolean> = MutableLiveData()
 
@@ -212,7 +223,7 @@ public class SmsCodeViewModel @MainThread constructor(
             this.isSmsCodeValid.postValue(value.isNotEmpty())
         }
 
-    fun getIsSignedUpLiveData(): LiveData<Boolean> {
+    fun getIsSignedUpLiveData(): LiveData<UserSessionInfo?> {
         return isSignedInLiveData
     }
 
@@ -226,14 +237,14 @@ public class SmsCodeViewModel @MainThread constructor(
         LOGGER.debug("smsCodeSignIn $smsCode")
         if (Strings.isNullOrEmpty(smsCode) || smsCode.length < smsCodeLength) {
             LOGGER.warn("Cannot sign in with null or empty SMS code")
-            isSignedInLiveData.postValue(false)
+            isSignedInLiveData.postValue(null)
             errorMessageMutableLiveData.postValue("Cannot sign in with null or empty SMS code")
             return
         }
 
         val number = phoneNumber ?: run {
             LOGGER.warn("Cannot sign in with null or empty past phone number")
-            isSignedInLiveData.postValue(false)
+            isSignedInLiveData.postValue(null)
             errorMessageMutableLiveData.postValue("Cannot sign in with null or empty past phone number")
             return
         }
@@ -252,9 +263,9 @@ public class SmsCodeViewModel @MainThread constructor(
                             isLoadingMutableLiveData.postValue(false)
                         }
                         .subscribe({
-                            isSignedInLiveData.postValue(true)
+                            isSignedInLiveData.postValue(it)
                         }) { error: Throwable ->
-                            isSignedInLiveData.postValue(false)
+                            isSignedInLiveData.postValue(null)
                             if (error is ConsentRequiredException) {
                                 isConsentRequiredExceptionData.postValue(true)
                             } else {
@@ -270,7 +281,7 @@ public class SmsCodeViewModel @MainThread constructor(
 
         val number = phoneNumber ?: run {
             LOGGER.warn("Cannot sign in with null or empty past phone number")
-            isSignedInLiveData.postValue(false)
+            isSignedInLiveData.postValue(null)
             errorMessageMutableLiveData.postValue("Cannot sign in with null or empty past phone number")
             return
         }
@@ -301,7 +312,7 @@ public class SmsCodeViewModel @MainThread constructor(
                                 errorMessageMutableLiveData.postValue(phoneErrorMsg)
                                 return@subscribe
                             }
-                            isSignedInLiveData.postValue(false)
+                            isSignedInLiveData.postValue(null)
                             errorMessageMutableLiveData.postValue(error.message)
                         })
     }

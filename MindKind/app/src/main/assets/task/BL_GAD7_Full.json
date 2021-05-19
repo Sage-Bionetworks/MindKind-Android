@@ -1,0 +1,102 @@
+{
+  "identifier": "GAD7",
+  "type": "conversationSurvey",
+  "taskIdentifier": "GAD7",
+  "schemaIdentifier": "GAD7",
+  "steps": [
+    {
+      "identifier": "GAD7_Intro",
+      "type": "instruction",
+      "title": "Over the last two weeks, how often have you been bothered by the following problems?",
+      "continueAfterDelay": true
+    },
+    {
+      "identifier": "GAD_1_Nervous",
+      "type": "singleChoice.integer",
+      "title": "Feeling nervous, anxious, or on edge?",
+      "choices": [
+        { "text": "Not at all"             ,       "value": 0 },
+        { "text": "Several days"           ,       "value": 1 },
+        { "text": "More than half the days",       "value": 2 },
+        { "text": "Nearly every day"       ,       "value": 3 }
+      ]
+    },
+    {
+      "identifier": "GAD_2_Control",
+      "type": "singleChoice.integer",
+      "title": "Not being able to stop or control worrying?",
+      "choices": [
+        { "text": "Not at all"             ,       "value": 0 },
+        { "text": "Several days"           ,       "value": 1 },
+        { "text": "More than half the days",       "value": 2 },
+        { "text": "Nearly every day"       ,       "value": 3 }
+      ]
+    },
+    {
+      "identifier": "GAD_3_Worry",
+      "type": "singleChoice.integer",
+      "title": "Worrying too much about different things?",
+      "choices": [
+        { "text": "Not at all"             ,       "value": 0 },
+        { "text": "Several days"           ,       "value": 1 },
+        { "text": "More than half the days",       "value": 2 },
+        { "text": "Nearly every day"       ,       "value": 3 }
+      ]
+    },
+    {
+      "identifier": "GAD_4_Relaxing",
+      "type": "singleChoice.integer",
+      "title": "Trouble relaxing?",
+      "choices": [
+        { "text": "Not at all"             ,       "value": 0 },
+        { "text": "Several days"           ,       "value": 1 },
+        { "text": "More than half the days",       "value": 2 },
+        { "text": "Nearly every day"       ,       "value": 3 }
+      ]
+    },
+    {
+      "identifier": "GAD_5_Restless",
+      "type": "singleChoice.integer",
+      "title": "Being so restless that it is hard to sit still?",
+      "choices": [
+        { "text": "Not at all"             ,       "value": 0 },
+        { "text": "Several days"           ,       "value": 1 },
+        { "text": "More than half the days",       "value": 2 },
+        { "text": "Nearly every day"       ,       "value": 3 }
+      ]
+    },
+    {
+      "identifier": "GAD_6_Irritable",
+      "type": "singleChoice.integer",
+      "title": "Becoming easily annoyed or irritable?",
+      "choices": [
+        { "text": "Not at all"             ,       "value": 0 },
+        { "text": "Several days"           ,       "value": 1 },
+        { "text": "More than half the days",       "value": 2 },
+        { "text": "Nearly every day"       ,       "value": 3 }
+      ]
+    },
+    {
+      "identifier": "GAD_7_Fear",
+      "type": "singleChoice.integer",
+      "title": "Feeling afraid, as if something awful might happen?",
+      "choices": [
+        { "text": "Not at all"             ,       "value": 0 },
+        { "text": "Several days"           ,       "value": 1 },
+        { "text": "More than half the days",       "value": 2 },
+        { "text": "Nearly every day"       ,       "value": 3 }
+      ]
+    },
+    {
+      "identifier": "GAD_8_Impair",
+      "type": "singleChoice.integer",
+      "title": "If you checked off any problems, how difficult have these problems made it for your work, take care of things at home, or get along with other people?",
+      "choices": [
+        { "text": "Not difficult at all "   ,       "value": 0 },
+        { "text": "Somewhat difficult  "    ,       "value": 1 },
+        { "text": "Very difficult "         ,       "value": 2 },
+        { "text": "Extremely difficult "    ,       "value": 3 }
+      ]
+    }
+  ]
+}

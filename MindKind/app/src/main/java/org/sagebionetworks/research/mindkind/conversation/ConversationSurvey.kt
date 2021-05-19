@@ -1,15 +1,25 @@
 package org.sagebionetworks.research.mindkind.conversation
 
 import android.content.Context
+import android.content.SharedPreferences
+import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import com.google.gson.annotations.SerializedName
+import org.joda.time.DateTime
+import org.joda.time.Days
 import org.sagebionetworks.research.domain.RuntimeTypeAdapterFactory
+import org.sagebionetworks.research.mindkind.backgrounddata.ProgressInStudy
 import java.io.BufferedReader
 import java.io.InputStreamReader
+import java.lang.Exception
 import java.nio.charset.StandardCharsets
 
 class ConversationGsonHelper {
     companion object {
+
+        private val TAG = ConversationGsonHelper::class.java.simpleName
+
         fun createGson(): Gson {
             return GsonBuilder()
                     .registerTypeAdapterFactory(getStepTypeAdapterFactory())
@@ -33,23 +43,72 @@ class ConversationGsonHelper {
          * @param jsonFilename json filename without the ".json" file extension
          * @return a parsed ConversationSurvey that has all it's nested steps expanded
          */
-        fun createSurvey(context: Context, jsonFilename: String): ConversationSurvey? {
+        fun createSurvey(context: Context, jsonFilename: String, progress: ProgressInStudy): ConversationSurvey? {
             val gson = createGson()
             val json = stringFromJsonAsset(context, jsonFilename)
-            val conversation = gson.fromJson(json, ConversationSurvey::class.java)
 
+            val conversation: ConversationSurvey?
+            try {
+                conversation = gson.fromJson(json, ConversationSurvey::class.java)
+            } catch (e: Exception) {
+                return null
+            }
+            var conversationSchemaIdentifier = conversation.schemaIdentifier
+
+            val filteredSteps = mutableListOf<ConversationStep>()
+            filteredSteps.addAll(conversation.steps)
             val newSteps = mutableListOf<ConversationStep>()
-            conversation.steps.forEach {
-                val nestedStep = (it as? NestedStep) ?: run {
-                    newSteps.add(it)
-                    return@forEach
+
+            // If this conversation is a schedule, there are multiple nestedGroup steps
+            // that first need filtered based on the rules and priority
+            if (conversation.isSchedule == true) {
+                conversation.steps.filter {
+                    val ngStep = (it as? NestedGroupStep) ?: run { return@filter false }
+                    return@filter shouldInclude(ngStep, progress)
+                }.sortedBy {
+                    return@sortedBy (it as? NestedGroupStep)?.frequency?.ordinal
+                }.firstOrNull()?.let {
+                    filteredSteps.clear()
+                    filteredSteps.add(it)
+                    // Let's also use the schema identifier to track which specific
+                    // nested group was the one we are doing today
+                    conversationSchemaIdentifier = it.identifier
+                    Log.d(TAG, "Run ${conversation.identifier} w/ dataType $conversationSchemaIdentifier")
                 }
-                val nestedJson = stringFromJsonAsset(context, nestedStep.filename)
-                val nestedConversation = gson.fromJson(nestedJson, ConversationSurvey::class.java)
-                newSteps.addAll(nestedConversation.steps)
             }
 
-            return conversation.copy(steps = newSteps)
+            filteredSteps.forEach { step ->
+                val filenamesToLoad = mutableListOf<String>()
+                (step as? NestedStep)?.let {
+                    filenamesToLoad.add(it.filename)
+                }
+
+                (step as? NestedGroupStep)?.let {
+                    filenamesToLoad.addAll(it.filenames)
+                }
+                if (filenamesToLoad.isEmpty()) {
+                    newSteps.add(step)
+                    return@forEach
+                }
+
+                filenamesToLoad.forEach { filename ->
+                    val nestedJson = stringFromJsonAsset(context, filename)
+                    val nestedConversation = gson.fromJson(nestedJson, ConversationSurvey::class.java)
+                    newSteps.addAll(nestedConversation.steps)
+                }
+            }
+
+            return conversation.copy(
+                    schemaIdentifier = conversationSchemaIdentifier,
+                    steps = newSteps)
+        }
+
+        fun shouldInclude(step: NestedGroupStep, progress: ProgressInStudy): Boolean {
+            return when(step.frequency) {
+                NestedGroupFrequency.weekly -> progress.dayOfWeek == step.startDay
+                NestedGroupFrequency.weeklyRandom -> progress.dayOfWeek == (1..7).shuffled().first()
+                else /* .daily */ -> progress.daysFromStart > step.startDay
+            }
         }
 
         private fun getStepTypeAdapterFactory(): RuntimeTypeAdapterFactory<ConversationStep> {
@@ -78,6 +137,10 @@ class ConversationGsonHelper {
                             ConversationStepType.gif.type)
                     .registerSubtype(NestedStep::class.java,
                             ConversationStepType.nested.type)
+                    .registerSubtype(NestedGroupStep::class.java,
+                            ConversationStepType.nestedGroup.type)
+                    .registerSubtype(RandomTitleStep::class.java,
+                            ConversationStepType.randomTitle.type)
                     .registerSubtype(
                             ConversationSingleChoiceWheelStringStep::class.java,
                             ConversationStepType.singleChoiceWheelString.type)
@@ -90,6 +153,7 @@ data class ConversationSurvey(
     val type: String?,
     val taskIdentifier: String?,
     val schemaIdentifier: String?,
+    val isSchedule: Boolean?,
     val steps: List<ConversationStep>)
 
 abstract class ConversationStep {
@@ -199,6 +263,26 @@ data class NestedStep(
         override val ifUserAnswers: String? = null,
         val filename: String): ConversationStep()
 
+data class NestedGroupStep(
+        override val identifier: String,
+        override val type: String,
+        override val title: String,
+        override val buttonTitle: String,
+        override val optional: Boolean? = true,
+        override val ifUserAnswers: String? = null,
+        val filenames: List<String>,
+        val frequency: NestedGroupFrequency?,
+        val startDay: Int): ConversationStep()
+
+data class RandomTitleStep(
+        override val identifier: String,
+        override val type: String,
+        override val title: String,
+        override val buttonTitle: String,
+        override val optional: Boolean? = true,
+        override val ifUserAnswers: String? = null,
+        val titleList: List<String>): ConversationStep()
+
 public enum class ConversationStepType(val type: String) {
     instruction("instruction"),
     singleChoiceInt("singleChoice.integer"),
@@ -208,5 +292,18 @@ public enum class ConversationStepType(val type: String) {
     text("text"),
     integer("integer"),
     gif("gif"),
-    nested("nested")
+    nested("nested"),
+    nestedGroup("nestedGroup"),
+    randomTitle("instruction.random")
+}
+
+public enum class NestedGroupFrequency(val type: String) {
+    // The order matters here, as it will be the priority in which each stomps the other
+    // Weekly is highest priority, then weekly random, then daily is the "default
+    @SerializedName("weekly")
+    weekly("weekly"),
+    @SerializedName("weeklyRandom")
+    weeklyRandom("weeklyRandom"),
+    @SerializedName("daily")
+    daily("daily"),
 }

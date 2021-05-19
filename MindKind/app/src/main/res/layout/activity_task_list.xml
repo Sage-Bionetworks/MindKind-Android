@@ -52,6 +52,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingLeft="15dp"
+            android:paddingBottom="@dimen/margin_medium"
             android:orientation="vertical"
             android:layout_centerHorizontal="true"
             android:layout_below="@id/gear">
@@ -59,7 +60,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Great work!"
+                android:text="Welcome to Mindkind"
                 android:textSize="24dp"
                 android:textStyle="bold"
                 android:gravity="center"
@@ -74,7 +75,8 @@
                 android:textColor="@color/dark_text"
                 android:gravity="center"
                 android:fontFamily="@font/lato"
-                android:layout_margin="24dp"/>
+                android:layout_margin="24dp"
+                android:visibility="gone"/>
 
         </LinearLayout>
 
@@ -108,12 +110,13 @@
             android:layout_below="@id/task_progress_bar"/>
 
         <TextView
+            android:id="@+id/week_textview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/anchor_view"
             android:layout_marginLeft="24dp"
             android:textStyle="italic"
-            android:text="Week 3"
+            android:text="Week"
             android:textSize="14dp"
             android:textColor="@color/dark_text" />
 
@@ -124,7 +127,7 @@
             android:layout_alignParentRight="true"
             android:layout_marginRight="24dp"
             android:textStyle="italic"
-            android:text="Week 12"
+            android:text="@string/week_12"
             android:textSize="14dp"
             android:textColor="@color/dark_text" />
     </RelativeLayout>

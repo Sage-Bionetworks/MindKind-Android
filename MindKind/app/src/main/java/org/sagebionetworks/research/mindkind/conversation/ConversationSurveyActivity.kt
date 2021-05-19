@@ -30,8 +30,12 @@ import kotlinx.android.synthetic.main.activity_conversation_survey.*
 import kotlinx.android.synthetic.main.integer_input.view.*
 import kotlinx.android.synthetic.main.number_picker.view.*
 import kotlinx.android.synthetic.main.text_input.view.*
+import org.joda.time.DateTime
 import org.sagebionetworks.research.mindkind.R
 import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService
+import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService.Companion.dateFormatter
+import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService.Companion.studyStartDateKey
+import org.sagebionetworks.research.sageresearch.dao.room.AppConfigRepository
 import org.sagebionetworks.research.sageresearch_app_sdk.TaskResultUploader
 import org.threeten.bp.LocalDateTime
 import java.text.SimpleDateFormat
@@ -58,12 +62,15 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         }
     }
 
-    private var sharedPrefs: SharedPreferences? = null
+    lateinit var sharedPrefs: SharedPreferences
 
     var handler: Handler? = null
 
     @Inject
     lateinit var taskResultUploader: TaskResultUploader
+
+    @Inject
+    lateinit var appConfigRepo: AppConfigRepository
 
     // Create a ViewModel the first time the system calls an activity's onCreate() method.
     // Re-created activities receive the same ConversationSurveyViewModel
@@ -81,8 +88,8 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         handler = Handler()
         sharedPrefs = BackgroundDataService.createSharedPrefs(this)
 
-        viewModel = ViewModelProvider(this,
-                ConversationSurveyViewModel.Factory(taskResultUploader)).get()
+        viewModel = ViewModelProvider(this, ConversationSurveyViewModel.Factory(
+                taskResultUploader, appConfigRepo, cacheDir.absolutePath)).get()
 
         var fm = supportFragmentManager
         close_button.setOnClickListener {
@@ -137,7 +144,8 @@ open class ConversationSurveyActivity: AppCompatActivity() {
 
         intent.extras?.getString(extraConversationId)?.let {
 
-            val conversation = ConversationGsonHelper.createSurvey(this, it) ?: run {
+            val progress = BackgroundDataService.progressInStudy(sharedPrefs)
+            val conversation = ConversationGsonHelper.createSurvey(this, it, progress) ?: run {
                 AlertDialog.Builder(this)
                         .setMessage(R.string.conversation_error_msg)
                         .setNeutralButton(R.string.rsb_ok) { dialog, which ->
@@ -173,9 +181,10 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         }
     }
 
-    fun completeConversation() {
+    private fun completeConversation() {
         viewModel.completeConversation()
-        sharedPrefs?.edit()?.putString(completedDateKey, LocalDateTime.now().toString())?.apply()
+        sharedPrefs.edit()?.putString(completedDateKey, LocalDateTime.now().toString())?.apply()
+        finish()
     }
 
     fun View.slideDown(duration: Int = 500) {
@@ -225,8 +234,15 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         }
 
         val adapter = recycler_view_conversation.adapter as ConversationAdapter
-        if (currentStep.type != ConversationStepType.gif.type) {
-            adapter.addItem(currentStep.identifier, currentStep.title, true)
+
+        when (currentStep.type) {
+            ConversationStepType.randomTitle.type -> {
+                (currentStep as? RandomTitleStep)?.titleList?.shuffled()?.firstOrNull()
+            }
+            ConversationStepType.gif.type -> null
+            else -> currentStep.title
+        }?.let {
+            adapter.addItem(currentStep.identifier, it, true)
         }
 
         showBottomInputView(currentStep, null, viewModel.isOnLastStep(), true)
@@ -241,7 +257,9 @@ open class ConversationSurveyActivity: AppCompatActivity() {
 
         when(step.type) {
             ConversationStepType.instruction.type ->
-                hasQuestions = !handleInstructionItem(step as? ConversationInstructionStep, scroll)
+                hasQuestions = !handleInstructionItem(step, scroll)
+            ConversationStepType.randomTitle.type ->
+                hasQuestions = !handleInstructionItem(step, scroll)
             ConversationStepType.singleChoiceInt.type ->
                 handleIntSingleChoice(step as? ConversationSingleChoiceIntFormStep, scroll)
             ConversationStepType.singleChoiceString.type ->
@@ -269,10 +287,6 @@ open class ConversationSurveyActivity: AppCompatActivity() {
                 addQuestion(scroll)
             }, DELAY)
         }
-
-        if (isLastItem) {
-            completeConversation()
-        }
     }
 
     private fun addAnswer(step: ConversationStep, textAnswer: String?, value: Any?, scroll: Boolean) {
@@ -296,9 +310,19 @@ open class ConversationSurveyActivity: AppCompatActivity() {
 
     }
 
-    private fun handleInstructionItem(instructionStep: ConversationInstructionStep?, scroll: Boolean): Boolean {
+    private fun handleInstructionItem(
+            instructionStep: ConversationStep?, scroll: Boolean): Boolean {
+
         val step = instructionStep ?: run { return false }
         button_container.removeAllViews()
+
+        val continueAfterDelay =
+                (instructionStep as? ConversationInstructionStep)?.continueAfterDelay ?: false
+
+        // If continuing after delay, we don't add the bottom button layout
+        if (continueAfterDelay) {
+            return continueAfterDelay
+        }
 
         (this.layoutInflater.inflate(R.layout.conversation_material_button,
                 button_container, false) as? MaterialButton)?.let {
@@ -322,7 +346,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
             addSkipButton(step, scroll)
         }
 
-        return instructionStep.continueAfterDelay ?: false
+        return continueAfterDelay
     }
 
     private fun handleStringSingleChoice(choiceStringFormStep: ConversationSingleChoiceStringFormStep?, scroll: Boolean) {
@@ -571,10 +595,11 @@ open class ConversationSurveyActivity: AppCompatActivity() {
             it.text = step.buttonTitle
 
             // For localization support, switch to whatever clock the user is using
+            val timeFormattor12 = SimpleDateFormat("h:mm aa", Locale.US)
             val textFormatter = if (is24HourFormat(baseContext)) {
                 SimpleDateFormat("H:mm", Locale.US)
             } else {
-                SimpleDateFormat("h:mm aa", Locale.US)
+                timeFormattor12
             }
 
             val activity = this
@@ -582,6 +607,8 @@ open class ConversationSurveyActivity: AppCompatActivity() {
                 var input: Date? = null
                 if(answer != null) {
                     input = textFormatter.parse(answer)
+                } else if (step.defaultTime != null) {
+                    input = timeFormattor12.parse(step.defaultTime)
                 }
                 val dialog = ConversationTimeOfDayDialog(input)
                 val callback = object: ConversationTimeOfDayDialog.Callback {

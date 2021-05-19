@@ -1,0 +1,98 @@
+{
+  "identifier": "ISI_Insomnia_Severity_Index",
+  "type": "conversationSurvey",
+  "taskIdentifier": "ISI",
+  "schemaIdentifier": "ISI",
+  "steps": [
+      {
+        "identifier": "Insomnia_Severity_Index_Intro",
+        "type": "instruction",
+        "title": "Please rate the CURRENT (i.e., LAST 2 WEEKS) SEVERITY of your insomnia problem(s).",
+        "continueAfterDelay": true
+      },
+      {
+        "identifier": "ISI_1_Falling",
+        "type": "singleChoice.integer",
+        "title": "Difficulty falling asleep",
+        "choices": [
+          { "text": "None"        ,               "value": 0 },
+          { "text": "Mild"        ,               "value": 1 },
+          { "text": "Moderate"    ,               "value": 2 },
+          { "text": "Severe"       ,              "value": 3 },
+          { "text": "Very severe"  ,              "value": 4 }
+        ]
+      },
+      {
+        "identifier": "ISI_2_Staying",
+        "type": "singleChoice.integer",
+        "title": "Difficulty staying asleep",
+        "choices": [
+          { "text": "None"        ,               "value": 0 },
+          { "text": "Mild"        ,               "value": 1 },
+          { "text": "Moderate"    ,               "value": 2 },
+          { "text": "Severe"       ,              "value": 3 },
+          { "text": "Very severe"  ,              "value": 4 }
+        ]
+      },
+      {
+        "identifier": "ISI_3_Waking",
+        "type": "singleChoice.integer",
+        "title": "Problems waking up too early",
+        "choices": [
+          { "text": "None"        ,               "value": 0 },
+          { "text": "Mild"        ,               "value": 1 },
+          { "text": "Moderate"    ,               "value": 2 },
+          { "text": "Severe"       ,              "value": 3 },
+          { "text": "Very severe"  ,              "value": 4 }
+        ]
+      },
+      {
+        "identifier": "ISI_4_Satisfaction",
+        "type": "singleChoice.integer",
+        "title": "How SATISFIED/DISSATISFIED are you with your CURRENT sleep pattern?",
+        "choices": [
+          { "text": "Very Satisfied"        ,      "value": 0 },
+          { "text": "Satisfied"             ,      "value": 1 },
+          { "text": "Moderately Satisfied"  ,      "value": 2 },
+          { "text": "Dissatisfied"          ,      "value": 3 },
+          { "text": "Very Dissatisfied"     ,      "value": 4 }
+        ]
+      },
+      {
+        "identifier": "ISI_5_Noticeability",
+        "type": "singleChoice.integer",
+        "title": "How NOTICEABLE to others do you think your sleep problem is in terms of impairing the quality of your life?",
+        "choices": [
+          { "text": "Not at all noticeable" ,       "value": 0 },
+          { "text": "A little"              ,       "value": 1 },
+          { "text": "Somewhat"              ,       "value": 2 },
+          { "text": "Much"                  ,       "value": 3 },
+          { "text": "Very much noticeable"  ,       "value": 4 }
+        ]
+      },
+      {
+        "identifier": "ISI_6_Worry",
+        "type": "singleChoice.integer",
+        "title": "How WORRIED/DISTRESSED are you about your current sleep problem?",
+        "choices": [
+          { "text": "Not at all worried"    ,       "value": 0 },
+          { "text": "A little"              ,       "value": 1 },
+          { "text": "Somewhat"              ,       "value": 2 },
+          { "text": "Much"                  ,       "value": 3 },
+          { "text": "Very much worried"     ,       "value": 4 }
+        ]
+      },
+      {
+        "identifier": "ISI_7_Interfere",
+        "type": "singleChoice.integer",
+        "title": "To what extent do you consider your sleep problem to INTERFERE with your daily functioning (e.g., daytime fatigue, mood, ability to function at work/daily chores, concentration, memory, mood, etc.) CURRENTLY?",
+        "choices": [
+          { "text": "Not at all interfering",       "value": 0 },
+          { "text": "A little"              ,       "value": 1 },
+          { "text": "Somewhat"              ,       "value": 2 },
+          { "text": "Much"                  ,       "value": 3 },
+          { "text": "Very much interfering" ,       "value": 4 }
+        ]
+      }
+    ]
+}

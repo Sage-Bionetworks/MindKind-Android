@@ -1,0 +1,20 @@
+{
+  "identifier": "Mood_Daily",
+  "type": "conversationSurvey",
+  "taskIdentifier": "Mood_Daily",
+  "schemaIdentifier": "Mood_Daily",
+  "steps": [
+    {
+      "identifier": "Mood_Daily",
+      "type": "singleChoice.integer",
+      "title": "Pick the response that describes how you felt today",
+      "choices": [
+        { "text": "Worst Ever"  ,               "value": 1 },
+        { "text": "Bad Mood"    ,               "value": 2 },
+        { "text": "Average"     ,               "value": 3 },
+        { "text": "Good Mood"   ,               "value": 4 },
+        { "text": "Best Ever"   ,               "value": 5 }
+      ]
+    }
+  ]
+}
