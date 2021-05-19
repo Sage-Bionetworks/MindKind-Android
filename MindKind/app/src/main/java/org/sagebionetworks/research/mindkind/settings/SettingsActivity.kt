@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.activity_settings.*
+import org.sagebionetworks.research.mindkind.BuildConfig
 import org.sagebionetworks.research.mindkind.R
 
 open class SettingsActivity: AppCompatActivity() {
@@ -30,8 +31,12 @@ open class SettingsActivity: AppCompatActivity() {
         }
     }
 
+    val versionStr = "Version ${BuildConfig.VERSION_NAME}"
+            .replace("-internal-debug", "")
+            .replace("-internal-release", "")
+
     var settingsItems = mutableListOf(
-            SettingsItem("About MindKind App", "Version 1.0", true, false),
+            SettingsItem("About MindKind App", versionStr, true, false),
             SettingsItem("About our team", null, false, false),
             SettingsItem("FAQ", null, false, false),
             SettingsItem("Feedback for Us", null, false, false),
