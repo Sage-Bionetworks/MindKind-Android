@@ -144,12 +144,8 @@ open class ConversationSurveyActivity: AppCompatActivity() {
 
         intent.extras?.getString(extraConversationId)?.let {
 
-            val now = DateTime.now()
-            val studyStartDate = sharedPrefs.getString(studyStartDateKey, null)?.let {
-                dateFormatter.parseDateTime(it)
-            } ?: now
-
-            val conversation = ConversationGsonHelper.createSurvey(this, it, studyStartDate, now) ?: run {
+            val progress = BackgroundDataService.progressInStudy(sharedPrefs)
+            val conversation = ConversationGsonHelper.createSurvey(this, it, progress) ?: run {
                 AlertDialog.Builder(this)
                         .setMessage(R.string.conversation_error_msg)
                         .setNeutralButton(R.string.rsb_ok) { dialog, which ->

@@ -61,6 +61,9 @@ import io.reactivex.Completable
 import io.reactivex.Scheduler
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import org.joda.time.DateTime
+import org.joda.time.Days
+import org.joda.time.Weeks
 import org.joda.time.format.ISODateTimeFormat
 import org.sagebionetworks.bridge.android.manager.UploadManager
 import org.sagebionetworks.research.domain.Schema
@@ -151,6 +154,19 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
 
         fun createSharedPrefs(context: Context): SharedPreferences {
             return context.getSharedPreferences("Mindkind", MODE_PRIVATE)
+        }
+
+        public const val studyDurationInWeeks = 12
+
+        fun progressInStudy(sharedPreferences: SharedPreferences): ProgressInStudy {
+            val now = DateTime.now()
+            val studyStartDate = sharedPreferences.getString(studyStartDateKey, null)?.let {
+                dateFormatter.parseDateTime(it)
+            } ?: now
+            val week = Weeks.weeksBetween(studyStartDate.withTimeAtStartOfDay(), now).weeks + 1
+            val daysFromStart = Days.daysBetween(studyStartDate.withTimeAtStartOfDay(), now).days
+            val dayOfWeek = (daysFromStart % 7) + 1
+            return ProgressInStudy(week, dayOfWeek, daysFromStart)
         }
     }
 
@@ -678,3 +694,17 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
         }
     }
 }
+
+public data class ProgressInStudy(
+        /**
+         * @property week in study. Initial week is 1, not 0.
+         */
+        val week: Int,
+        /**
+         * @property dayOfWeek in the study. Initial day is 1, max is 7, and repeats every 7.
+         */
+        val dayOfWeek: Int,
+        /**
+         * @property daysFromStart of the study. Initial day is 1, not 0.
+         */
+        val daysFromStart: Int)

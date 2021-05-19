@@ -1,6 +1,7 @@
 package org.sagebionetworks.research.mindkind.conversation
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -8,6 +9,7 @@ import com.google.gson.annotations.SerializedName
 import org.joda.time.DateTime
 import org.joda.time.Days
 import org.sagebionetworks.research.domain.RuntimeTypeAdapterFactory
+import org.sagebionetworks.research.mindkind.backgrounddata.ProgressInStudy
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.lang.Exception
@@ -41,8 +43,7 @@ class ConversationGsonHelper {
          * @param jsonFilename json filename without the ".json" file extension
          * @return a parsed ConversationSurvey that has all it's nested steps expanded
          */
-        fun createSurvey(context: Context, jsonFilename: String,
-                         studyStartDate: DateTime, now: DateTime): ConversationSurvey? {
+        fun createSurvey(context: Context, jsonFilename: String, progress: ProgressInStudy): ConversationSurvey? {
             val gson = createGson()
             val json = stringFromJsonAsset(context, jsonFilename)
 
@@ -63,7 +64,7 @@ class ConversationGsonHelper {
             if (conversation.isSchedule == true) {
                 conversation.steps.filter {
                     val ngStep = (it as? NestedGroupStep) ?: run { return@filter false }
-                    return@filter shouldInclude(ngStep, studyStartDate, now)
+                    return@filter shouldInclude(ngStep, progress)
                 }.sortedBy {
                     return@sortedBy (it as? NestedGroupStep)?.frequency?.ordinal
                 }.firstOrNull()?.let {
@@ -102,13 +103,11 @@ class ConversationGsonHelper {
                     steps = newSteps)
         }
 
-        fun shouldInclude(step: NestedGroupStep, studyStartDate: DateTime, now: DateTime): Boolean {
-            val daysFromStart = Days.daysBetween(studyStartDate.withTimeAtStartOfDay(), now).days
-            val dayOfWeek = (daysFromStart % 7) + 1
+        fun shouldInclude(step: NestedGroupStep, progress: ProgressInStudy): Boolean {
             return when(step.frequency) {
-                NestedGroupFrequency.weekly -> dayOfWeek == step.startDay
-                NestedGroupFrequency.weeklyRandom -> dayOfWeek == (1..7).shuffled().first()
-                else /* .daily */ -> daysFromStart > step.startDay
+                NestedGroupFrequency.weekly -> progress.dayOfWeek == step.startDay
+                NestedGroupFrequency.weeklyRandom -> progress.dayOfWeek == (1..7).shuffled().first()
+                else /* .daily */ -> progress.daysFromStart > step.startDay
             }
         }
 

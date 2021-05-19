@@ -146,5 +146,10 @@
     <string name="welcome_4_message">Protecting your data is very important to us.  Your data will only be used for this study.</string>
     <string name="welcome_accept">Accept</string>
     <string name="welcome_cancel"><u>No Thanks</u></string>
-    
+
+    <!-- Task List Activity -->
+    <string name="day_x">Day %s</string>
+    <string name="week_x">Week %s</string>
+    <string name="week_12">Week 12</string>
+
 </resources>

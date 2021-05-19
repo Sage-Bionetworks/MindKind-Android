@@ -34,6 +34,7 @@ package org.sagebionetworks.research.mindkind
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -51,11 +52,12 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_conversation_survey.*
 import kotlinx.android.synthetic.main.activity_task_list.*
+import org.joda.time.DateTime
+import org.joda.time.Weeks
 import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService
 import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService.Companion.SHOW_ENGAGEMENT_NOTIFICATION_ACTION
-import org.sagebionetworks.research.mindkind.conversation.ConversationSurveyActivity
-import org.sagebionetworks.research.mindkind.conversation.ConversationSurveyViewModel
-import org.sagebionetworks.research.mindkind.conversation.SpacesItemDecoration
+import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService.Companion.studyDurationInWeeks
+import org.sagebionetworks.research.mindkind.conversation.*
 import org.sagebionetworks.research.mindkind.settings.SettingsActivity
 import org.sagebionetworks.research.sageresearch.dao.room.AppConfigRepository
 import org.sagebionetworks.research.sageresearch.dao.room.ReportRepository
@@ -87,10 +89,15 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
 
     private val appConfigDisposable = CompositeDisposable()
 
+    private lateinit var sharedPrefs: SharedPreferences
+
+    @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_task_list)
+
+        sharedPrefs = BackgroundDataService.createSharedPrefs(this)
 
         val llm = LinearLayoutManager(this)
         llm.orientation = LinearLayoutManager.VERTICAL
@@ -124,6 +131,13 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
             startActivity(intent)
             overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
         }
+
+        task_progress_bar.max = 12 * 7 // 12 weeks in the study
+        val progressInStudy = BackgroundDataService.progressInStudy(sharedPrefs)
+        task_progress_bar.progress = progressInStudy.daysFromStart
+        val weekStr = getString(R.string.week_x, progressInStudy.week.toString())
+        val dayStr = getString(R.string.day_x, progressInStudy.dayOfWeek.toString())
+        week_textview.text = "$weekStr | $dayStr"
 
         refreshServiceButtonState()
 
