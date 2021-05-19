@@ -14,7 +14,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.TranslateAnimation
 import android.widget.LinearLayout
-import android.widget.NumberPicker
+import com.shawnlin.numberpicker.NumberPicker
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.children
@@ -414,7 +414,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
 
             it.displayedValues = choices.toTypedArray()
             it.wrapSelectorWheel = false
-            it.maxValue = 0
+            it.minValue = 0
             it.maxValue = choices.size - 1
             if (answer != null) {
                 it.value = choices.indexOf(answer)

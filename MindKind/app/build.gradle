@@ -166,6 +166,7 @@ dependencies {
     implementation 'com.dampcake:gson-immutable:1.2'
 
     implementation 'com.nineoldandroids:library:2.4.0'
+    implementation 'com.shawnlin:number-picker:2.4.12'
 
     testImplementation 'junit:junit:4.12'
     testImplementation 'androidx.arch.core:core-testing:2.0.0'
