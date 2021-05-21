@@ -24,9 +24,9 @@
       "type": "singleChoice.wheel.string",
       "title": "What is your reason for withdrawing?",
       "choices": [
-        "I no longer have the time",
-        "This was not what I thought I was signing up for ",
-        "I found the questions too personal",
+        "I no longer \nhave the time",
+        "This was not what I \nthought I was signing up for ",
+        "I found the questions \ntoo personal",
         "Prefer not to say",
         "Other"],
       "buttonTitle": "Ok"
