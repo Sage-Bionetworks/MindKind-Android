@@ -72,6 +72,10 @@ open class ConversationSurveyViewModel(
         return conversationSurvey
     }
 
+    fun isLastStep() {
+        return goToNextStep()
+    }
+
     fun getCurrentStep(): ConversationStep? {
         val steps = conversationSurvey.value?.steps ?: run { return null }
         if (itemCount >= 0 && itemCount < steps.size) {
@@ -150,7 +154,7 @@ open class ConversationSurveyViewModel(
             progressLiveData.postValue(0.0f)
             return
         }
-        progressLiveData.postValue(startTimeMap.size.toFloat() / steps.size.toFloat())
+        progressLiveData.postValue(itemCount.toFloat() / steps.size.toFloat())
     }
 
     /**
@@ -162,12 +166,12 @@ open class ConversationSurveyViewModel(
 
         (answer as? Int)?.let {
             answersLiveData += ConversationAnswer(
-                    step.identifier, startTime, endTime, AnswerResultType.INTEGER, it)
+                    step.identifier, AnswerResultType.INTEGER, it, startTime, endTime)
         }
 
         (answer as? String)?.let {
             answersLiveData += ConversationAnswer(
-                    step.identifier, startTime, endTime, AnswerResultType.STRING, it)
+                    step.identifier, AnswerResultType.STRING, it, startTime, endTime)
         }
 
         if (answersLiveData.value?.lastOrNull()?.identifier != step.identifier) {
@@ -220,11 +224,8 @@ open class ConversationSurveyViewModel(
         }
 
         val file = File(folder, "data.json")
-        val stream = FileOutputStream(file)
-        try {
+        FileOutputStream(file).use { stream ->
             stream.write(json.toByteArray())
-        } finally {
-            stream.close()
         }
 
         val finalStepHistory = arrayListOf<Result>()
@@ -270,7 +271,7 @@ open class ConversationSurveyViewModel(
 
 public data class ConversationAnswer(
     public val identifier: String,
-    public val startTime: Instant,
-    public val endTime: Instant,
     public val type: String,
-    public val answer: Any)
+    public val answer: Any,
+    public val startTime: Instant,
+    public val endTime: Instant)

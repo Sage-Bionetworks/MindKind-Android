@@ -11,7 +11,7 @@
         "continueAfterDelay": true
       },
       {
-        "identifier": "ISI_1_Falling",
+        "identifier": "ISI_1_FallingAsleep",
         "type": "singleChoice.integer",
         "title": "Difficulty falling asleep",
         "choices": [
@@ -23,7 +23,7 @@
         ]
       },
       {
-        "identifier": "ISI_2_Staying",
+        "identifier": "ISI_2_StayingAsleep",
         "type": "singleChoice.integer",
         "title": "Difficulty staying asleep",
         "choices": [
@@ -35,7 +35,7 @@
         ]
       },
       {
-        "identifier": "ISI_3_Waking",
+        "identifier": "ISI_3_WakingUp",
         "type": "singleChoice.integer",
         "title": "Problems waking up too early",
         "choices": [
