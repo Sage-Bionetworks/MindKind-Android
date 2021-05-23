@@ -72,8 +72,11 @@ class ConversationGsonHelper {
                     filteredSteps.add(it)
                     // Let's also use the schema identifier to track which specific
                     // nested group was the one we are doing today
-                    conversationSchemaIdentifier = (it as? NestedGroupStep)?.schemaIdentifier
-                    Log.d(TAG, "Run ${conversation.identifier} w/ dataType $conversationSchemaIdentifier")
+                    (it as? NestedGroupStep)?.let { nestedGroupStep ->
+                        conversationSchemaIdentifier = nestedGroupStep.schemaIdentifier
+                        Log.d(TAG, "Run ${conversation.identifier} w/ dataType " +
+                                (nestedGroupStep.identifier + nestedGroupStep.schemaIdentifier))
+                    }
                 }
             }
 

@@ -42,14 +42,11 @@ import org.joda.time.DateTime
 import org.sagebionetworks.bridge.rest.gson.ByteArrayToBase64TypeAdapter
 import org.sagebionetworks.bridge.rest.gson.DateTimeTypeAdapter
 import org.sagebionetworks.bridge.rest.gson.LocalDateTypeAdapter
+import org.sagebionetworks.research.mindkind.conversation.ConversationAnswer
 import org.sagebionetworks.research.sageresearch.dao.room.*
 import org.threeten.bp.*
 import org.threeten.bp.chrono.IsoChronology
-import org.threeten.bp.format.DateTimeFormatter
-import org.threeten.bp.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
 import org.threeten.bp.format.DateTimeFormatterBuilder
-import org.threeten.bp.format.ResolverStyle
-import org.threeten.bp.temporal.ChronoField
 import java.io.IOException
 
 open class BackgroundDataTypeConverters {
