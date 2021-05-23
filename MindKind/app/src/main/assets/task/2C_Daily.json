@@ -1,0 +1,54 @@
+{
+  "identifier": "2C_Daily",
+  "type": "conversationSurvey",
+  "taskIdentifier": "2C_Daily",
+  "schemaIdentifier": "2C_Daily",
+  "steps": [
+    {
+      "identifier": "2C_Daily_Y",
+      "type": "singleChoice.string",
+      "ifUserAnswers": "No, skip to 2C_Dept",
+      "title": "Did you do anything social today?",
+      "choices": [
+        { "text": "Yes" ,               "value": "Yes" },
+        { "text": "No"  ,               "value": "No" }
+      ]
+    },
+    {
+      "identifier": "2C_Daily_Locale",
+      "type": "singleChoice.integer",
+      "title": "How much of  your social activity was done online?",
+      "choices": [
+        { "text": "All Online"      ,          "value": 0 },
+        { "text": "Mostly Online"   ,          "value": 1 },  
+        { "text": "Half and Half"   ,          "value": 2 },
+        { "text": "Mostly In Person",          "value": 3 },
+        { "text": "All In Person"   ,          "value": 4 }
+      ]
+    },
+    {
+      "identifier": "2C_Daily_Enjoy",
+      "type": "singleChoice.integer",
+      "title": "How much did you enjoy yourself?",
+      "choices": [
+        { "text": "Not At All"  ,               "value": 0 },
+        { "text": "Not Very"    ,               "value": 1 },
+        { "text": "Neutral"     ,               "value": 2 },
+        { "text": "Somewhat"    ,               "value": 3 },
+        { "text": "Very Much"   ,               "value": 4 }
+      ]
+    },
+    {
+      "identifier": "2C_Daily_Importance",
+      "type": "singleChoice.integer",
+      "title": "How important was doing something social to your mood?",
+      "choices": [
+        { "text": "Not At All"  ,               "value": 0 },
+        { "text": "Not Very"    ,               "value": 1 },
+        { "text": "Neutral"     ,               "value": 2 },
+        { "text": "Somewhat"    ,               "value": 3 },
+        { "text": "Very Much"   ,               "value": 4 }
+      ]
+    }
+  ]
+}

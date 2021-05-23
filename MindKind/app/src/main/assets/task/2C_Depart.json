@@ -1,0 +1,21 @@
+{
+  "identifier": "2C_Depart",
+  "type": "conversationSurvey",
+  "taskIdentifier": "2C_Depart",
+  "schemaIdentifier": "2C_Depart",
+  "steps": [
+    {
+      "identifier": "2C_Dept",
+      "type": "instruction.random",
+      "title": "Will be replaced with one from the titleList",
+      "buttonTitle": "Done",
+      "optional": false,
+      "titleList": [
+          "Thank you for taking the time to answer my questions.",
+          "Appreciate you taking the time to answer my questions.",
+          "Much love to you for taking the time to answer my questions.",
+          "Unlimited thanks to you for taking the time to answer my questions."
+      ]
+    }
+  ]
+}

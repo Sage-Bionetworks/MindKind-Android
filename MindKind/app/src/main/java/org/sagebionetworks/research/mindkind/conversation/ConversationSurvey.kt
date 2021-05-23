@@ -72,8 +72,11 @@ class ConversationGsonHelper {
                     filteredSteps.add(it)
                     // Let's also use the schema identifier to track which specific
                     // nested group was the one we are doing today
-                    conversationSchemaIdentifier = it.identifier
-                    Log.d(TAG, "Run ${conversation.identifier} w/ dataType $conversationSchemaIdentifier")
+                    (it as? NestedGroupStep)?.let { nestedGroupStep ->
+                        conversationSchemaIdentifier = nestedGroupStep.schemaIdentifier
+                        Log.d(TAG, "Run ${conversation.identifier} w/ dataType " +
+                                (nestedGroupStep.identifier + nestedGroupStep.schemaIdentifier))
+                    }
                 }
             }
 
@@ -107,7 +110,7 @@ class ConversationGsonHelper {
             return when(step.frequency) {
                 NestedGroupFrequency.weekly -> progress.dayOfWeek == step.startDay
                 NestedGroupFrequency.weeklyRandom -> progress.dayOfWeek == (1..7).shuffled().first()
-                else /* .daily */ -> progress.daysFromStart > step.startDay
+                else /* .daily */ -> progress.daysFromStart >= step.startDay
             }
         }
 
@@ -270,6 +273,7 @@ data class NestedGroupStep(
         override val buttonTitle: String,
         override val optional: Boolean? = true,
         override val ifUserAnswers: String? = null,
+        val schemaIdentifier: String,
         val filenames: List<String>,
         val frequency: NestedGroupFrequency?,
         val startDay: Int): ConversationStep()

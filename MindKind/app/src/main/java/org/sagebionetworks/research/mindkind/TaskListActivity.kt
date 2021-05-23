@@ -91,10 +91,15 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
         taskRecyclerView.layoutManager = llm
 
         val taskItems = mutableListOf(
-                TaskItem(SageTaskIdentifier.Sleep,
+                TaskItem("Sleep",
                         "Sleep",
                         "3 minutes",
                         "Sleep",
+                        false),
+                TaskItem("Social",
+                        "Social",
+                        "3 minutes",
+                        "Social",
                         false))
         // Useful for development
 //          TaskItem("Playground",
