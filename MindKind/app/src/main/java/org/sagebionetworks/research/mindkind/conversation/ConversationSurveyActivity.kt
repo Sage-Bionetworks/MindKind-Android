@@ -95,7 +95,9 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         close_button.setOnClickListener {
             if(viewModel.hasAnswers()) {
                 val dialog = ConfirmationDialog.newInstance(getString(R.string.conversation_confirmation_title),
-                        getString(R.string.conversation_confirmation_message))
+                        getString(R.string.conversation_confirmation_message),
+                        getString(R.string.conversation_confirmation_continue),
+                        getString(R.string.conversation_confirmation_quit))
                 dialog.show(fm, ConfirmationDialog.TAG)
                 dialog.setActionListener(View.OnClickListener {
                     logInfo("Action listener")

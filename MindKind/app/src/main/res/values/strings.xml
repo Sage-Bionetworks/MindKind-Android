@@ -154,4 +154,14 @@
     <string name="week_x">Week %s</string>
     <string name="week_12">Week 12</string>
 
+    <!-- Settings -->
+    <string name="settings_withdrawal_title">Withdraw From MindKind Study</string>
+    <string name="settings_withdrawal_message">You can choose to withdraw from the study at any time. Your account will be deleted, but we will keep the data we have already collected.</string>
+    <string name="settings_withdrawal_continue"><u>Remain in Study</u></string>
+    <string name="settings_withdrawal_quit">Withdraw From Study</string>
+    <string name="settings_withdrawal2_title">We are sorry to see you go, but we understand.</string>
+    <string name="settings_withdrawal2_message">Before you go, we\'d like to ask you a few questions about your experience and reasons for leaving.  Would this be OK?</string>
+    <string name="settings_withdrawal2_continue"><u>No Thanks</u></string>
+    <string name="settings_withdrawal2_quit"><u>Yes, Take Survey</u></string>
+
 </resources>
