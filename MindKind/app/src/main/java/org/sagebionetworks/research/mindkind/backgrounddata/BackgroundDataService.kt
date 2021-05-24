@@ -467,9 +467,7 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
     private fun createForegroundNotification(text: String? = null): Notification {
         return Builder(this, FOREGROUND_CHANNEL_ID)
                 .setContentText(text ?: "")
-                .setSmallIcon(
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                            drawable.ic_launcher_foreground else R.mipmap.ic_launcher)
+                .setSmallIcon(drawable.ic_status_bar)
                 .setStyle(NotificationCompat.BigTextStyle()
                         .bigText(text ?: ""))
                 .build()
@@ -513,9 +511,7 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
 
         return Builder(this, ENGAGEMENT_CHANNEL_ID)
                 .setContentText(text ?: "")
-                .setSmallIcon(
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                            drawable.ic_launcher_foreground else R.mipmap.ic_launcher)
+                .setSmallIcon(drawable.ic_status_bar)
                 .setStyle(NotificationCompat.BigTextStyle()
                         .bigText(text ?: ""))
                 .setContentIntent(pendingIntent)
