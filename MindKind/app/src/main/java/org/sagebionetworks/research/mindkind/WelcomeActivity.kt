@@ -14,16 +14,14 @@ import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
 import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.activity_welcome.*
-import kotlinx.android.synthetic.main.welcome_4.view.*
-import org.sagebionetworks.research.mindkind.R2.id.confirmation_continue
-import org.sagebionetworks.research.mindkind.R2.id.confirmation_quit
+import kotlinx.android.synthetic.main.welcome_5.view.*
 
 open class WelcomeActivity: AppCompatActivity() {
 
     var bullets = ArrayList<ImageView>()
 
     companion object {
-        private var NUM_ITEMS = 4
+        private var NUM_ITEMS = 5
         fun logInfo(msg: String) {
             Log.i(WelcomeActivity::class.simpleName, msg)
         }
@@ -94,7 +92,7 @@ open class WelcomeActivity: AppCompatActivity() {
         }
 
         override fun getCount(): Int {
-            return 4
+            return NUM_ITEMS
         }
 
         override fun instantiateItem(collection: ViewGroup, position: Int): Any {
@@ -102,12 +100,13 @@ open class WelcomeActivity: AppCompatActivity() {
                 0 -> R.layout.welcome_1
                 1 -> R.layout.welcome_2
                 2 -> R.layout.welcome_3
-                else /*3*/ -> R.layout.welcome_4
+                3 -> R.layout.welcome_4
+                else /*4*/ -> R.layout.welcome_5
             }
             val inflater = LayoutInflater.from(mContext)
             val layout = inflater.inflate(resId, collection, false) as ViewGroup
 
-            if (resId == R.layout.welcome_4) {
+            if (resId == R.layout.welcome_5) {
                 layout.confirmation_quit.setOnClickListener {
                     onQuitClicked()
                 }
