@@ -1,0 +1,365 @@
+{
+  "identifier": "BADS",
+  "type": "conversationSurvey",
+  "taskIdentifier": "BADS",
+  "schemaIdentifier": "BADS",
+  "measureType": "Validated", 
+  "steps": [
+    {
+      "identifier": "BADS_Intro",
+      "type": "instruction",
+      "buttonTitle": "Ok",
+      "title": "Please read each statement carefully and then circle the number which best describes how much the statement was true for you DURING THE PAST WEEK, INCLUDING TODAY."
+    },
+    {
+      "identifier": "BADS_1_BED",
+      "type": "singleChoice.integer",
+      "title": "I stayed in bed for too long even though I had things to do.",
+      "choices": [
+        { "text": "0= Not at all"                  ,       "value": 0 },
+        { "text": "1"                              ,       "value": 1 },
+        { "text": "2= A Little"                    ,       "value": 2 },
+        { "text": "3"                              ,       "value": 3 },
+        { "text": "4= A lot "                      ,       "value": 4 },
+        { "text": "5"                              ,       "value": 5 },
+        { "text": "Completely"                     ,       "value": 6 }
+      ]  
+    },
+        {
+      "identifier": "BADS_2_Tasks",
+      "type": "singleChoice.integer",
+      "title": "There were certain things I needed to do that I didn’t do.",
+      "choices": [
+        { "text": "0= Not at all"                  ,       "value": 0 },
+        { "text": "1"                              ,       "value": 1 },
+        { "text": "2= A Little"                    ,       "value": 2 },
+        { "text": "3"                              ,       "value": 3 },
+        { "text": "4= A lot "                      ,       "value": 4 },
+        { "text": "5"                              ,       "value": 5 },
+        { "text": "Completely"                     ,       "value": 6 }
+      ]  
+    },
+      {
+      "identifier": "BADS_3_Content",
+      "type": "singleChoice.integer",
+      "title": "I am content with the amount and types of things I did. ",
+      "choices": [
+        { "text": "0= Not at all"                  ,       "value": 0 },
+        { "text": "1"                              ,       "value": 1 },
+        { "text": "2= A Little"                    ,       "value": 2 },
+        { "text": "3"                              ,       "value": 3 },
+        { "text": "4= A lot "                      ,       "value": 4 },
+        { "text": "5"                              ,       "value": 5 },
+        { "text": "Completely"                     ,       "value": 6 }
+      ]  
+    },
+          {
+      "identifier": "BADS_4_Activities",
+      "type": "singleChoice.integer",
+      "title": "I engaged in a wide and diverse array of activities.",
+      "choices": [
+        { "text": "0= Not at all"                  ,       "value": 0 },
+        { "text": "1"                              ,       "value": 1 },
+        { "text": "2= A Little"                    ,       "value": 2 },
+        { "text": "3"                              ,       "value": 3 },
+        { "text": "4= A lot "                      ,       "value": 4 },
+        { "text": "5"                              ,       "value": 5 },
+        { "text": "Completely"                     ,       "value": 6 }
+      ]  
+    },
+              {
+      "identifier": "BADS_5_Decisions",
+      "type": "singleChoice.integer",
+      "title": "I made good decisions about what type of activities and/or situations I put myself in.",
+      "choices": [
+        { "text": "0= Not at all"                  ,       "value": 0 },
+        { "text": "1"                              ,       "value": 1 },
+        { "text": "2= A Little"                    ,       "value": 2 },
+        { "text": "3"                              ,       "value": 3 },
+        { "text": "4= A lot "                      ,       "value": 4 },
+        { "text": "5"                              ,       "value": 5 },
+        { "text": "Completely"                     ,       "value": 6 }
+      ] 
+    },
+     {
+      "identifier": "BADS_6_Active",
+      "type": "singleChoice.integer",
+      "title": "I was active, but did not accomplish any of my goals for the day.",
+      "choices": [
+        { "text": "0= Not at all"                  ,       "value": 0 },
+        { "text": "1"                              ,       "value": 1 },
+        { "text": "2= A Little"                    ,       "value": 2 },
+        { "text": "3"                              ,       "value": 3 },
+        { "text": "4= A lot "                      ,       "value": 4 },
+        { "text": "5"                              ,       "value": 5 },
+        { "text": "Completely"                     ,       "value": 6 }
+      ]  
+    },
+      {
+      "identifier": "BADS_7_Goals",
+      "type": "singleChoice.integer",
+      "title": "I was an active person and accomplished the goals I set out to do.",
+      "choices": [
+        { "text": "0= Not at all"                  ,       "value": 0 },
+        { "text": "1"                              ,       "value": 1 },
+        { "text": "2= A Little"                    ,       "value": 2 },
+        { "text": "3"                              ,       "value": 3 },
+        { "text": "4= A lot "                      ,       "value": 4 },
+        { "text": "5"                              ,       "value": 5 },
+        { "text": "Completely"                     ,       "value": 6 }
+      ]  
+    },
+    {
+      "identifier": "BADS_8_Escape",
+      "type": "singleChoice.integer",
+      "title": "Most of what I did was to escape from or avoid something unpleasant.",
+      "choices": [
+        { "text": "0= Not at all"                  ,       "value": 0 },
+        { "text": "1"                              ,       "value": 1 },
+        { "text": "2= A Little"                    ,       "value": 2 },
+        { "text": "3"                              ,       "value": 3 },
+        { "text": "4= A lot "                      ,       "value": 4 },
+        { "text": "5"                              ,       "value": 5 },
+        { "text": "Completely"                     ,       "value": 6 }
+      ] 
+    },
+    {
+      "identifier": "BADS_9_Sadness",
+      "type": "singleChoice.integer",
+      "title": "I did things to avoid feeling sadness or other painful emotion",
+      "choices": [
+        { "text": "0= Not at all"                  ,       "value": 0 },
+        { "text": "1"                              ,       "value": 1 },
+        { "text": "2= A Little"                    ,       "value": 2 },
+        { "text": "3"                              ,       "value": 3 },
+        { "text": "4= A lot "                      ,       "value": 4 },
+        { "text": "5"                              ,       "value": 5 },
+        { "text": "Completely"                     ,       "value": 6 }
+      ]  
+    },
+      {
+      "identifier": "BADS_10_AvoidThinking",
+      "type": "singleChoice.integer",
+      "title": "I tried not to think about certain things.",
+      "choices": [
+        { "text": "0= Not at all"                  ,       "value": 0 },
+        { "text": "1"                              ,       "value": 1 },
+        { "text": "2= A Little"                    ,       "value": 2 },
+        { "text": "3"                              ,       "value": 3 },
+        { "text": "4= A lot "                      ,       "value": 4 },
+        { "text": "5"                              ,       "value": 5 },
+        { "text": "Completely"                     ,       "value": 6 }
+      ]  
+    },
+      {
+      "identifier": "BADS_11_Accomplish",
+      "type": "singleChoice.integer",
+      "title": "I did things even though they were hard because they fit in with my long-term goals for myself.",
+      "choices": [
+        { "text": "0= Not at all"                  ,       "value": 0 },
+        { "text": "1"                              ,       "value": 1 },
+        { "text": "2= A Little"                    ,       "value": 2 },
+        { "text": "3"                              ,       "value": 3 },
+        { "text": "4= A lot "                      ,       "value": 4 },
+        { "text": "5"                              ,       "value": 5 },
+        { "text": "Completely"                     ,       "value": 6 }
+      ]  
+    },
+    {
+      "identifier": "BADS_12_HardTask",
+      "type": "singleChoice.integer",
+      "title": "I did something that was hard to do but it was worth it.",
+      "choices": [
+        { "text": "0= Not at all"                  ,       "value": 0 },
+        { "text": "1"                              ,       "value": 1 },
+        { "text": "2= A Little"                    ,       "value": 2 },
+        { "text": "3"                              ,       "value": 3 },
+        { "text": "4= A lot "                      ,       "value": 4 },
+        { "text": "5"                              ,       "value": 5 },
+        { "text": "Completely"                     ,       "value": 6 }
+      ]  
+    },
+        {
+      "identifier": "BADS_13_Rumination",
+      "type": "singleChoice.integer",
+      "title": "I spent a long time thinking over and over about my problems.",
+      "choices": [
+        { "text": "0= Not at all"                  ,       "value": 0 },
+        { "text": "1"                              ,       "value": 1 },
+        { "text": "2= A Little"                    ,       "value": 2 },
+        { "text": "3"                              ,       "value": 3 },
+        { "text": "4= A lot "                      ,       "value": 4 },
+        { "text": "5"                              ,       "value": 5 },
+        { "text": "Completely"                     ,       "value": 6 }
+      ]  
+    },
+    {
+      "identifier": "BADS_14_Problemsolve",
+      "type": "singleChoice.integer",
+      "title": "I kept trying to think of ways to solve a problem but never tried any of the solutions.",
+      "choices": [
+        { "text": "0= Not at all"                  ,       "value": 0 },
+        { "text": "1"                              ,       "value": 1 },
+        { "text": "2= A Little"                    ,       "value": 2 },
+        { "text": "3"                              ,       "value": 3 },
+        { "text": "4= A lot "                      ,       "value": 4 },
+        { "text": "5"                              ,       "value": 5 },
+        { "text": "Completely"                     ,       "value": 6 }
+      ]  
+    },
+        {
+      "identifier": "BADS_15_Mistakes",
+      "type": "singleChoice.integer",
+      "title": "I frequently spent time thinking about my past, people who have hurt me, mistakes I've made, and other bad things in my history.",
+      "choices": [
+        { "text": "0= Not at all"                  ,       "value": 0 },
+        { "text": "1"                              ,       "value": 1 },
+        { "text": "2= A Little"                    ,       "value": 2 },
+        { "text": "3"                              ,       "value": 3 },
+        { "text": "4= A lot "                      ,       "value": 4 },
+        { "text": "5"                              ,       "value": 5 },
+        { "text": "Completely"                     ,       "value": 6 }
+      ]  
+    },
+        {
+      "identifier": "BADS_16_Friends",
+      "type": "singleChoice.integer",
+      "title": "I did not see any of my friends.",
+      "choices": [
+        { "text": "0= Not at all"                  ,       "value": 0 },
+        { "text": "1"                              ,       "value": 1 },
+        { "text": "2= A Little"                    ,       "value": 2 },
+        { "text": "3"                              ,       "value": 3 },
+        { "text": "4= A lot "                      ,       "value": 4 },
+        { "text": "5"                              ,       "value": 5 },
+        { "text": "Completely"                     ,       "value": 6 }
+      ]  
+    },
+            {
+      "identifier": "BADS_17_Withdrawn",
+      "type": "singleChoice.integer",
+      "title": "I was withdrawn and quiet, even around people I know well.",
+      "choices": [
+        { "text": "0= Not at all"                  ,       "value": 0 },
+        { "text": "1"                              ,       "value": 1 },
+        { "text": "2= A Little"                    ,       "value": 2 },
+        { "text": "3"                              ,       "value": 3 },
+        { "text": "4= A lot "                      ,       "value": 4 },
+        { "text": "5"                              ,       "value": 5 },
+        { "text": "Completely"                     ,       "value": 6 }
+      ]  
+    },
+    {
+      "identifier": "BADS_18_NotSocial",
+      "type": "singleChoice.integer",
+      "title": "I was not social, even though I had opportunities to be.",
+      "choices": [
+        { "text": "0= Not at all"                  ,       "value": 0 },
+        { "text": "1"                              ,       "value": 1 },
+        { "text": "2= A Little"                    ,       "value": 2 },
+        { "text": "3"                              ,       "value": 3 },
+        { "text": "4= A lot "                      ,       "value": 4 },
+        { "text": "5"                              ,       "value": 5 },
+        { "text": "Completely"                     ,       "value": 6 }
+      ] 
+    },
+    {
+      "identifier": "BADS_19_Push",
+      "type": "singleChoice.integer",
+      "title": "I pushed people away with my negativity.",
+      "choices": [
+        { "text": "0= Not at all"                  ,       "value": 0 },
+        { "text": "1"                              ,       "value": 1 },
+        { "text": "2= A Little"                    ,       "value": 2 },
+        { "text": "3"                              ,       "value": 3 },
+        { "text": "4= A lot "                      ,       "value": 4 },
+        { "text": "5"                              ,       "value": 5 },
+        { "text": "Completely"                     ,       "value": 6 }
+      ]  
+    },
+    {
+      "identifier": "BADS_20_Cutoff",
+      "type": "singleChoice.integer",
+      "title": "I did things to cut myself off from other people.",
+      "choices": [
+        { "text": "0= Not at all"                  ,       "value": 0 },
+        { "text": "1"                              ,       "value": 1 },
+        { "text": "2= A Little"                    ,       "value": 2 },
+        { "text": "3"                              ,       "value": 3 },
+        { "text": "4= A lot "                      ,       "value": 4 },
+        { "text": "5"                              ,       "value": 5 },
+        { "text": "Completely"                     ,       "value": 6 }
+      ]  
+    },
+    {
+      "identifier": "BADS_21_Timeoff",
+      "type": "singleChoice.integer",
+      "title": "I took time off of work/school/chores/responsibilities simply because I was too tired or didn't feel like going in.",
+      "choices": [
+        { "text": "0= Not at all"                  ,       "value": 0 },
+        { "text": "1"                              ,       "value": 1 },
+        { "text": "2= A Little"                    ,       "value": 2 },
+        { "text": "3"                              ,       "value": 3 },
+        { "text": "4= A lot "                      ,       "value": 4 },
+        { "text": "5"                              ,       "value": 5 },
+        { "text": "Completely"                     ,       "value": 6 }
+      ]  
+    },
+    {
+      "identifier": "BADS_22_responsibility",
+      "type": "singleChoice.integer",
+      "title": "My work/schoolwork/chores/responsibilities suffered because I was not as active as I needed to be.",
+      "choices": [
+        { "text": "0= Not at all"                  ,       "value": 0 },
+        { "text": "1"                              ,       "value": 1 },
+        { "text": "2= A Little"                    ,       "value": 2 },
+        { "text": "3"                              ,       "value": 3 },
+        { "text": "4= A lot "                      ,       "value": 4 },
+        { "text": "5"                              ,       "value": 5 },
+        { "text": "Completely"                     ,       "value": 6 }
+      ] 
+    },
+    {
+      "identifier": "BADS_23_Structure",
+      "type": "singleChoice.integer",
+      "title": "I structured my day’s activities.",
+      "choices": [
+        { "text": "0= Not at all"                  ,       "value": 0 },
+        { "text": "1"                              ,       "value": 1 },
+        { "text": "2= A Little"                    ,       "value": 2 },
+        { "text": "3"                              ,       "value": 3 },
+        { "text": "4= A lot "                      ,       "value": 4 },
+        { "text": "5"                              ,       "value": 5 },
+        { "text": "Completely"                     ,       "value": 6 }
+      ] 
+    },
+    {
+      "identifier": "BADS_24_Distraction",
+      "type": "singleChoice.integer",
+      "title": "I only engaged in activities that would distract me from feeling bad.",
+      "choices": [
+        { "text": "0= Not at all"                  ,       "value": 0 },
+        { "text": "1"                              ,       "value": 1 },
+        { "text": "2= A Little"                    ,       "value": 2 },
+        { "text": "3"                              ,       "value": 3 },
+        { "text": "4= A lot "                      ,       "value": 4 },
+        { "text": "5"                              ,       "value": 5 },
+        { "text": "Completely"                     ,       "value": 6 }
+      ]  
+    },
+    {
+      "identifier": "BADS_25_AroundOthers",
+      "type": "singleChoice.integer",
+      "title": "I began to feel badly when others around me expressed negative feelings or experiences.",
+      "choices": [
+        { "text": "0= Not at all"                  ,       "value": 0 },
+        { "text": "1"                              ,       "value": 1 },
+        { "text": "2= A Little"                    ,       "value": 2 },
+        { "text": "3"                              ,       "value": 3 },
+        { "text": "4= A lot "                      ,       "value": 4 },
+        { "text": "5"                              ,       "value": 5 },
+        { "text": "Completely"                     ,       "value": 6 }
+      ]  
+    }
+  ]
+}

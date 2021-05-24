@@ -1,0 +1,145 @@
+{{
+  "identifier": "DEMOG",
+  "type": "conversationSurvey",
+  "taskIdentifier": "DEMOG",
+  "schemaIdentifier": "DEMOG",
+  "measureType": "Validated", 
+  "steps": [
+    {
+      "identifier": "DEMOG_Intro",
+      "type": "instruction",
+      "title": "Thanks for agreeing to help us build a better way to understand mental and emotional health. We want to get to know you better. Some questions will be easy, some personal, and some may not apply to you. Answer as best as you can. You can skip any questions we ask and you can still be in the study.",
+      "continueAfterDelay": true
+    },
+    {
+      "identifier": "DEMOG_BIRTH_SEX",
+      "type": "singleChoice.integer",
+      "title": "What sex were you assigned at birth?",
+      "choices": [
+        { "text": "Female"                ,         "value": 0 },
+        { "text": "Male"                  ,         "value": 1 },
+        { "text": "Intersex"              ,         "value": 2 },
+        { "text": "Other"                 ,         "value": 3 }
+        { "text": "Prefer not to say"     ,         "value": 4 }
+      ]
+    },
+    {
+      "identifier": "DEMOG_RACE_ETH_IN",
+      "type": "singleChoice.integer",
+      "title": "What is the caste or tribe of the head of the household?",
+      "choices": [
+        { "text": "Scheduled caste"       ,         "value": 0 },
+        { "text": "Scheduled tribe"       ,         "value": 1 },
+        { "text": "Other backward class"  ,         "value": 2 },
+        { "text": "General"               ,         "value": 3 }
+        { "text": "Don't know"            ,         "value": 4 }
+        { "text": "Prefer not to say"     ,         "value": 5 }
+      ]
+    },
+    {
+      "identifier": "DEMOG_RACE_ETH_SA",
+      "type": "singleChoice.integer",
+      "title": "To which population group do you belong?",
+      "choices": [
+        { "text": "Black African"       ,         "value": 0 },
+        { "text": "White"               ,         "value": 1 },
+        { "text": "Coloured"            ,         "value": 2 },
+        { "text": "Indian/Asian"        ,         "value": 3 }
+        { "text": "Other"               ,         "value": 4 }
+        { "text": "Prefer not to say"   ,         "value": 5 }
+      ]
+    },
+    {
+      "identifier": "DEMOG_RACE_ETH_UK",
+      "type": "singleChoice.wheel.string",
+      "title": "What is your Race / Ethnicity?",
+      "choices": [
+        { "text": "White",
+        { "text": "Mixed / Multiple ethnic groups",
+        { "text": "Asian / Asian British",
+        { "text": "Black / African / Caribbean / Black British",
+        { "text": "Other ethnic group"
+        { "text": "Prefer not to say",
+      "buttonTitle": "Ok"
+      ]
+    },
+    {
+      "identifier": "DEMOG_SEXUALITY",
+      "type": "singleChoice.wheel.string",
+      "title": "Do you consider yourself to be:",
+      "choices": [
+        { "text": "Heterosexual or straight",
+        { "text": "Gay",
+        { "text": "Lesbian",
+        { "text": "Bisexual",
+        { "text": "Other"
+        { "text": "Prefer not to say",
+      "buttonTitle": "Ok"
+      ]
+    },
+    {
+      "identifier": "DEMOG_SOC_ECON_Intro",
+      "type": "instruction",
+      "title": "We have found that the circumstances you have grown up in can be an important part of how you see this world. The next set of questions will ask you about the basic resources youhave to make ends meet. Like all other questions, these are optional.",
+      "continueAfterDelay": true
+    },
+    {
+      "identifier": "DEMOG_SOC_CLASS",
+      "type": "singleChoice.integer",
+      "title": "Would you consider your family to be:",
+      "choices": [
+        { "text": "Poor"                    ,         "value": 0 },
+        { "text": "Working class"           ,         "value": 1 },
+        { "text": "Lower middle class"      ,         "value": 2 },
+        { "text": "Upper middle class"      ,         "value": 3 }
+        { "text": "Upper class"             ,         "value": 4 }
+        { "text": "Prefer not to say"       ,         "value": 5 }
+      ]
+    },
+    {
+      "identifier": "DEMOG_JOB",
+      "type": "singleChoice.integer",
+      "title": "Choose all the people in your household who have a paying job.",
+      "choices": [
+        { "text": "Mother"                  ,         "value": 0 },
+        { "text": "Father"                  ,         "value": 1 },
+        { "text": "Siblings"                ,         "value": 2 },
+        { "text": "Aunt/Uncle"              ,         "value": 3 }
+        { "text": "Grandfather"             ,         "value": 4 }
+        { "text": "Grandmother"             ,         "value": 5 }
+        { "text": "Boyfriend/Girlfriend"    ,         "value": 6 }
+        { "text": "Other"                   ,         "value": 7 }
+        { "text": "Prefer not to say"       ,         "value": 8 }
+      ]
+    },
+    {
+      "identifier": "DEMOG_ADULTS",
+      "type": "integer",
+      "title": "How many adults besides you live with you?",
+      "buttonTitle": "Ok",
+      "min": 0,
+      "max": 9
+    },
+    {
+      "identifier": "DEMOG_CHILDREN",
+      "type": "integer",
+      "title": "How many children live with you?",
+      "buttonTitle": "Ok",
+      "min": 0,
+      "max": 9
+    },
+    {
+      "identifier": "DEMOG_HOUSE",
+      "type": "singleChoice.wheel.string",
+      "title": "Do you live in a...",
+      "choices": [
+        { "text": "House (own, rent, other)",
+        { "text": "Apartment (own, rent, other)",
+        { "text": "Dormitory",
+        { "text": "Shelter",
+        { "text": "No fixed address",
+      "buttonTitle": "Ok"
+      ]
+    },
+  ]
+}}

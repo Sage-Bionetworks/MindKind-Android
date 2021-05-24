@@ -1,0 +1,98 @@
+{
+  "identifier": "Demographics_India",
+  "type": "conversationSurvey",
+  "taskIdentifier": "Demographics_India",
+  "schemaIdentifier": "Demographics_India",
+  "steps": [
+    {
+      "identifier": "DEMOG_IN_EDU",
+      "type": "singleChoice.wheel.string",
+      "title": "What kind of toilet facilitydo members of your household usually use?",
+      "buttonTitle": "Ok",
+      "choices": [
+        "Flush or Pour Flush Toilet",
+        "Pit Latrine"
+      ]
+    },
+    {
+      "identifier": "DEMOG_IN_H20",
+      "type": "singleChoice.integer",
+      "title": "What is the main source of drinking water for members of your household?",
+      "choices": [
+        { "text": "Piped water"         ,         "value": 0 },
+        { "text": "Dug well"            ,         "value": 1 },
+        { "text": "Water from spring"   ,         "value": 2 },
+        { "text": "Prefer not to say"   ,         "value": 3 }
+      ]
+    },
+    {
+      "identifier": "DEMOG_IN_TOILET",
+      "type": "singleChoice.wheel.string",
+      "title": "What kind of toilet facility do members of your household usually use?",
+      "buttonTitle": "Ok",
+      "choices": [
+        "Flush or Pour Flush Toilet",
+        "Pit Latrine"
+      ]
+    },
+    {
+      "identifier": "DEMOG_IN_SHARE_TOILET",
+      "type": "singleChoice.integer",
+      "title": "Do you share this toilet facility with other households?",
+      "choices": [
+        { "text": "Yes"                     ,         "value": 0 },
+        { "text": "No"                      ,         "value": 1 },
+        { "text": "Prefer not to say"       ,         "value": 2 }
+      ]
+    },
+    {
+      "identifier": "DEMOG_IN_RELIGION",
+      "type": "singleChoice.wheel.string",
+      "title": "What is the religion of the head of the household?",
+      "buttonTitle": "Ok",
+      "choices": [
+        "Hindu",
+        "Muslim",
+        "Christian",
+        "Buddhist/Neo-Buddhist",
+        "Jain",
+        "Jewish",
+        "Parsi/Zoroastrian",
+        "Sikh",
+        "No Religion",
+        "Other",
+        "Prefer not to say"
+      ]
+    },
+    {
+      "identifier": "DEMOG_IN_ROOMS",
+      "type": "integer",
+      "title": "How many rooms in this household are used for sleeping?",
+      "min": 0,
+      "max": 9
+    },
+    {
+      "identifier": "DEMOG_IN_HEALTH_INS",
+      "type": "singleChoice.integer",
+      "title": "Is any usual member of this household covered by a health scheme or health insurance?",
+      "choices": [
+        { "text": "Yes"                     ,         "value": 0 },
+        { "text": "No"                      ,         "value": 1 },
+        { "text": "Prefer not to say"       ,         "value": 2 }
+      ]
+    },
+    {
+      "identifier": "DEMOG_IN_SICK",
+      "type": "singleChoice.wheel.string",
+      "title": "When members of your household get sick, where do they generally go for treatment?",
+      "buttonTitle": "Ok",
+      "choices": [
+        "Gov't Care Facility/Hospital",
+        "Ayush",
+        "Private Health Sectore",
+        "Other",
+        "Prefer not to say"
+      ]
+    }
+  ]
+}
