@@ -1,8 +1,8 @@
 {
   "identifier": "Withdrawal",
   "type": "conversationSurvey",
-  "taskIdentifier": "Sleep",
-  "schemaIdentifier": "Sleep",
+  "taskIdentifier": "Survey",
+  "schemaIdentifier": "Survey",
   "isSchedule": true,
   "steps": [
     {

@@ -100,31 +100,13 @@ open class SettingsActivity: AppCompatActivity() {
                     intent.putExtra(extraSettingsId, "Data Settings")
                     startActivity(intent)
                 } else if (label == "Withdraw From Study") {
-                    var fm = supportFragmentManager
-                    val dialog = ConfirmationDialog.newInstance(getString(R.string.settings_withdrawal_title),
-                            getString(R.string.settings_withdrawal_message),
-                            getString(R.string.settings_withdrawal_continue),
-                            getString(R.string.settings_withdrawal_quit))
-                    dialog.show(fm, ConfirmationDialog.TAG)
-                    dialog.setActionListener(View.OnClickListener {
-                        dialog.dismiss()
-                        val dialog2 = ConfirmationDialog.newInstance(getString(R.string.settings_withdrawal2_title),
-                                getString(R.string.settings_withdrawal2_message),
-                                getString(R.string.settings_withdrawal2_continue),
-                                getString(R.string.settings_withdrawal2_quit))
-                        dialog2.show(fm, ConfirmationDialog.TAG)
-                        dialog2.setActionListener(View.OnClickListener {
-                            dialog2.dismiss()
-                            ConversationSurveyActivity.start(activity, "Withdrawal")
-                        })
-                    })
+                    startActivity(Intent(activity, WithdrawalActivity::class.java))
                 } else {
                     Toast.makeText(activity, "Not implemented yet.", Toast.LENGTH_LONG).show()
                 }
             }
         })
         settingsRecycler.adapter = adapter
-
     }
 
 }

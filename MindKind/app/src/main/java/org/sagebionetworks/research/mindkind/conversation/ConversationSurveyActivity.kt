@@ -1,5 +1,6 @@
 package org.sagebionetworks.research.mindkind.conversation
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -59,6 +60,12 @@ open class ConversationSurveyActivity: AppCompatActivity() {
             val intent = Intent(baseCtx, ConversationSurveyActivity::class.java)
             intent.putExtra(extraConversationId, conversationSurvey)
             baseCtx.startActivity(intent)
+        }
+
+        fun startForResult(activity: Activity, conversationSurvey: String, code: Int) {
+            val intent = Intent(activity, ConversationSurveyActivity::class.java)
+            intent.putExtra(extraConversationId, conversationSurvey)
+            activity.startActivityForResult(intent, code)
         }
     }
 
@@ -185,6 +192,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
 
     private fun completeConversation() {
         viewModel.completeConversation(sharedPrefs)
+        setResult(RESULT_OK)
         finish()
     }
 

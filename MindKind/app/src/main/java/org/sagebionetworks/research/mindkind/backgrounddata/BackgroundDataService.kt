@@ -193,6 +193,12 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
 
             editPrefs.commit()
         }
+
+        fun permanentlyStopSelf(context: Context) {
+            WorkUtils.cancelPeriodicWork(context, BridgeUploadWorker.periodicWorkName)
+            WorkUtils.cancelPeriodicWork(context, DataUsageWorker.periodicWorkName)
+            context.stopService(Intent(context, BackgroundDataService::class.java))
+        }
     }
 
     private lateinit var sharedPrefs: SharedPreferences

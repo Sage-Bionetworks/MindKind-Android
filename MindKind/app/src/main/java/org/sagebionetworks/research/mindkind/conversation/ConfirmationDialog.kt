@@ -6,6 +6,7 @@ import android.graphics.Paint
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
+import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
@@ -16,6 +17,8 @@ import org.sagebionetworks.research.mindkind.R
 class ConfirmationDialog : DialogFragment() {
 
     lateinit var listener: View.OnClickListener
+    var cancelListener: View.OnClickListener? = null
+    var skipButtonListener: View.OnClickListener? = null
 
     companion object {
 
@@ -58,6 +61,14 @@ class ConfirmationDialog : DialogFragment() {
             setupClickListeners(it)
         }
 
+        dialog.setOnKeyListener { _, keyCode, _ ->
+            if (keyCode == KeyEvent.KEYCODE_BACK) {
+                dialog.dismiss()
+                cancelListener?.onClick(null)
+            }
+            return@setOnKeyListener true
+        }
+
         return dialog
     }
 
@@ -78,13 +89,14 @@ class ConfirmationDialog : DialogFragment() {
     private fun setupClickListeners(view: View) {
         view.close_button.setOnClickListener {
             dismiss()
+            cancelListener?.onClick(it)
         }
 
         view.confirmation_continue.setOnClickListener {
             dismiss()
+            skipButtonListener?.onClick(it)
         }
 
         view.confirmation_quit?.setOnClickListener(listener)
     }
-
 }
