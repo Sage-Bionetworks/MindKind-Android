@@ -143,6 +143,10 @@ open class WithdrawalActivity: AppCompatActivity() {
             viewModel?.withdraw(this)
         }
 
+        dialog.skipButtonListener = OnClickListener {
+            finish()
+        }
+
         dialog.cancelListener = OnClickListener {
             finish()
         }

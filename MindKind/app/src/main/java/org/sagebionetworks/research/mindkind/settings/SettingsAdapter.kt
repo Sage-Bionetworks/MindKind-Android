@@ -1,29 +1,25 @@
 package org.sagebionetworks.research.mindkind.settings
 
-import android.content.Context
-import android.graphics.drawable.Drawable
-import android.os.Build
+import android.content.SharedPreferences
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import org.sagebionetworks.research.mindkind.R
-import org.sagebionetworks.research.mindkind.conversation.ConversationAdapter
-import java.util.*
+import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService
 
 
 data class SettingsItem(
         val label: String,
-        val subtext: String?,
+        var subtext: String?,
         val header: Boolean,
-        val sectionHeader: Boolean)
+        val sectionHeader: Boolean,
+        val identifier: String = label)
 
 public interface SettingsAdapterListener {
-    fun onItemClicked(jsonResourceName: String?)
+    fun onItemClicked(item: SettingsItem?)
 }
 
 class SettingsAdapter(
@@ -64,7 +60,7 @@ class SettingsAdapter(
         }
         if(!item.header && !item.sectionHeader) {
             viewHolder.itemView.setOnClickListener {
-                listener.onItemClicked(item.label)
+                listener.onItemClicked(item)
             }
         }
     }
@@ -78,5 +74,17 @@ class SettingsAdapter(
             item.sectionHeader -> 1
             else -> 2
         }
+    }
+
+    public fun updateDataTrackingItems(prefs: SharedPreferences) {
+        val tracking = BackgroundDataService.loadDataAllowedToBeTracked(prefs)
+        dataSet.forEach {
+            it.subtext = if (tracking.contains(it.identifier)) {
+                "On"
+            } else {
+                "Off"
+            }
+        }
+        notifyDataSetChanged()
     }
 }

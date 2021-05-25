@@ -123,7 +123,7 @@
     <!-- Phone registration -->
     <string name="registration_header_subtext">Study</string>
     <string name="registration_title">Let\'s get started</string>
-    <string name="registration_message">Please enter the phone number you used to sign up. We ask so we can verify it\'s you and get you started!\n\nIf you have not already signed up you can join using the link below.</string>
+    <string name="registration_message">Please enter the phone number you used to sign up. We ask so we can verify it\'s you and get you started!\n\nGo to the link below to join the MindKind Study.</string>
     <string name="registration_continue">Continue</string>
     <string name="registration_link"><u>JOIN</u></string>
     <string name="registration_learn_link"><u>Learn More</u></string>
@@ -140,7 +140,7 @@
     <string name="welcome_1_message">Your experience will help researchers better understand the emotional health of young people.</string>
     <string name="welcome_2_title">Interacting with the MindKind Study</string>
     <string name="welcome_2_message">Although MindKind Study surveys may look like a text chat - MindKind is a computer, not a person.\n\nIf you experience distress or thoughts of harming yourself, contact your physician or click the resources link for ways to find help.</string>
-    <string name="welcome_3_title">Your responses are important</string>
+    <string name="welcome_3_title">Your responses\nare important</string>
     <string name="welcome_3_message">Keeping up with your daily surveys and weekly check-ins gives the MindKind Study a better picture of your emotional health. You can skip any question you don\'t want to answer.</string>
     <string name="welcome_4_title">We protect your personal data</string>
     <string name="welcome_4_message">Your privacy is important to us. Encryption removes your name and encodes your data. This makes it difficult for people who view your data to be able to identify you.</string>
@@ -155,6 +155,7 @@
     <string name="week_12">Week 12</string>
 
     <!-- Settings -->
+    <string name="save_button">Save</string>
     <string name="settings_withdrawal_title">Withdraw From MindKind Study</string>
     <string name="settings_withdrawal_message">You can choose to withdraw from the study at any time. Your account will be deleted, but we will keep the data we have already collected.</string>
     <string name="settings_withdrawal_continue"><u>Remain in Study</u></string>
