@@ -5,12 +5,10 @@ import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.Window
-import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import android.widget.ToggleButton
@@ -110,13 +108,15 @@ open class SettingsActivity: AppCompatActivity() {
         val adapter = SettingsAdapter(items, object: SettingsAdapterListener {
             override fun onItemClicked(item: SettingsItem?) {
                 logInfo("Item clicked $item.label")
-                when(item?.identifier) {
+                when (item?.identifier) {
                     "Background Data Collection" -> goToBackgroundDataCollection()
+                    "Withdraw From Study" -> goToWithdrawal()
                     else -> processDataTracking(item)
                 }
             }
         })
         settingsRecycler.adapter = adapter
+
         if (isDataTracking) {
             adapter.updateDataTrackingItems(sharedPrefs)
         }
@@ -134,6 +134,10 @@ open class SettingsActivity: AppCompatActivity() {
         val intent = Intent(this, SettingsActivity::class.java)
         intent.putExtra(extraSettingsId, "Data Settings")
         startActivity(intent)
+    }
+
+    fun goToWithdrawal() {
+        startActivity(Intent(this, WithdrawalActivity::class.java))
     }
 
     fun processDataTracking(item: SettingsItem?) {

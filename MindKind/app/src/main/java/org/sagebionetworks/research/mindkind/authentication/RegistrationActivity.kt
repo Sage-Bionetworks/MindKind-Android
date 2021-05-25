@@ -141,16 +141,16 @@ open class RegistrationActivity: AppCompatActivity() {
         super.onResume()
         web_consent_container.visibility = View.GONE
     }
+}
 
-    fun onErrorMessage(errorMessage: String?) {
-        if (Strings.isNullOrEmpty(errorMessage)) {
-            return
-        }
-        AlertDialog.Builder(this)
-                .setTitle(R.string.consent_error_title)
-                .setNeutralButton(R.string.rsb_ok, null)
-                .create().show()
+public fun AppCompatActivity.onErrorMessage(errorMessage: String?) {
+    if (Strings.isNullOrEmpty(errorMessage)) {
+        return
     }
+    AlertDialog.Builder(this)
+            .setTitle(R.string.consent_error_title)
+            .setNeutralButton(R.string.rsb_ok, null)
+            .create().show()
 }
 
 public class PhoneSignUpViewModel @MainThread constructor(

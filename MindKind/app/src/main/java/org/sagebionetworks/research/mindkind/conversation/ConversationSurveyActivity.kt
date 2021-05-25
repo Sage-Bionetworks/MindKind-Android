@@ -1,5 +1,6 @@
 package org.sagebionetworks.research.mindkind.conversation
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -60,6 +61,12 @@ open class ConversationSurveyActivity: AppCompatActivity() {
             intent.putExtra(extraConversationId, conversationSurvey)
             baseCtx.startActivity(intent)
         }
+
+        fun startForResult(activity: Activity, conversationSurvey: String, code: Int) {
+            val intent = Intent(activity, ConversationSurveyActivity::class.java)
+            intent.putExtra(extraConversationId, conversationSurvey)
+            activity.startActivityForResult(intent, code)
+        }
     }
 
     lateinit var sharedPrefs: SharedPreferences
@@ -95,7 +102,9 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         close_button.setOnClickListener {
             if(viewModel.hasAnswers()) {
                 val dialog = ConfirmationDialog.newInstance(getString(R.string.conversation_confirmation_title),
-                        getString(R.string.conversation_confirmation_message))
+                        getString(R.string.conversation_confirmation_message),
+                        getString(R.string.conversation_confirmation_continue),
+                        getString(R.string.conversation_confirmation_quit))
                 dialog.show(fm, ConfirmationDialog.TAG)
                 dialog.setActionListener(View.OnClickListener {
                     logInfo("Action listener")
@@ -183,6 +192,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
 
     private fun completeConversation() {
         viewModel.completeConversation(sharedPrefs)
+        setResult(RESULT_OK)
         finish()
     }
 

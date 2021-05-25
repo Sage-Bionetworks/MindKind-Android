@@ -156,5 +156,16 @@
 
     <!-- Settings -->
     <string name="save_button">Save</string>
+    <string name="settings_withdrawal_title">Withdraw From MindKind Study</string>
+    <string name="settings_withdrawal_message">You can choose to withdraw from the study at any time. Your account will be deleted, but we will keep the data we have already collected.</string>
+    <string name="settings_withdrawal_continue"><u>Remain in Study</u></string>
+    <string name="settings_withdrawal_quit">Withdraw From Study</string>
+    <string name="settings_withdrawal2_title">We are sorry to see you go, but we understand.</string>
+    <string name="settings_withdrawal2_message">Before you go, we\'d like to ask you a few questions about your experience and reasons for leaving.  Would this be OK?</string>
+    <string name="settings_withdrawal2_continue"><u>No Thanks</u></string>
+    <string name="settings_withdrawal2_quit"><u>Yes, Take Survey</u></string>
+
+    <string name="settings_withdrawal_waiting_title">Withdrawing you from the MindKind study.</string>
+    <string name="settings_withdrawal_waiting_message">Please wait a moment while we remove you from study.</string>
 
 </resources>
