@@ -44,7 +44,6 @@
             android:layout_height="wrap_content"
             android:foreground="?attr/selectableItemBackgroundBorderless"
             android:background="@color/transparent"
-            android:padding="@dimen/margin_small"
             android:layout_alignParentRight="true">
 
             <ImageView
