@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
@@ -14,6 +15,8 @@ import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.activity_settings.*
 import org.sagebionetworks.research.mindkind.BuildConfig
 import org.sagebionetworks.research.mindkind.R
+import org.sagebionetworks.research.mindkind.conversation.ConfirmationDialog
+import org.sagebionetworks.research.mindkind.conversation.ConversationSurveyActivity
 
 open class SettingsActivity: AppCompatActivity() {
 
@@ -96,13 +99,14 @@ open class SettingsActivity: AppCompatActivity() {
                     val intent = Intent(activity, SettingsActivity::class.java)
                     intent.putExtra(extraSettingsId, "Data Settings")
                     startActivity(intent)
+                } else if (label == "Withdraw From Study") {
+                    startActivity(Intent(activity, WithdrawalActivity::class.java))
                 } else {
                     Toast.makeText(activity, "Not implemented yet.", Toast.LENGTH_LONG).show()
                 }
             }
         })
         settingsRecycler.adapter = adapter
-
     }
 
 }

@@ -38,6 +38,7 @@ import org.sagebionetworks.research.mindkind.WelcomeActivity;
 import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService;
 import org.sagebionetworks.research.mindkind.conversation.ConversationSurveyActivity;
 import org.sagebionetworks.research.mindkind.settings.SettingsActivity;
+import org.sagebionetworks.research.mindkind.settings.WithdrawalActivity;
 import org.sagebionetworks.research.mobile_ui.perform_task.PerformTaskActivity;
 
 import dagger.Module;
@@ -66,4 +67,7 @@ public abstract class SageAppModule {
 
     @ContributesAndroidInjector
     abstract SmsCodeActivity contributeSmsCodeActivity();
+
+    @ContributesAndroidInjector
+    abstract WithdrawalActivity contributeWithdrawalActivity();
 }
