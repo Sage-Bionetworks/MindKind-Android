@@ -9,8 +9,9 @@
     app:np_textColor="@color/black"
     android:layout_marginHorizontal="@dimen/conversation_button_margin"
     app:np_dividerColor="@color/reply_background"
-    app:np_dividerDistance="80dp"
+    app:np_dividerDistance="72dp"
     app:np_itemSpacing="0dp"
+    app:np_lineSpacingMultiplier="1.75"
     >
 
 </com.shawnlin.numberpicker.NumberPicker>
