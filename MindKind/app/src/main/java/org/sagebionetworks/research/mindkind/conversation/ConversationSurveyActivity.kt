@@ -38,6 +38,7 @@ import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataServic
 import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService.Companion.studyStartDateKey
 import org.sagebionetworks.research.sageresearch.dao.room.AppConfigRepository
 import org.sagebionetworks.research.sageresearch_app_sdk.TaskResultUploader
+import org.sagebionetworks.researchstack.backbone.step.InstructionStep
 import org.threeten.bp.LocalDateTime
 import java.text.SimpleDateFormat
 import java.util.*
@@ -244,14 +245,18 @@ open class ConversationSurveyActivity: AppCompatActivity() {
 
         val adapter = recycler_view_conversation.adapter as ConversationAdapter
 
-        when (currentStep.type) {
+        val shouldLinkWithNext = (true == (currentStep as? ConversationInstructionStep)?.continueAfterDelay)
+        val cannotEdit = currentStep is ConversationInstructionStep ||
+                currentStep is GifStep
+
+                when (currentStep.type) {
             ConversationStepType.randomTitle.type -> {
                 (currentStep as? RandomTitleStep)?.titleList?.shuffled()?.firstOrNull()
             }
             ConversationStepType.gif.type -> null
             else -> currentStep.title
         }?.let {
-            adapter.addItem(currentStep.identifier, it, true)
+            adapter.addItem(currentStep.identifier, it, true, shouldLinkWithNext, cannotEdit)
         }
 
         showBottomInputView(currentStep, null, viewModel.isOnLastStep(), true)
@@ -301,7 +306,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
     private fun addAnswer(step: ConversationStep, textAnswer: String?, value: Any?, scroll: Boolean) {
         val adapter = recycler_view_conversation.adapter as ConversationAdapter
         val id = step.identifier
-        adapter.addItem(id, textAnswer, false)
+        adapter.addItem(id, textAnswer, false, linkWithNext = false)
         logInfo("addAnswer(): $id - $textAnswer: scroll[$scroll]")
 
         if(scroll) {
