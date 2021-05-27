@@ -72,6 +72,8 @@ open class ConversationSurveyActivity: AppCompatActivity() {
 
     lateinit var sharedPrefs: SharedPreferences
 
+    var exitDialog: ConfirmationDialog? = null
+
     var handler: Handler? = null
 
     @Inject
@@ -99,21 +101,8 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         viewModel = ViewModelProvider(this, ConversationSurveyViewModel.Factory(
                 taskResultUploader, appConfigRepo, cacheDir.absolutePath)).get()
 
-        var fm = supportFragmentManager
         close_button.setOnClickListener {
-            if(viewModel.hasAnswers()) {
-                val dialog = ConfirmationDialog.newInstance(getString(R.string.conversation_confirmation_title),
-                        getString(R.string.conversation_confirmation_message),
-                        getString(R.string.conversation_confirmation_continue),
-                        getString(R.string.conversation_confirmation_quit))
-                dialog.show(fm, ConfirmationDialog.TAG)
-                dialog.setActionListener(View.OnClickListener {
-                    logInfo("Action listener")
-                    finish()
-                })
-            } else {
-                finish()
-            }
+            closeOrBackPressed()
         }
 
         val llm = LinearLayoutManager(this)
@@ -188,6 +177,30 @@ open class ConversationSurveyActivity: AppCompatActivity() {
             }.map { it as GifStep }
             adapter.preloadGifs(gifSteps)
 
+        }
+    }
+
+    override fun onBackPressed() {
+        if(viewModel.hasAnswers() && (exitDialog?.dialog?.isShowing != true)) {
+            closeOrBackPressed()
+            return
+        }
+        super.onBackPressed()
+    }
+
+    private fun closeOrBackPressed() {
+        if(viewModel.hasAnswers()) {
+            exitDialog = ConfirmationDialog.newInstance(getString(R.string.conversation_confirmation_title),
+                    getString(R.string.conversation_confirmation_message),
+                    getString(R.string.conversation_confirmation_continue),
+                    getString(R.string.conversation_confirmation_quit))
+            exitDialog?.show(supportFragmentManager, ConfirmationDialog.TAG)
+            exitDialog?.setActionListener {
+                logInfo("Action listener")
+                finish()
+            }
+        } else {
+            finish()
         }
     }
 
