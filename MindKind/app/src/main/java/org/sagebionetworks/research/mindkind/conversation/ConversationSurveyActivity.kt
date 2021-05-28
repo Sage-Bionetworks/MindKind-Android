@@ -501,10 +501,8 @@ open class ConversationSurveyActivity: AppCompatActivity() {
                     it.isChecked = true
                 }
 
-                val llp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT)
-                llp.bottomMargin = resources.getDimensionPixelSize(R.dimen.conversation_button_margin)
-                ll.addView(it, llp)
+                ll.addView(it, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT))
             }
         }
 
@@ -513,22 +511,21 @@ open class ConversationSurveyActivity: AppCompatActivity() {
 
             it.text = step.buttonTitle
             it.setOnClickListener {
-                val selected = ArrayList<String>()
+                val newSelected = ArrayList<String>()
                 for (i in 0..(choices.size-1)) {
                     val cb = ll.getChildAt(i) as CheckBox
                     if(cb.isChecked) {
-                        selected.add(choices[i].text)
+                        newSelected.add(choices[i].text)
                     }
                 }
 
-                val values = selected.joinToString()
+                val values = newSelected.joinToString()
                 addAnswer(step, values, values, scroll)
                 disableAllButtons()
             }
-            val llp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT)
-            llp.bottomMargin = resources.getDimensionPixelSize(R.dimen.conversation_button_margin)
-            button_container.addView(it, llp)
+            button_container.addView(it,
+                    LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT))
         }
 
         if(step.optional != false) {
