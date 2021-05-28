@@ -24,7 +24,9 @@ data class ConversationItem(
         val stepIdentifier: String,
         var text: String?,
         val isQuestion: Boolean,
-        val gifUrl: String? = null)
+        val linkWithNext: Boolean = false,
+        val gifUrl: String? = null,
+        val cannotEdit: Boolean = false)
 
 public interface ConversationAdapterListener {
     fun onConversationClicked(stepIdentifier: String, answer: String?, position: Int)
@@ -76,24 +78,26 @@ class ConversationAdapter(
         Log.i(LOG_TAG, "onBindViewHolder(): $position")
         val item = dataSet[position]
 
-        // TODO: for now allow long press on both question and answer
-        //if(item.isQuestion) {
+        if (item.cannotEdit) {
+            viewHolder.itemView.setOnLongClickListener(null)
+        } else {
+            // Allow long press on both question and answer
             viewHolder.itemView.setOnLongClickListener {
                 listener.onConversationClicked(item.stepIdentifier, findAnswer(item.stepIdentifier), position)
                 currentIdentifier = item.stepIdentifier
                 notifyDataSetChanged()
-                true
+                return@setOnLongClickListener true
             }
-        //}
+        }
+
+        // Only show as full alpha if the question is currently showing
+        // or it is linked with the currently showing step
+        val isFullAlpha = (item.stepIdentifier == currentIdentifier) ||
+                (item.linkWithNext && (position >= (dataSet.size - 2)))
 
         (viewHolder as? ChatViewHolder)?.let {
             it.textView.text = dataSet[position].text
-            it.container.alpha =
-                if (item.stepIdentifier != currentIdentifier) {
-                    0.45f
-                } else {
-                    1.0f
-                }
+            it.container.alpha = if (isFullAlpha) { 1.0f } else { 0.45f }
         }
 
         (viewHolder as? GifViewHolder)?.let {
@@ -119,8 +123,9 @@ class ConversationAdapter(
 
     override fun getItemCount() = dataSet.size
 
-    open fun addItem(stepId: String, message: String?, question: Boolean) {
-        val item = ConversationItem(stepId, message, question)
+    open fun addItem(stepId: String, message: String?, question: Boolean,
+                     linkWithNext: Boolean, cannotEdit: Boolean = false) {
+        val item = ConversationItem(stepId, message, question, linkWithNext, cannotEdit = cannotEdit)
         Log.d(LOG_TAG, "addItem(): $stepId - $question: $message")
         if(findExistingQuestion(item)) {
             if(!question) {
@@ -129,7 +134,7 @@ class ConversationAdapter(
                 currentIdentifier = dataSet.last().stepIdentifier
             }
         } else {
-            dataSet.add(ConversationItem(stepId, message, question))
+            dataSet.add(item)
             currentIdentifier = stepId
             notifyItemInserted(dataSet.size)
         }
@@ -180,7 +185,7 @@ class ConversationAdapter(
 
     open fun addGif(stepId: String, backupText: String, gifUrl: String) {
         Log.d(LOG_TAG, "addGif(): $stepId")
-        var item = ConversationItem(stepId, backupText, false, gifUrl)
+        val item = ConversationItem(stepId, backupText, false, gifUrl = gifUrl)
 
         val found =  dataSet.find {
             it.stepIdentifier == item.stepIdentifier

@@ -70,7 +70,6 @@ import org.sagebionetworks.bridge.android.manager.UploadManager
 import org.sagebionetworks.research.domain.Schema
 import org.sagebionetworks.research.domain.result.implementations.FileResultBase
 import org.sagebionetworks.research.domain.result.implementations.TaskResultBase
-import org.sagebionetworks.research.mindkind.R
 import org.sagebionetworks.research.mindkind.R.drawable
 import org.sagebionetworks.research.mindkind.R.string
 import org.sagebionetworks.research.mindkind.TaskListActivity
@@ -109,6 +108,9 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
 
         public const val SHOW_ENGAGEMENT_NOTIFICATION_ACTION =
                 "org.sagebionetworks.research.MindKind.ShowEngagementNotification"
+
+        public const val SETTINGS_CHANGED_ACTION =
+                "org.sagebionetworks.research.MindKind.SettingsChanged"
 
         private const val TASK_IDENTIFIER = SageTaskIdentifier.BACKGROUND_DATA
         private const val FOREGROUND_NOTIFICATION_ID = 100
@@ -193,6 +195,46 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
 
             editPrefs.commit()
         }
+
+        // List of data types to track
+        // This should be hooked up to the permission manager's list of data the user wants us to track
+        public val allDataTypes = listOf(
+                SageTaskIdentifier.ScreenTime,
+                SageTaskIdentifier.BatteryStatistics,
+                SageTaskIdentifier.ChargingTime,
+                SageTaskIdentifier.DataUsage,
+                SageTaskIdentifier.AmbientLight)
+
+        fun loadDataAllowedToBeTracked(sharedPrefs: SharedPreferences): List<String> {
+            return allDataTypes.filter {
+                // TODO: mdephillips 5/24/21 switch back to default to false before launch
+                //sharedPrefs.getBoolean("DataTracking$it", false)
+                sharedPrefs.getBoolean("DataTracking$it", true)
+            }
+        }
+
+        @SuppressLint("ApplySharedPref")
+        fun setDataAllowedToBeTracked(sharedPrefs: SharedPreferences,
+                                      dataToTrack: String, isTracking: Boolean) {
+            sharedPrefs.edit().putBoolean("DataTracking$dataToTrack", isTracking).commit()
+        }
+
+        fun notifySettingsChanged(context: Context) {
+            // Notify the service that data tracking has changed
+            val intent = Intent(context, BackgroundDataService::class.java)
+            intent.action = BackgroundDataService.SETTINGS_CHANGED_ACTION
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(intent)
+            } else {
+                context.startService(intent)
+            }
+        }
+
+        fun permanentlyStopSelf(context: Context) {
+            WorkUtils.cancelPeriodicWork(context, BridgeUploadWorker.periodicWorkName)
+            WorkUtils.cancelPeriodicWork(context, DataUsageWorker.periodicWorkName)
+            context.stopService(Intent(context, BackgroundDataService::class.java))
+        }
     }
 
     private lateinit var sharedPrefs: SharedPreferences
@@ -208,16 +250,10 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
     @Inject
     lateinit var uploadManager: UploadManager
 
-    // List of data types to track
-    // This should be hooked up to the permission manager's list of data the user wants us to track
-    public var dataToTrack = listOf(
-            SageTaskIdentifier.ScreenTime,
-            SageTaskIdentifier.BatteryStatistics,
-            SageTaskIdentifier.ChargingTime,
-            SageTaskIdentifier.DataUsage,
-            SageTaskIdentifier.AmbientLight)
-
     private var sensorManager: SensorManager? = null
+
+    // Updated onCreate and when the service gets settings changed commands
+    private var dataAllowedToBeTracked = listOf<String>()
 
     private val compositeDisposable = CompositeDisposable()
     /**
@@ -265,24 +301,18 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
         Log.d(TAG, "onCreate")
         super.onCreate()
 
+        isServiceRunning = true
+
         // Used for local data storage
         sharedPrefs = createSharedPrefs(this)
+
+        // Refresh the data that the service should be tracking
+        // It is important that this always stays up to date
+        dataAllowedToBeTracked = loadDataAllowedToBeTracked(sharedPrefs)
 
         // Setup daily wifi & charger upload worker
         WorkUtils.enqueueDailyWorkNetwork(this,
                 BridgeUploadWorker::class.java, BridgeUploadWorker.periodicWorkName)
-
-        // Setup data usage worker
-        if (dataToTrack.contains(SageTaskIdentifier.DataUsage)) {
-            WorkUtils.enqueueHourlyWork(this,
-                    DataUsageWorker::class.java,
-                    DataUsageWorker.periodicWorkName)
-        }
-        if (dataToTrack.contains(SageTaskIdentifier.AmbientLight)) {
-            handler.post(ambientLightRunnable)
-        }
-
-        isServiceRunning = true
 
         createNotificationChannel()
         createEngagementNotificationChannel()
@@ -294,16 +324,32 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
                 /* .addMigrations(*migrations) */
                 .build()
 
+        // If this is our first time running, mark a starting point for convo complete date
+        if (!sharedPrefs.contains(ConversationSurveyActivity.completedDateKey)) {
+            sharedPrefs.edit().putString(ConversationSurveyActivity.completedDateKey,
+                    LocalDateTime.now().toString()).apply()
+        }
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+                uploadDataReceiver, IntentFilter(ACTIVITY_UPLOAD_DATA_ACTION))
+
+        startBackgroundData()
+    }
+
+    private fun startBackgroundData() {
+
+        Log.d(TAG, "Starting background data $dataAllowedToBeTracked")
+
         // Register broadcast receivers
         val filter = IntentFilter().apply {
-            if (dataToTrack.contains(SageTaskIdentifier.ChargingTime)) {
+            if (dataAllowedToBeTracked.contains(SageTaskIdentifier.ChargingTime)) {
                 addAction(Intent.ACTION_POWER_CONNECTED)
                 addAction(Intent.ACTION_POWER_DISCONNECTED)
             }
-            if (dataToTrack.contains(SageTaskIdentifier.BatteryStatistics)) {
+            if (dataAllowedToBeTracked.contains(SageTaskIdentifier.BatteryStatistics)) {
                 addAction(Intent.ACTION_BATTERY_CHANGED)
             }
-            if (dataToTrack.contains(SageTaskIdentifier.ScreenTime)) {
+            if (dataAllowedToBeTracked.contains(SageTaskIdentifier.ScreenTime)) {
                 addAction(Intent.ACTION_USER_PRESENT)
                 addAction(Intent.ACTION_SCREEN_ON)
                 addAction(Intent.ACTION_SCREEN_OFF)
@@ -311,30 +357,35 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
         }
         registerReceiver(receiver, filter)
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(
-                uploadDataReceiver, IntentFilter(ACTIVITY_UPLOAD_DATA_ACTION))
+        // Setup data usage worker
+        if (dataAllowedToBeTracked.contains(SageTaskIdentifier.DataUsage)) {
+            WorkUtils.enqueueHourlyWork(this,
+                    DataUsageWorker::class.java,
+                    DataUsageWorker.periodicWorkName)
+        }
 
-        // If this is our first time running, mark a starting point for convo complete date
-        if (!sharedPrefs.contains(ConversationSurveyActivity.completedDateKey)) {
-            sharedPrefs.edit().putString(ConversationSurveyActivity.completedDateKey,
-                    LocalDateTime.now().toString()).apply()
+        if (dataAllowedToBeTracked.contains(SageTaskIdentifier.AmbientLight)) {
+            handler.post(ambientLightRunnable)
         }
     }
 
     override fun onDestroy() {
         Log.d(TAG, "onDestroy")
 
+        stopBackgroundData()
         LocalBroadcastManager.getInstance(this).unregisterReceiver(uploadDataReceiver)
-        unregisterReceiver(receiver)
         compositeDisposable.clear()
         stopForeground(true)
-
-        sensorManager?.unregisterListener(this)
-        handler.removeCallbacks(ambientLightRunnable)
 
         isServiceRunning = false
 
         super.onDestroy()
+    }
+
+    private fun stopBackgroundData() {
+        unregisterReceiver(receiver)
+        sensorManager?.unregisterListener(this)
+        handler.removeCallbacks(ambientLightRunnable)
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -367,8 +418,8 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
             }
 
             val taskResultList = mutableListOf<TaskResultBase>()
-            // Only upload data the user allowed to track
-            dataToTrack.forEach { taskIdentifier ->
+            // Upload all the data types we have data for
+            allDataTypes.forEach { taskIdentifier ->
                 val filtered = data.filter {
                     return@filter it.dataType == taskIdentifier
                 }
@@ -437,22 +488,15 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.d(TAG, "onStartCommand: startId = $startId")
 
-        if (intent?.action == WIFI_CHARGING_UPLOAD_DATA_ACTION) {
-            uploadDataToBridge()
+        when (intent?.action) {
+            WIFI_CHARGING_UPLOAD_DATA_ACTION -> uploadDataToBridge()
+            DATA_USAGE_RECEIVER_ACTION -> writeDataUsageToDatabase()
+            AMBIENT_LIGHT_WORKER_ACTION -> kickOffAmbientLightUpdates()
+            SHOW_ENGAGEMENT_NOTIFICATION_ACTION -> checkLastConversationCompleteDate(true)
+            SETTINGS_CHANGED_ACTION -> checkAllowedDataTypes()
         }
 
-        if (intent?.action == DATA_USAGE_RECEIVER_ACTION) {
-            writeDataUsageToDatabase()
-        }
-
-        if (intent?.action == AMBIENT_LIGHT_WORKER_ACTION) {
-            kickOffAmbientLightUpdates()
-        }
-
-        if (intent?.action == SHOW_ENGAGEMENT_NOTIFICATION_ACTION) {
-            checkLastConversationCompleteDate(true)
-        }
-
+        // Always check last conversation at this point
         checkLastConversationCompleteDate()
 
         return START_STICKY
@@ -467,9 +511,7 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
     private fun createForegroundNotification(text: String? = null): Notification {
         return Builder(this, FOREGROUND_CHANNEL_ID)
                 .setContentText(text ?: "")
-                .setSmallIcon(
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                            drawable.ic_launcher_foreground else R.mipmap.ic_launcher)
+                .setSmallIcon(drawable.ic_status_bar)
                 .setStyle(NotificationCompat.BigTextStyle()
                         .bigText(text ?: ""))
                 .build()
@@ -513,9 +555,7 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
 
         return Builder(this, ENGAGEMENT_CHANNEL_ID)
                 .setContentText(text ?: "")
-                .setSmallIcon(
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                            drawable.ic_launcher_foreground else R.mipmap.ic_launcher)
+                .setSmallIcon(drawable.ic_status_bar)
                 .setStyle(NotificationCompat.BigTextStyle()
                         .bigText(text ?: ""))
                 .setContentIntent(pendingIntent)
@@ -565,7 +605,7 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
     }
 
     private fun writeDataUsageToDatabase() {
-        if (!dataToTrack.contains(SageTaskIdentifier.DataUsage)) {
+        if (!dataAllowedToBeTracked.contains(SageTaskIdentifier.DataUsage)) {
             // User did not consent to have this tracked
             return
         }
@@ -590,7 +630,7 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
     }
 
     private fun kickOffAmbientLightUpdates() {
-        if (!dataToTrack.contains(SageTaskIdentifier.DataUsage)) {
+        if (!dataAllowedToBeTracked.contains(SageTaskIdentifier.DataUsage)) {
             // User did not consent to have this tracked
             return
         }
@@ -646,13 +686,26 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
         }
         val lastConvoDate = LocalDateTime.parse(lastConversationCompleteStr)
         val daysFromLastConvo = ChronoUnit.DAYS.between(lastConvoDate, LocalDateTime.now())
-        if (daysFromLastConvo >= ENGAGEMENT_TRIGGER_DAYS || debugForceShow) {
+        if ((daysFromLastConvo >= ENGAGEMENT_TRIGGER_DAYS) || debugForceShow) {
             val notification = createEngagementNotification(
                     getString(string.engagement_notification_title))
 
             val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.notify(ENGAGEMENT_REQUEST_CODE, notification)
         }
+    }
+
+    private fun checkAllowedDataTypes() {
+        val newAllowedDataTypes = loadDataAllowedToBeTracked(sharedPrefs)
+        // No need to update if data types are the same
+        if (dataAllowedToBeTracked.containsAll(newAllowedDataTypes) &&
+                newAllowedDataTypes.containsAll(dataAllowedToBeTracked)) {
+            return
+        }
+        // Update the data types and restart the background data trackers
+        dataAllowedToBeTracked = newAllowedDataTypes
+        stopBackgroundData()
+        startBackgroundData()
     }
 
     inner class BackgroundDataReceiver : BroadcastReceiver() {
