@@ -13,8 +13,8 @@ android {
         minSdkVersion 21
         targetSdkVersion 29
         // this is not the final version code, product flavors add to it
-        versionCode 2
-        versionName "0.2.0"
+        versionCode 3
+        versionName "0.3.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
@@ -46,20 +46,6 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             testProguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguardTest-rules.pro'
-        }
-    }
-
-    flavorDimensions "userRole"
-
-    productFlavors {
-        internal {
-            versionCode 1 + 2 * android.defaultConfig.versionCode
-            versionNameSuffix "-internal"
-            dimension "userRole"
-        }
-        participant {
-            versionCode 2 * android.defaultConfig.versionCode
-            dimension "userRole"
         }
     }
 

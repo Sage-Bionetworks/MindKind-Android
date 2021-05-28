@@ -1,0 +1,163 @@
+{
+  "identifier": "Withdrawal",
+  "type": "conversationSurvey",
+  "taskIdentifier": "Survey",
+  "schemaIdentifier": "Survey",
+  "isSchedule": true,
+  "steps": [
+    {
+      "identifier": "WITHDRAWAL_1",
+      "type": "singleChoice.wheel.string",
+      "title": "Which of these is your primary reason for withdrawing from the study?",
+      "buttonTitle": "Ok",
+      "choices": [
+        "I no longer have the time ",
+        "This was not what I thought \nI was signing up for",
+        "I found the questions \ntoo personal ",
+        "I was concerned about privacy",
+        "I was asked too many questions",
+        "The app made my phone work \npoorly (e.g.: battery drain, \nkeyboard started behaving oddly)",
+        "I did not like the GIFs",
+        "Other"
+      ]
+    },
+    {
+      "identifier": "WITHDRAWAL_2",
+      "type": "singleChoice.wheel.string",
+      "title": "Would you be more likely to stay in the study if we:",
+      "buttonTitle": "Ok",
+      "choices": [
+        "paid you a small amount \nof money? ",
+        "shared more information with \nyou about your mental health? ",
+        "allowed you to personalize the \nresearch experience for yourself? ",
+        "Other"
+      ]
+    },
+    {
+      "identifier": "WITHDRAWAL_INTRO",
+      "type": "instruction",
+      "title": "For each of the following statements, select which best describes your reactions to the MindKind Study app today. ",
+      "continueAfterDelay": true
+    },
+    {
+      "identifier": "WITHDRAWAL_UseApp",
+      "type": "singleChoice.integer",
+      "title": "I think that I would like to use the study app frequently. ",
+      "choices": [
+        { "text": "Strongly Disagree"        , "value": 0 },
+        { "text": "Disagree"        ,          "value": 1 },
+        { "text": "Undecided"    ,             "value": 2 },
+        { "text": "Agree"       ,              "value": 3 },
+        { "text": "Strongly Agree"  ,          "value": 4 }
+      ]
+    },
+    {
+      "identifier": "WITHDRAWAL_Complex",
+      "type": "singleChoice.integer",
+      "title": "I found the study app unnecessarily complex. ",
+      "choices": [
+        { "text": "Strongly Disagree"        , "value": 0 },
+        { "text": "Disagree"        ,          "value": 1 },
+        { "text": "Undecided"    ,             "value": 2 },
+        { "text": "Agree"       ,              "value": 3 },
+        { "text": "Strongly Agree"  ,          "value": 4 }
+      ]
+    },
+    {
+      "identifier": "WITHDRAWAL_Easy",
+      "type": "singleChoice.integer",
+      "title": "I thought the study app was easy to use.",
+      "choices": [
+        { "text": "Strongly Disagree"        , "value": 0 },
+        { "text": "Disagree"        ,          "value": 1 },
+        { "text": "Undecided"    ,             "value": 2 },
+        { "text": "Agree"       ,              "value": 3 },
+        { "text": "Strongly Agree"  ,          "value": 4 }
+      ]
+    },
+    {
+      "identifier": "WITHDRAWAL_Technical",
+      "type": "singleChoice.integer",
+      "title": "I think that I would need the support of a technical person to be able to use the study app. ",
+      "choices": [
+        { "text": "Strongly Disagree"        , "value": 0 },
+        { "text": "Disagree"        ,          "value": 1 },
+        { "text": "Undecided"    ,             "value": 2 },
+        { "text": "Agree"       ,              "value": 3 },
+        { "text": "Strongly Agree"  ,          "value": 4 }
+      ]
+    },
+    {
+      "identifier": "WITHDRAWAL_Integrated",
+      "type": "singleChoice.integer",
+      "title": "I found the various functions in the study app were well integrated. ",
+      "choices": [
+        { "text": "Strongly Disagree"        , "value": 0 },
+        { "text": "Disagree"        ,          "value": 1 },
+        { "text": "Undecided"    ,             "value": 2 },
+        { "text": "Agree"       ,              "value": 3 },
+        { "text": "Strongly Agree"  ,          "value": 4 }
+      ]
+    },
+    {
+      "identifier": "WITHDRAWAL_Inconsistent",
+      "type": "singleChoice.integer",
+      "title": "I thought there was too much inconsistency in the study app. ",
+      "choices": [
+        { "text": "Strongly Disagree"        , "value": 0 },
+        { "text": "Disagree"        ,          "value": 1 },
+        { "text": "Undecided"    ,             "value": 2 },
+        { "text": "Agree"       ,              "value": 3 },
+        { "text": "Strongly Agree"  ,          "value": 4 }
+      ]
+    },
+    {
+      "identifier": "WITHDRAWAL_Learn",
+      "type": "singleChoice.integer",
+      "title": "I would imagine that most people would learn to use the study app very quickly. ",
+      "choices": [
+        { "text": "Strongly Disagree"        , "value": 0 },
+        { "text": "Disagree"        ,          "value": 1 },
+        { "text": "Undecided"    ,             "value": 2 },
+        { "text": "Agree"       ,              "value": 3 },
+        { "text": "Strongly Agree"  ,          "value": 4 }
+      ]
+    },
+    {
+      "identifier": "WITHDRAWAL_Cumbersome",
+      "type": "singleChoice.integer",
+      "title": "I found the study app very cumbersome to use. ",
+      "choices": [
+        { "text": "Strongly Disagree"        , "value": 0 },
+        { "text": "Disagree"        ,          "value": 1 },
+        { "text": "Undecided"    ,             "value": 2 },
+        { "text": "Agree"       ,              "value": 3 },
+        { "text": "Strongly Agree"  ,          "value": 4 }
+      ]
+    },
+    {
+      "identifier": "WITHDRAWAL_Confident",
+      "type": "singleChoice.integer",
+      "title": "I felt very confident using the study app. ",
+      "choices": [
+        { "text": "Strongly Disagree"        , "value": 0 },
+        { "text": "Disagree"        ,          "value": 1 },
+        { "text": "Undecided"    ,             "value": 2 },
+        { "text": "Agree"       ,              "value": 3 },
+        { "text": "Strongly Agree"  ,          "value": 4 }
+      ]
+    },
+    {
+      "identifier": "WITHDRAWAL_Going",
+      "type": "singleChoice.integer",
+      "title": "I needed to learn a lot of things before I could get going with the study app. ",
+      "choices": [
+        { "text": "Strongly Disagree"        , "value": 0 },
+        { "text": "Disagree"        ,          "value": 1 },
+        { "text": "Undecided"    ,             "value": 2 },
+        { "text": "Agree"       ,              "value": 3 },
+        { "text": "Strongly Agree"  ,          "value": 4 }
+      ]
+    }
+  ]
+}
