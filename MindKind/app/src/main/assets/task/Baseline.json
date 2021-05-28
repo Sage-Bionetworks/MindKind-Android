@@ -1,0 +1,77 @@
+{
+  "identifier": "Baseline",
+  "type": "conversationSurvey",
+  "taskIdentifier": "Baseline",
+  "schemaIdentifier": "Baseline",
+  "isSchedule": true,
+  "steps": [
+    {
+      "identifier": "UK",
+      "schemaIdentifier": "UK",
+      "type": "nestedGroup",
+      "frequency": "once",
+      "userHasDataGroup": "UK",
+      "startDay": 1,
+      "filenames": [
+        "Demographics_Basic1",
+        "Demographics_Basic2_UK",
+        "Demographics_Basic3",
+        "Demographics_UK",
+        "BL_3_FoodInsecurity",
+        "BL_4.1_PHNXNeighborhood",
+        "BL_4.2_NeighborhoodCollective"
+      ]
+    },
+    {
+      "identifier": "IN",
+      "schemaIdentifier": "IN",
+      "type": "nestedGroup",
+      "frequency": "once",
+      "userHasDataGroup": "IN",
+      "startDay": 1,
+      "filenames": [
+        "Demographics_Basic1",
+        "Demographics_Basic2_India",
+        "Demographics_Basic3",
+        "Demographics_India",
+        "BL_3_FoodInsecurity",
+        "BL_4.1_PHNXNeighborhood",
+        "BL_4.2_NeighborhoodCollective"
+      ]
+    },
+    {
+      "identifier": "ZA",
+      "schemaIdentifier": "ZA",
+      "type": "nestedGroup",
+      "frequency": "once",
+      "userHasDataGroup": "ZA",
+      "startDay": 1,
+      "filenames": [
+        "Demographics_Basic1",
+        "Demographics_Basic2_SA",
+        "Demographics_Basic3",
+        "Demographics_SA",
+        "BL_3_FoodInsecurity",
+        "BL_4.1_PHNXNeighborhood",
+        "BL_4.2_NeighborhoodCollective"
+      ]
+    },
+    {
+      "identifier": "USTest",
+      "schemaIdentifier": "USTest",
+      "type": "nestedGroup",
+      "frequency": "once",
+      "userHasDataGroup": "US",
+      "startDay": 1,
+      "filenames": [
+        "Demographics_Basic1",
+        "Demographics_Basic2_UK",
+        "Demographics_Basic3",
+        "Demographics_UK",
+        "BL_3_FoodInsecurity",
+        "BL_4.1_PHNXNeighborhood",
+        "BL_4.2_NeighborhoodCollective"
+      ]
+    }
+  ]
+}

@@ -57,7 +57,7 @@
       "identifier": "UFI_3_SkipMeal",
       "type": "singleChoice.integer",
       "title": "In the last 12 months, did (you/you or other adults in your household) ever cut the size of your meals or skip meals because there wasn't enough money for food?",
-      "ifUserAnswers": "No | Don't Know, skip to UFI_4_EatLess",
+      "ifUserAnswers": "No, skip to UFI_4_EatLess",
       "choices": [{
         "text": "Yes",
         "value": 1

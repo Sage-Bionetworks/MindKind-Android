@@ -102,40 +102,16 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
                         "3 minutes",
                         "Social",
                         false),
+                TaskItem("Baseline",
+                        "Baseline Survey",
+                        "5 minutes",
+                        "Baseline",
+                        false)
                 )
         // Useful for development
 //          TaskItem("Playground",
 //                  "Ready to start your day.",
 //                  "Playground"))
-
-        // Now, add the the baseline survey that matches the locale of the user
-        // Currently no default action if there isn't an appropriate data group
-        val dataGroups = SageResearchStack.SageDataProvider.getInstance().userDataGroups
-        if (dataGroups.contains("UK")) {
-            taskItems.add(
-                    TaskItem("Baseline_UK",
-                            "Baseline Survey",
-                            "5 minutes",
-                            "Baseline_UK",
-                            false)
-            )
-        } else if (dataGroups.contains("ZA")) {
-            taskItems.add(
-                    TaskItem("Baseline_SA",
-                            "Baseline Survey",
-                            "5 minutes",
-                            "Baseline_SA",
-                            false)
-            )
-        } else if (dataGroups.contains("IN")) {
-            taskItems.add(
-                    TaskItem("Baseline_India",
-                            "Baseline Survey",
-                            "5 minutes",
-                            "Baseline_India",
-                            false)
-            )
-        }
 
         taskRecyclerView.addItemDecoration(SpacesItemDecoration(resources.getDimensionPixelSize(R.dimen.converation_recycler_spacing)))
         val adapter = TaskAdapter(taskItems, object : TaskAdapterListener {
