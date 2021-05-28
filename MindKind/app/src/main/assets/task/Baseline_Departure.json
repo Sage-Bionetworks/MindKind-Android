@@ -1,0 +1,14 @@
+{
+  "identifier": "Baseline_Departure",
+  "type": "conversationSurvey",
+  "taskIdentifier": "Baseline_Departure",
+  "schemaIdentifier": "Baseline_Departure",
+  "steps": [
+    {
+      "identifier": "DEMOG_Intro",
+      "type": "instruction",
+      "buttonTitle": "Done",
+      "title": "Thank you for taking the time to answer my questions."
+    }
+  ]
+}

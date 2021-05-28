@@ -19,7 +19,8 @@
         "Demographics_UK",
         "BL_3_FoodInsecurity",
         "BL_4.1_PHNXNeighborhood",
-        "BL_4.2_NeighborhoodCollective"
+        "BL_4.2_NeighborhoodCollective",
+        "Baseline_Departure"
       ]
     },
     {
@@ -36,7 +37,8 @@
         "Demographics_India",
         "BL_3_FoodInsecurity",
         "BL_4.1_PHNXNeighborhood",
-        "BL_4.2_NeighborhoodCollective"
+        "BL_4.2_NeighborhoodCollective",
+        "Baseline_Departure"
       ]
     },
     {
@@ -53,7 +55,8 @@
         "Demographics_SA",
         "BL_3_FoodInsecurity",
         "BL_4.1_PHNXNeighborhood",
-        "BL_4.2_NeighborhoodCollective"
+        "BL_4.2_NeighborhoodCollective",
+        "Baseline_Departure"
       ]
     },
     {
@@ -70,7 +73,8 @@
         "Demographics_UK",
         "BL_3_FoodInsecurity",
         "BL_4.1_PHNXNeighborhood",
-        "BL_4.2_NeighborhoodCollective"
+        "BL_4.2_NeighborhoodCollective",
+        "Baseline_Departure"
       ]
     }
   ]
