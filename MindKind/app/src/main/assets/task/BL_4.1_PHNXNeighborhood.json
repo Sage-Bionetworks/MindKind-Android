@@ -1,0 +1,54 @@
+{
+  "identifier": "BL_4_PHNX",
+  "type": "conversationSurvey",
+  "taskIdentifier": "BL_4_PHNX",
+  "schemaIdentifier": "BL_4_PHNX",
+  "steps": [
+      {
+        "identifier": "BL_PHNX_Intro",
+        "type": "instruction",
+        "title": "For the next three question please choose an answer that best relates to your situation:",
+        "continueAfterDelay": true
+      },
+      {
+        "identifier": "PHNX_1_SafeWalk",
+        "type": "singleChoice.integer",
+        "title": "I feel safe walking in my neighborhood, day or night.",
+        "choices": [
+          { "text": "Strongly Agree"                           ,               "value": 5 },
+          { "text": "Agree"                                   ,               "value": 4 },
+          { "text": "Neutral (neither agree, nor disagree)"   ,               "value": 3 },
+          { "text": "Strongly Disagree"                        ,               "value": 2 },
+          { "text": "Disagree"                                ,               "value": 1 },
+          { "text": "Strongly Disagree"                       ,               "value": 0 }
+        ]
+      },
+        {
+        "identifier": "PHNX_2_Violence",
+        "type": "singleChoice.integer",
+        "title": "Violence is not a problem in my neighborhood.",
+        "choices": [
+          { "text": "Strongly Agree"                           ,               "value": 5 },
+          { "text": "Agree"                                   ,               "value": 4 },
+          { "text": "Neutral (neither agree, nor disagree)"   ,               "value": 3 },
+          { "text": "Strongly Disagree"                        ,               "value": 2 },
+          { "text": "Disagree"                                ,               "value": 1 },
+          { "text": "Strongly Disagree"                       ,               "value": 0 }
+        ]
+      },
+        {
+        "identifier": "PHNX_3_Crime",
+        "type": "singleChoice.integer",
+        "title": "My neighborhood is safe from crime.",
+        "choices": [
+          { "text": "Strongly Agree"                           ,               "value": 5 },
+          { "text": "Agree"                                   ,               "value": 4 },
+          { "text": "Neutral (neither agree, nor disagree)"   ,               "value": 3 },
+          { "text": "Strongly Disagree"                        ,               "value": 2 },
+          { "text": "Disagree"                                ,               "value": 1 },
+          { "text": "Strongly Disagree"                       ,               "value": 0 }
+        ]
+
+      }
+    ]
+}

@@ -55,6 +55,7 @@ import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataServic
 import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService.Companion.isConversationComplete
 import org.sagebionetworks.research.mindkind.conversation.*
 import org.sagebionetworks.research.mindkind.research.SageTaskIdentifier
+import org.sagebionetworks.research.mindkind.researchstack.framework.SageResearchStack
 import org.sagebionetworks.research.mindkind.settings.SettingsActivity
 import org.sagebionetworks.research.sageresearch.dao.room.AppConfigRepository
 import org.sagebionetworks.research.sageresearch.dao.room.ReportRepository
@@ -101,45 +102,40 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
                         "3 minutes",
                         "Social",
                         false),
-                TaskItem("UCLA_Loneliness",
-                        "Loneliness",
-                        "2 minutes",
-                        "2C_Loneliness",
-                        false),
-                TaskItem("3M_IPAQ",
-                        "Activity Survey",
-                        "4 minutes",
-                        "3M_IPAQ",
-                        false),
-                TaskItem("4P_BADS",
-                        "Choices Survey",
-                        "5 minutes",
-                        "4P_BADS",
-                        false)
                 )
         // Useful for development
 //          TaskItem("Playground",
 //                  "Ready to start your day.",
 //                  "Playground"))
-        // Now add the locale appropriate Demographics Survey
-        taskItems.add(TaskItem("Demographics_UK",
-                "Demographics UK",
-                "3 minutes",
-                "Demographics_UK",
-                false
-        ))
-        taskItems.add(TaskItem("Demographics_India",
-                "Demographics India",
-                "3 minutes",
-                "Demographics_India",
-                false
-        ))
-        taskItems.add(TaskItem("Demographics_SouthAfrica",
-                "Demographics South Africa",
-                "3 minutes",
-                "Demographics_SouthAfrica",
-                false
-        ))
+
+        // Now, add the the baseline survey that matches the locale of the user
+        // Currently no default action if there isn't an appropriate data group
+        val dataGroups = SageResearchStack.SageDataProvider.getInstance().userDataGroups
+        if (dataGroups.contains("UK")) {
+            taskItems.add(
+                    TaskItem("Baseline_UK",
+                            "Baseline Survey",
+                            "5 minutes",
+                            "Baseline_UK",
+                            false)
+            )
+        } else if (dataGroups.contains("ZA")) {
+            taskItems.add(
+                    TaskItem("Baseline_SA",
+                            "Baseline Survey",
+                            "5 minutes",
+                            "Baseline_SA",
+                            false)
+            )
+        } else if (dataGroups.contains("IN")) {
+            taskItems.add(
+                    TaskItem("Baseline_India",
+                            "Baseline Survey",
+                            "5 minutes",
+                            "Baseline_India",
+                            false)
+            )
+        }
 
         taskRecyclerView.addItemDecoration(SpacesItemDecoration(resources.getDimensionPixelSize(R.dimen.converation_recycler_spacing)))
         val adapter = TaskAdapter(taskItems, object : TaskAdapterListener {

@@ -1,0 +1,135 @@
+{
+  "identifier": "BL_3_UFoodInsecurity",
+  "type": "conversationSurvey",
+  "taskIdentifier": "BL_3_UFoodInsecurity",
+  "schemaIdentifier": "BL_3_UFoodInsecurity",
+  "steps": [{
+    "identifier": "BL_3_UFoodInsecurity_Intro",
+    "type": "instruction",
+    "title": "Please tell us whether the following statements are often true, sometimes true, or never true for (you/your household) in the last 12 months.",
+    "continueAfterDelay": true
+  },
+    {
+      "identifier": "UFI_1_FoodMoney",
+      "type": "singleChoice.integer",
+      "title": "The food that (I/we) bought just didn’t last, and (I/we) didn’t have money to get more.",
+      "choices": [{
+        "text": "Often True",
+        "value": 0
+      },
+        {
+          "text": "Sometimes True",
+          "value": 1
+        },
+        {
+          "text": "Never True",
+          "value": 2
+        },
+        {
+          "text": "Don't Know or Refuse to answer",
+          "value": -1
+        }
+      ]
+    },
+    {
+      "identifier": "UFI_2_BalancedMeals",
+      "type": "singleChoice.integer",
+      "title": "(I/we) couldn’t afford to eat balanced meals.",
+      "choices": [{
+        "text": "Often True",
+        "value": 0
+      },
+        {
+          "text": "Sometimes True",
+          "value": 1
+        },
+        {
+          "text": "Never True",
+          "value": 2
+        },
+        {
+          "text": "Don't Know or Refuse to answer",
+          "value": -1
+        }
+      ]
+    },
+    {
+      "identifier": "UFI_3_SkipMeal",
+      "type": "singleChoice.integer",
+      "title": "In the last 12 months, did (you/you or other adults in your household) ever cut the size of your meals or skip meals because there wasn't enough money for food?",
+      "ifUserAnswers": "No | Don't Know, skip to UFI_4_EatLess",
+      "choices": [{
+        "text": "Yes",
+        "value": 1
+      },
+        {
+          "text": "No",
+          "value": 0
+        },
+        {
+          "text": "Don't Know",
+          "value": -1
+        }
+      ]
+    },
+    {
+      "identifier": "UFI_3a_HowOftenSkip",
+      "type": "singleChoice.integer",
+      "title": "How often did this happen?",
+      "choices": [{
+        "text": "Almost every month",
+        "value": 0
+      },
+        {
+          "text": "Some months but not every month",
+          "value": 1
+        },
+        {
+          "text": "Only 1 or 2 months",
+          "value": 2
+        },
+        {
+          "text": "Don't Know",
+          "value": -1
+        }
+      ]
+    },
+    {
+      "identifier": "UFI_4_EatLess",
+      "type": "singleChoice.integer",
+      "title": "In the last 12 months, did you ever eat less than you felt you should because there wasn't enough money for food? ",
+      "choices": [{
+        "text": "Yes",
+        "value": 1
+      },
+        {
+          "text": "No",
+          "value": 0
+        },
+        {
+          "text": "Don't Know",
+          "value": -1
+        }
+      ]
+    },
+    {
+      "identifier": "UFI_5_Hungry",
+      "type": "singleChoice.integer",
+      "title": "In the last 12 months, were you ever hungry but didn't eat because there wasn't enough money for food?",
+      "choices": [{
+        "text": "Yes",
+        "value": 1
+      },
+        {
+          "text": "No",
+          "value": 0
+        },
+        {
+          "text": "Don't Know",
+          "value": -1
+        }
+      ]
+
+    }
+  ]
+}

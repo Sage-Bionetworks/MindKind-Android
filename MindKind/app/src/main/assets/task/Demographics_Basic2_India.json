@@ -1,0 +1,23 @@
+{
+  "identifier": "Demographics_Basic2_India",
+  "type": "conversationSurvey",
+  "taskIdentifier": "Demographics_Basic2_India",
+  "schemaIdentifier": "Demographics_Basic2_India",
+  "steps": [
+
+    {
+      "identifier": "DEMOG_RACE_ETH_INDIA",
+      "type": "singleChoice.wheel.string",
+      "title": "What is the caste or tribe of the head of the household?",
+      "buttonTitle": "Ok",
+      "choices": [
+        "Scheduled caste",
+        "Scheduled tribe",
+        "Other backward class",
+        "General",
+        "Don't know",
+        "Prefer not to say"
+      ]
+    }
+  ]
+}

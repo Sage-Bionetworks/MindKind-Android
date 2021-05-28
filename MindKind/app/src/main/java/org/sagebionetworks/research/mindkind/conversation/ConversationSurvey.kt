@@ -110,6 +110,7 @@ class ConversationGsonHelper {
             return when(step.frequency) {
                 NestedGroupFrequency.weekly -> progress.dayOfWeek == step.startDay
                 NestedGroupFrequency.weeklyRandom -> progress.dayOfWeek == (1..7).shuffled().first()
+                //NestedGroupFrequency.once -> progress !=
                 else /* .daily */ -> progress.daysFromStart >= step.startDay
             }
         }
@@ -310,4 +311,6 @@ public enum class NestedGroupFrequency(val type: String) {
     weeklyRandom("weeklyRandom"),
     @SerializedName("daily")
     daily("daily"),
+    @SerializedName("once")
+    once("once")
 }
