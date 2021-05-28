@@ -32,6 +32,19 @@
       "buttonTitle": "Ok"
     },
     {
+      "identifier": "question_multi_choice_checkbox",
+      "type": "multiChoice.checkbox.string",
+      "title": "How many of these statements apply to you?",
+      "choices": [
+        { "text": "I love waterpolo"      ,             "value": "0" },
+        { "text": "I was born on a Wednesday"   ,       "value": "1" },
+        { "text": "I have never been on an airplane"   ,"value": "2" },
+        { "text": "I enjoy playing the banjo",          "value": "3" },
+        { "text": "I sometimes forget to wakeup"   ,    "value": "4 "}
+      ],
+      "buttonTitle": "Ok"
+    },
+    {
       "identifier": "text_entry_age",
       "type": "text",
       "title": "How much time did you spend exercising today? (in minutes)",

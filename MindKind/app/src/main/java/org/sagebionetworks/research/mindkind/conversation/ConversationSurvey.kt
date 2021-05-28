@@ -147,6 +147,9 @@ class ConversationGsonHelper {
                     .registerSubtype(
                             ConversationSingleChoiceWheelStringStep::class.java,
                             ConversationStepType.singleChoiceWheelString.type)
+                    .registerSubtype(
+                            ConversationMultiChoiceCheckboxStringStep::class.java,
+                            ConversationStepType.multiChoiceCheckboxString.type)
         }
     }
 }
@@ -240,6 +243,16 @@ data class ConversationSingleChoiceWheelStringStep(
         override val optional: Boolean? = true
 ): ConversationStep()
 
+data class ConversationMultiChoiceCheckboxStringStep(
+        override val identifier: String,
+        override val type: String,
+        override val title: String,
+        override val buttonTitle: String,
+        val choices: List<StringConversationInputFieldChoice>,
+        override val ifUserAnswers: String? = null,
+        override val optional: Boolean? = true
+): ConversationStep()
+
 data class IntegerConversationInputFieldChoice(
         val text: String,
         val value: Int)
@@ -298,7 +311,8 @@ public enum class ConversationStepType(val type: String) {
     gif("gif"),
     nested("nested"),
     nestedGroup("nestedGroup"),
-    randomTitle("instruction.random")
+    randomTitle("instruction.random"),
+    multiChoiceCheckboxString("multiChoice.checkbox.string")
 }
 
 public enum class NestedGroupFrequency(val type: String) {
