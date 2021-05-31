@@ -179,10 +179,10 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
         fun isConversationComplete(sharedPreferences: SharedPreferences, identifier: String): Boolean {
             val progress = progressInStudy(sharedPreferences)
             sharedPreferences.getStringSet(completedTasksKey, null)?.let {
-                if (ONE_TIME_SURVEYS.contains(identifier)) {
-                    return it.contains("$identifier")
+                return if (ONE_TIME_SURVEYS.contains(identifier)) {
+                    it.contains(identifier)
                 } else {
-                    return it.contains("$identifier $progress")
+                    it.contains("$identifier $progress")
                 }
             }
             return false
@@ -197,11 +197,11 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
 
             val prev = sharedPreferences.getStringSet(completedTasksKey, null)
                     ?.toMutableSet() ?: mutableSetOf()
-            if (ONE_TIME_SURVEYS.contains(identifier)) {
-                prev.add("$identifier")
+            prev.add( if (ONE_TIME_SURVEYS.contains(identifier)) {
+                identifier
             } else {
-                prev.add("$identifier $progress")
-            }
+                "$identifier $progress"
+            })
             editPrefs.putStringSet(completedTasksKey, prev)
 
             editPrefs.commit()
