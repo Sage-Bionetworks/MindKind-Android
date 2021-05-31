@@ -1,0 +1,70 @@
+{
+  "identifier": "Demographics_SouthAfrica",
+  "type": "conversationSurvey",
+  "taskIdentifier": "Demographics_SouthAfrica",
+  "schemaIdentifier": "Demographics_SouthAfrica",
+  "measureType": "MindKindInternal", 
+  "steps": [
+    {
+      "identifier": "DEMOG_SA_EDU",
+      "type": "singleChoice.integer",
+      "title": "What is your highest level of education?",
+      "choices": [
+        { "text": "Below high school"     ,         "value": 0 },
+        { "text": "College"               ,         "value": 1 },
+        { "text": "University"            ,         "value": 2 },
+        { "text": "Post-graduate"         ,         "value": 3 }
+      ]
+    },
+    {
+      "identifier": "DEMOG_SA_COMM",
+      "type": "singleChoice.wheel.string",
+      "title": "What best describes the type of residential community you call home?",
+      "buttonTitle": "Ok",
+      "choices": [
+        "City",
+        "Suburb",
+        "Township",
+        "Informal settlement",
+        "Rural (Traditional tribal area)",
+        "Farm",
+        "Prefer not to say"
+      ]
+    },
+    {
+      "identifier": "DEMOG_SA_DWELLING",
+      "type": "singleChoice.wheel.string",
+      "title": "In the place you call home, what type of dwelling is it?",
+      "buttonTitle": "Ok",
+      "choices": [
+        "A brick house",
+        "An apartment/flat",
+        "A shack",
+        "A hut",
+        "A house made of mud and stick",
+        "A house made of mud bricks and thatch",
+        "A house made of wood and iron sheet (Tin)",
+        "Wendy house / backyard dweller",
+        "Prefer not to say"
+      ]
+    },
+    {
+     "identifier": "DEMOG_SA_ELEC",
+      "type": "singleChoice.integer",
+      "title": "Does your home have electricity?",
+      "choices": [
+        { "text": "Yes"                     ,         "value": 0 },
+        { "text": "No"                      ,         "value": 1 }
+      ]
+    },
+    {
+     "identifier": "DEMOG_SA_WATER",
+      "type": "singleChoice.integer",
+      "title": "Does your home have running water?",
+      "choices": [
+        { "text": "Yes"                     ,         "value": 0 },
+        { "text": "No"                      ,         "value": 1 }
+      ]
+    }
+  ]
+}

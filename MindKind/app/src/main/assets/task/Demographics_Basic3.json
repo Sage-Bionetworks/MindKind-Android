@@ -1,0 +1,106 @@
+{
+  "identifier": "Demographics_Basic_Part1",
+  "type": "conversationSurvey",
+  "taskIdentifier": "Demographics_Basic_Part1",
+  "schemaIdentifier": "Demographics_Basic_Part1",
+  "steps": [
+    {
+      "identifier": "DEMOG_SEXUALITY",
+      "type": "singleChoice.wheel.string",
+      "title": "Do you consider yourself to be:",
+      "buttonTitle": "Ok",
+      "choices": [
+        "Gay",
+        "Heterosexual or straight",
+        "Lesbian",
+        "Bisexual",
+        "Other",
+        "Prefer not to say"
+      ]
+    },
+    {
+      "identifier": "DEMOG_SOC_ECON_Intro",
+      "type": "instruction",
+      "title": "We have found that the circumstances you have grown up in can be an important part of how you see this world. The next set of questions will ask you about the basic resources you have to make ends meet. Like all other questions, these are optional.",
+      "continueAfterDelay": true
+    },
+    {
+      "identifier": "DEMOG_SOC_CLASS",
+      "type": "singleChoice.wheel.string",
+      "title": "Would you consider your family to be:",
+      "buttonTitle": "Ok",
+      "choices": [
+        "Poor",
+        "Working class",
+        "Lower middle class",
+        "Upper middle class",
+        "Upper class",
+        "Prefer not to say"
+      ]
+    },
+    {
+      "identifier": "DEMOG_JOB",
+      "type": "multiChoice.checkbox.string",
+      "title": "Choose all the people in your household who have a paying job.",
+      "choices": [
+        { "text": "Mother"      ,             "value": "Mother" },
+        { "text": "Father"   ,                "value": "Father" },
+        { "text": "Siblings"   ,              "value": "Siblings" },
+        { "text": "Aunt/Uncle",               "value": "Aunt/Uncle" },
+        { "text": "Grandfather"   ,           "value": "Grandfather"},
+        { "text": "Grandmother"   ,           "value": "Grandmother"},
+        { "text": "Boyfriend/Girlfriend"   ,  "value": "Boyfriend/Girlfriend"},
+        { "text": "Other"   ,                 "value": "Other"},
+        { "text": "Prefer not to say"   ,     "value": "Prefer not to say"}
+      ],
+      "buttonTitle": "Ok"
+    },
+    {
+      "identifier": "DEMOG_ADULTS",
+      "type": "integer",
+      "title": "How many adults besides you live with you?",
+      "buttonTitle": "Ok",
+      "min": 0,
+      "max": 9
+    },
+    {
+      "identifier": "DEMOG_CHILDREN",
+      "type": "integer",
+      "title": "How many children live with you?",
+      "buttonTitle": "Ok",
+      "min": 0,
+      "max": 9
+    },
+    {
+      "identifier": "DEMOG_HOUSE",
+      "type": "singleChoice.wheel.string",
+      "title": "Do you live in a...",
+      "buttonTitle": "Ok",
+      "choices": [
+        "House (own, rent, other)",
+        "Apartment (own, rent, other)",
+        "Dormitory",
+        "Shelter",
+        "No fixed address"
+      ]
+    },
+    {
+      "identifier": "DEMOG_FOOD",
+      "type": "singleChoice.integer",
+      "title": "Are you or others in your household worried about not having enough food to eat because of a lack of money or other resources?",
+      "choices": [{
+        "text": "Yes",
+        "value": 0
+      },
+        {
+          "text": "No",
+          "value": 1
+        },
+        {
+          "text": "Prefer not to say",
+          "value": -1
+        }
+      ]
+    }
+  ]
+}

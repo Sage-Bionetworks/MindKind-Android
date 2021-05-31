@@ -1,0 +1,22 @@
+{
+  "identifier": "Demographics_Basic2_UK",
+  "type": "conversationSurvey",
+  "taskIdentifier": "Demographics_Basic2_UK",
+  "schemaIdentifier": "Demographics_Basic2_UK",
+  "steps": [
+    {
+      "identifier": "DEMOG_RACE_ETH_UK",
+      "type": "singleChoice.wheel.string",
+      "title": "What is your Race / Ethnicity?",
+      "buttonTitle": "Ok",
+      "choices": [
+        "White",
+        "Mixed / Multiple ethnic groups",
+        "Asian / Asian British",
+        "Black / African / Caribbean / Black British",
+        "Other ethnic group",
+        "Prefer not to say"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "identifier": "Demographics_Basic_Part1",
+  "type": "conversationSurvey",
+  "taskIdentifier": "Demographics_Basic_Part1",
+  "schemaIdentifier": "Demographics_Basic_Part1",
+  "steps": [
+    {
+      "identifier": "DEMOG_Intro",
+      "type": "instruction",
+      "title": "Thanks for agreeing to be part of our team as we build a better way to understand emotional health. We want to take a few minutes to get to know you better. Some of these questions will be easy, some rather personal, and some may not apply to you. Answer as best as you can, and as a volunteer, you can skip questions we ask of you.",
+      "buttonTitle": "Ok",
+      "optional": false
+  },
+    {
+      "identifier": "DEMOG_BIRTH_SEX",
+      "type": "singleChoice.integer",
+      "title": "What sex were you assigned at birth?",
+      "choices": [{
+        "text": "Female",
+        "value": 0
+      },
+        {
+          "text": "Male",
+          "value": 1
+        },
+        {
+          "text": "Intersex",
+          "value": 2
+        },
+        {
+          "text": "Other",
+          "value": 3
+        },
+        {
+          "text": "Prefer not to say",
+          "value": -1
+        }
+      ]
+    }
+  ]
+}

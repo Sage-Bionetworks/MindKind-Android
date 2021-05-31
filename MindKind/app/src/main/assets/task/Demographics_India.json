@@ -1,0 +1,101 @@
+{
+  "identifier": "Demographics_India",
+  "type": "conversationSurvey",
+  "taskIdentifier": "Demographics_India",
+  "schemaIdentifier": "Demographics_India",
+  "measureType": "MindKindInternal", 
+  "steps": [
+    {
+      "identifier": "DEMOG_INDIA_EDU",
+      "type": "singleChoice.integer",
+      "title": "What is your highest level of education?",
+      "choices": [
+        { "text": "Up to 10th grade"               ,         "value": 0 },
+        { "text": "Up to 12h grade"                ,         "value": 1 },
+        { "text": "Undergraduate"                  ,         "value": 2 },
+        { "text": "Postgraduate and above"         ,         "value": 3 }
+      ]
+    },
+    {
+      "identifier": "DEMOG_INDIA_H20",
+      "type": "singleChoice.integer",
+      "title": "What is the main source of drinking water for members of your household?",
+      "choices": [
+        { "text": "Piped water"         ,         "value": 0 },
+        { "text": "Dug well"            ,         "value": 1 },
+        { "text": "Water from spring"   ,         "value": 2 },
+        { "text": "Prefer not to say"   ,         "value": -1 }
+      ]
+    },
+    {
+      "identifier": "DEMOG_INDIA_TOILET",
+      "type": "singleChoice.wheel.string",
+      "title": "What kind of toilet facility do members of your household usually use?",
+      "buttonTitle": "Ok",
+      "choices": [
+        "Flush or Pour Flush Toilet",
+        "Pit Latrine"
+      ]
+    },
+    {
+      "identifier": "DEMOG_INDIA_SHARE_TOILET",
+      "type": "singleChoice.integer",
+      "title": "Do you share this toilet facility with other households?",
+      "choices": [
+        { "text": "Yes"                     ,         "value": 0 },
+        { "text": "No"                      ,         "value": 1 },
+        { "text": "Prefer not to say"       ,         "value": -1 }
+      ]
+    },
+    {
+      "identifier": "DEMOG_INDIA_RELIGION",
+      "type": "singleChoice.wheel.string",
+      "title": "What is the religion of the head of the household?",
+      "buttonTitle": "Ok",
+      "choices": [
+        "Hindu",
+        "Muslim",
+        "Christian",
+        "Buddhist/Neo-Buddhist",
+        "Jain",
+        "Jewish",
+        "Parsi/Zoroastrian",
+        "Sikh",
+        "No Religion",
+        "Other",
+        "Prefer not to say"
+      ]
+    },
+    {
+      "identifier": "DEMOG_INDIA_ROOMS",
+      "type": "integer",
+      "title": "How many rooms in this household are used for sleeping?",
+      "buttonTitle": "Ok",
+      "min": 0,
+      "max": 9
+    },
+    {
+      "identifier": "DEMOG_INDIA_HEALTH_INS",
+      "type": "singleChoice.integer",
+      "title": "Is any usual member of this household covered by a health scheme or health insurance?",
+      "choices": [
+        { "text": "Yes"                     ,         "value": 0 },
+        { "text": "No"                      ,         "value": 1 },
+        { "text": "Prefer not to say"       ,         "value": -1 }
+      ]
+    },
+    {
+      "identifier": "DEMOG_INDIA_SICK",
+      "type": "singleChoice.wheel.string",
+      "title": "When members of your household get sick, where do they generally go for treatment?",
+      "buttonTitle": "Ok",
+      "choices": [
+        "Gov't Care Facility/Hospital",
+        "Ayush",
+        "Private Health Sectore",
+        "Other",
+        "Prefer not to say"
+      ]
+    }
+  ]
+}

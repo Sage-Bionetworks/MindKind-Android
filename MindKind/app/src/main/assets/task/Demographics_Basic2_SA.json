@@ -1,0 +1,22 @@
+{
+  "identifier": "Demographics_Basic2_SA",
+  "type": "conversationSurvey",
+  "taskIdentifier": "Demographics_Basic2_SA",
+  "schemaIdentifier": "Demographics_Basic2_SA",
+  "steps": [
+    {
+      "identifier": "DEMOG_RACE_ETH_SA",
+      "type": "singleChoice.wheel.string",
+      "title": "To which population group do you belong?",
+      "buttonTitle": "Ok",
+      "choices": [
+        "Black African",
+        "White",
+        "Coloured",
+        "Indian/Asian",
+        "Other",
+        "Prefer not to say"
+      ]
+    }
+  ]
+}

@@ -55,6 +55,7 @@ import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataServic
 import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService.Companion.isConversationComplete
 import org.sagebionetworks.research.mindkind.conversation.*
 import org.sagebionetworks.research.mindkind.research.SageTaskIdentifier
+import org.sagebionetworks.research.mindkind.researchstack.framework.SageResearchStack
 import org.sagebionetworks.research.mindkind.settings.SettingsActivity
 import org.sagebionetworks.research.sageresearch.dao.room.AppConfigRepository
 import org.sagebionetworks.research.sageresearch.dao.room.ReportRepository
@@ -100,7 +101,13 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
                         "Social",
                         "3 minutes",
                         "Social",
-                        false))
+                        false),
+                TaskItem(BackgroundDataService.BASELINE_IDENTIFIER_KEY,
+                        "Baseline Survey",
+                        "5 minutes",
+                        "Baseline",
+                        false)
+                )
         // Useful for development
 //          TaskItem("Playground",
 //                  "Ready to start your day.",

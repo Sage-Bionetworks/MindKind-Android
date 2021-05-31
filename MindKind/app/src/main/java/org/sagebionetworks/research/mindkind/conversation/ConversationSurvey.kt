@@ -10,6 +10,7 @@ import org.joda.time.DateTime
 import org.joda.time.Days
 import org.sagebionetworks.research.domain.RuntimeTypeAdapterFactory
 import org.sagebionetworks.research.mindkind.backgrounddata.ProgressInStudy
+import org.sagebionetworks.research.mindkind.researchstack.framework.SageResearchStack
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.lang.Exception
@@ -46,6 +47,7 @@ class ConversationGsonHelper {
         fun createSurvey(context: Context, jsonFilename: String, progress: ProgressInStudy): ConversationSurvey? {
             val gson = createGson()
             val json = stringFromJsonAsset(context, jsonFilename)
+            val dataGroups = SageResearchStack.SageDataProvider.getInstance().userDataGroups
 
             val conversation: ConversationSurvey?
             try {
@@ -64,6 +66,11 @@ class ConversationGsonHelper {
             if (conversation.isSchedule == true) {
                 conversation.steps.filter {
                     val ngStep = (it as? NestedGroupStep) ?: run { return@filter false }
+                    ngStep.userHasDataGroup?.let { dataGroup ->
+                        if (!dataGroups.contains(dataGroup)) {
+                            return@filter false
+                        }
+                    }
                     return@filter shouldInclude(ngStep, progress)
                 }.sortedBy {
                     return@sortedBy (it as? NestedGroupStep)?.frequency?.ordinal
@@ -110,6 +117,7 @@ class ConversationGsonHelper {
             return when(step.frequency) {
                 NestedGroupFrequency.weekly -> progress.dayOfWeek == step.startDay
                 NestedGroupFrequency.weeklyRandom -> progress.dayOfWeek == (1..7).shuffled().first()
+                NestedGroupFrequency.once -> true
                 else /* .daily */ -> progress.daysFromStart >= step.startDay
             }
         }
@@ -289,7 +297,8 @@ data class NestedGroupStep(
         val schemaIdentifier: String,
         val filenames: List<String>,
         val frequency: NestedGroupFrequency?,
-        val startDay: Int): ConversationStep()
+        val startDay: Int,
+        val userHasDataGroup: String?): ConversationStep()
 
 data class RandomTitleStep(
         override val identifier: String,
@@ -324,4 +333,6 @@ public enum class NestedGroupFrequency(val type: String) {
     weeklyRandom("weeklyRandom"),
     @SerializedName("daily")
     daily("daily"),
+    @SerializedName("once")
+    once("once")
 }

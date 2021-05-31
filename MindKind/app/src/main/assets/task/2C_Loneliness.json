@@ -1,0 +1,45 @@
+{
+  "identifier": "UCLA_Loneliness",
+  "type": "conversationSurvey",
+  "taskIdentifier": "UCLA_Loneliness",
+  "schemaIdentifier": "UCLA_Loneliness",
+  "measureType": "Validated", 
+  "steps": [
+    {
+      "identifier": "UCLA_Loneliness",
+      "type": "instruction",
+      "title": "The next questions are about how you feel about different aspects of your life. For each one, tell me how often you feel that way.",
+      "buttonTitle": "Ok"
+    },
+    {
+      "identifier": "UCLA_1_Company",
+      "type": "singleChoice.integer",
+      "title": "How often do you feel that you lack companionship",
+      "choices": [
+        { "text": "Hardly Ever"         ,       "value": 1 },
+        { "text": "Some of the Time "   ,       "value": 2 },
+        { "text": "Often "              ,       "value": 3 }
+      ]
+    },
+     {
+      "identifier": "UCLA_2_Leftout",
+      "type": "singleChoice.integer",
+      "title": "How often do you feel left out",
+      "choices": [
+        { "text": "Hardly Ever"         ,       "value": 1 },
+        { "text": "Some of the Time "   ,       "value": 2 },
+        { "text": "Often "              ,       "value": 3 }
+      ]
+    },
+     {
+      "identifier": "UCLA_3_Isolated",
+      "type": "singleChoice.integer",
+      "title": "How often do you feel isolated from others",
+      "choices": [
+        { "text": "Hardly Ever"         ,       "value": 1 },
+        { "text": "Some of the Time "   ,       "value": 2 },
+        { "text": "Often "              ,       "value": 3 }
+      ]
+    }
+  ]
+}
