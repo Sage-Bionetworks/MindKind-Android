@@ -117,7 +117,7 @@ class ConversationGsonHelper {
             return when(step.frequency) {
                 NestedGroupFrequency.weekly -> progress.dayOfWeek == step.startDay
                 NestedGroupFrequency.weeklyRandom -> progress.dayOfWeek == (1..7).shuffled().first()
-                NestedGroupFrequency.once -> true  // TODO: check shared prefs if task is already complete
+                NestedGroupFrequency.once -> true
                 else /* .daily */ -> progress.daysFromStart >= step.startDay
             }
         }

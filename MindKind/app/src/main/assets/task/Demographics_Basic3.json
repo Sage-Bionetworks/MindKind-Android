@@ -40,7 +40,7 @@
     },
     {
       "identifier": "DEMOG_JOB",
-      "type": "singleChoice.wheel.string",
+      "type": "multiChoice.checkbox.string",
       "title": "Choose all the people in your household who have a paying job.",
       "buttonTitle": "Ok",
       "choices": [

@@ -6,8 +6,8 @@
   "isSchedule": true,
   "steps": [
     {
-      "identifier": "UK",
-      "schemaIdentifier": "UK",
+      "identifier": "Baseline_UK",
+      "schemaIdentifier": "Baseline_UK",
       "type": "nestedGroup",
       "frequency": "once",
       "userHasDataGroup": "UK",
@@ -24,8 +24,8 @@
       ]
     },
     {
-      "identifier": "IN",
-      "schemaIdentifier": "IN",
+      "identifier": "Baseline_IN",
+      "schemaIdentifier": "Baseline_IN",
       "type": "nestedGroup",
       "frequency": "once",
       "userHasDataGroup": "IN",
@@ -42,8 +42,8 @@
       ]
     },
     {
-      "identifier": "ZA",
-      "schemaIdentifier": "ZA",
+      "identifier": "Baseline_SA",
+      "schemaIdentifier": "Baseline_SA",
       "type": "nestedGroup",
       "frequency": "once",
       "userHasDataGroup": "ZA",
