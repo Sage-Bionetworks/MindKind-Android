@@ -14,7 +14,9 @@ import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.TranslateAnimation
+import android.widget.CheckBox
 import android.widget.LinearLayout
+import android.widget.ScrollView
 import com.shawnlin.numberpicker.NumberPicker
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -31,15 +33,10 @@ import kotlinx.android.synthetic.main.activity_conversation_survey.*
 import kotlinx.android.synthetic.main.integer_input.view.*
 import kotlinx.android.synthetic.main.number_picker.view.*
 import kotlinx.android.synthetic.main.text_input.view.*
-import org.joda.time.DateTime
 import org.sagebionetworks.research.mindkind.R
 import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService
-import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService.Companion.dateFormatter
-import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService.Companion.studyStartDateKey
 import org.sagebionetworks.research.sageresearch.dao.room.AppConfigRepository
 import org.sagebionetworks.research.sageresearch_app_sdk.TaskResultUploader
-import org.sagebionetworks.researchstack.backbone.step.InstructionStep
-import org.threeten.bp.LocalDateTime
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -299,6 +296,8 @@ open class ConversationSurveyActivity: AppCompatActivity() {
                 handleWheelStringInput(step as? ConversationSingleChoiceWheelStringStep, answer, scroll)
             ConversationStepType.timeOfDay.type ->
                 handleTimeOfDayInput(step as? ConversationTimeOfDayStep, answer, scroll)
+            ConversationStepType.multiChoiceCheckboxString.type ->
+                handleMultiChoiceCheckboxStringInput(step as? ConversationMultiChoiceCheckboxStringStep, answer, scroll)
             ConversationStepType.gif.type -> {
                 handleGifInput(step as? GifStep)
             }
@@ -465,6 +464,68 @@ open class ConversationSurveyActivity: AppCompatActivity() {
                     LinearLayout.LayoutParams.WRAP_CONTENT)
             llp.bottomMargin = resources.getDimensionPixelSize(R.dimen.conversation_button_margin)
             button_container.addView(it, llp)
+        }
+
+        if(step.optional != false) {
+            addSkipButton(step, scroll)
+        }
+    }
+
+    private fun handleMultiChoiceCheckboxStringInput(choiceIntFormStep: ConversationMultiChoiceCheckboxStringStep?,
+                                                     answer: String?, scroll: Boolean) {
+        val step = choiceIntFormStep ?: run { return }
+        val choices = step.choices
+        button_container.removeAllViews()
+        var selected: Array<String>? = null
+        if(answer != null) {
+            selected = answer.split(", ").toTypedArray()
+        }
+
+        val sv = ScrollView(this)
+        val llp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                resources.getDimensionPixelSize(R.dimen.conversation_checkbox_input_height))
+        button_container.addView(sv, llp)
+
+        val ll = LinearLayout(this)
+        ll.orientation = LinearLayout.VERTICAL
+        val llp2 = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT)
+        sv.addView(ll, llp2)
+
+        choices.forEach { c ->
+            (this.layoutInflater.inflate(R.layout.conversation_checkbox,
+                    ll, false) as? CheckBox)?.let {
+
+                it.text = c.text
+                if(selected != null && selected.contains(c.text)) {
+                    it.isChecked = true
+                }
+
+                ll.addView(it, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT))
+            }
+        }
+
+        (this.layoutInflater.inflate(R.layout.conversation_material_button,
+                button_container, false) as? MaterialButton)?.let {
+
+            it.text = step.buttonTitle
+            it.setOnClickListener {
+                val newSelected = ArrayList<String>()
+                for (i in 0..(choices.size-1)) {
+                    val cb = ll.getChildAt(i) as CheckBox
+                    if(cb.isChecked) {
+                        newSelected.add(choices[i].text)
+                    }
+                }
+
+                val values = newSelected.joinToString()
+                addAnswer(step, values, values, scroll)
+                disableAllButtons()
+            }
+            button_container.addView(it,
+                    LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT))
         }
 
         if(step.optional != false) {

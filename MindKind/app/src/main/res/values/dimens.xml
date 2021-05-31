@@ -24,6 +24,7 @@
 
     <dimen name="converation_recycler_spacing">10dp</dimen>
     <dimen name="conversation_button_margin">8dp</dimen>
+    <dimen name="conversation_checkbox_input_height">216dp</dimen>
 
     <dimen name="welcome_bullet_padding">5dp</dimen>
 
