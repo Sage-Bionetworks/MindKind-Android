@@ -5,10 +5,11 @@
   "schemaIdentifier": "Demographics_Basic_Part1",
   "steps": [
     {
-    "identifier": "DEMOG_Intro",
-    "type": "instruction",
-    "title": "Thanks for agreeing to be part of our team as we build a better way to understand emotional health. We want to take a few minutes to get to know you better. Some of these questions will be easy, some rather personal, and some may not apply to you. Answer as best as you can, and as a volunteer, you can skip questions we ask of you.",
-    "continueAfterDelay": true
+      "identifier": "DEMOG_Intro",
+      "type": "instruction",
+      "title": "Thanks for agreeing to be part of our team as we build a better way to understand emotional health. We want to take a few minutes to get to know you better. Some of these questions will be easy, some rather personal, and some may not apply to you. Answer as best as you can, and as a volunteer, you can skip questions we ask of you.",
+      "buttonTitle": "Ok",
+      "optional": false
   },
     {
       "identifier": "DEMOG_BIRTH_SEX",

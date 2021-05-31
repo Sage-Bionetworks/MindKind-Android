@@ -102,7 +102,7 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
                         "3 minutes",
                         "Social",
                         false),
-                TaskItem("Baseline",
+                TaskItem(BackgroundDataService.BASELINE_IDENTIFIER_KEY,
                         "Baseline Survey",
                         "5 minutes",
                         "Baseline",
