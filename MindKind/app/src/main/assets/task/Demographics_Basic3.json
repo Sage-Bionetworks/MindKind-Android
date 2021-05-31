@@ -42,18 +42,18 @@
       "identifier": "DEMOG_JOB",
       "type": "multiChoice.checkbox.string",
       "title": "Choose all the people in your household who have a paying job.",
-      "buttonTitle": "Ok",
       "choices": [
-        "Mother",
-        "Father",
-        "Siblings",
-        "Aunt/Uncle",
-        "Grandfather",
-        "Grandmother",
-        "Boyfriend/Girlfriend",
-        "Other",
-        "Prefer not to say"
-      ]
+        { "text": "Mother"      ,             "value": "Mother" },
+        { "text": "Father"   ,                "value": "Father" },
+        { "text": "Siblings"   ,              "value": "Siblings" },
+        { "text": "Aunt/Uncle",               "value": "Aunt/Uncle" },
+        { "text": "Grandfather"   ,           "value": "Grandfather"},
+        { "text": "Grandmother"   ,           "value": "Grandmother"},
+        { "text": "Boyfriend/Girlfriend"   ,  "value": "Boyfriend/Girlfriend"},
+        { "text": "Other"   ,                 "value": "Other"},
+        { "text": "Prefer not to say"   ,     "value": "Prefer not to say"}
+      ],
+      "buttonTitle": "Ok"
     },
     {
       "identifier": "DEMOG_ADULTS",
