@@ -48,16 +48,16 @@
         android:layout_height="wrap_content"
         android:padding="@dimen/margin_medium"
         android:textColor="@color/white"
-        android:text="Enter your External ID"
+        android:text="Welcome to Mindkind\n\nSelect or enter your email to continue"
         tools:ignore="HardcodedText"
         android:gravity="center"
         android:layout_alignParentTop="true"
         android:layout_marginTop="64dp"/>
 
-    <androidx.appcompat.widget.AppCompatEditText
+    <AutoCompleteTextView
         style="@style/TextAppearance.Sage.Header"
         android:id="@+id/externalId"
-        android:layout_width="200dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/externalIdLabel"
         android:layout_centerHorizontal="true"
@@ -68,7 +68,8 @@
         android:singleLine="true"
         android:gravity="center"
         android:backgroundTint="@color/white"
-        android:textSize="36sp"
+        android:textSize="20sp"
+        android:layout_margin="@dimen/margin_small"
         android:textColorHint="@color/appLightGray"
         tools:ignore="HardcodedText" />
 

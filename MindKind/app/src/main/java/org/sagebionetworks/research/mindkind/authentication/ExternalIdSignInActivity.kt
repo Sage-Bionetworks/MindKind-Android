@@ -32,31 +32,58 @@
 
 package org.sagebionetworks.research.mindkind.authentication
 
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.util.DisplayMetrics
 import android.util.Log
-import android.view.View
+import android.widget.ArrayAdapter
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.google.common.base.Strings
 import dagger.android.AndroidInjection
-import org.sagebionetworks.research.mindkind.authentication.ExternalIdSignInViewModel.Factory
-import kotlinx.android.synthetic.main.activity_external_id_sign_in.externalId
-import kotlinx.android.synthetic.main.activity_external_id_sign_in.progressBar
-import kotlinx.android.synthetic.main.activity_external_id_sign_in.signIn
+import kotlinx.android.synthetic.main.activity_external_id_sign_in.*
 import org.sagebionetworks.research.mindkind.R
 import org.sagebionetworks.research.mindkind.TaskListActivity
+import org.sagebionetworks.research.mindkind.authentication.ExternalIdSignInViewModel.Factory
 import javax.inject.Inject
 
 class ExternalIdSignInActivity : AppCompatActivity() {
 
     companion object {
         private val TAG = ExternalIdSignInActivity::class.qualifiedName
+        public val BETA_EXTERNAL_IDS = arrayOf(
+                "miranda.f.marcus@gmail.com",
+                "himanishah3396@gmail.com",
+                "sushmitasumant@gmail.com",
+                "laramangravite@gmail.com",
+                "gfinch@netactive.co.za",
+                "emma.carey142@gmail.com",
+                "blossom.fernandes@psych.ox.ac.uk",
+                "amb278@medschl.cam.ac.uk",
+                "m.wolpert@wellcome.org",
+                "mikerkellen@gmail.com",
+                "lucy909on@gmail.com",
+                "larsson.omberg@sagebase.org",
+                "minalkarani14@gmail.com",
+                "ewzb98@gmail.com",
+                "cmaccoinnich@gmail.com",
+                "scanlan.erinjoy@gmail.com",
+                "katiemtaylormail@gmail.com",
+                "catsebastian@gmail.com",
+                "kmartin271@gmail.com",
+                "yochannah@gmail.com",
+                "tamsincromwell@gmail.com",
+                "refiloesibisi97@gmail.com",
+                "mike@sdpdigital.com",
+                "eric@sdpdigital.com",
+                "solly.sieberts@sagebase.org",
+                "ruppert.ian@gmail.com",
+                "rianhouston@yahoo.com",
+                "sonia.carlson@sagebase.org")
     }
 
     @JvmField
@@ -105,9 +132,27 @@ class ExternalIdSignInActivity : AppCompatActivity() {
     }
 
     private fun initView() {
-        externalId.doOnTextChanged { externalId, _, _, _ ->
-            externalIdSignInViewModel?.externalId = externalId?.toString()
+        externalId.doOnTextChanged { extlIdText, _, _, _ ->
+            externalIdSignInViewModel?.externalId = extlIdText?.toString()
         }
+
+        Log.d("TODO_REMOVE",
+                BETA_EXTERNAL_IDS.sortedArray()
+                .joinToString {
+                    val parts = it.splitToSequence("@")
+                    val externalId = parts.firstOrNull()?.replace(".", "")
+                    return@joinToString "\n$externalId $externalId#MindKind1"
+                })
+
+        externalId.setAdapter(ArrayAdapter(this,
+                android.R.layout.simple_dropdown_item_1line, BETA_EXTERNAL_IDS.sortedArray()))
+        externalId.threshold = 1
+        Handler().postDelayed({
+            val displayMetrics = DisplayMetrics()
+            windowManager.defaultDisplay.getMetrics(displayMetrics)
+            externalId.dropDownHeight = (displayMetrics.heightPixels * 0.33f).toInt()
+            externalId.showDropDown()
+        }, 1000)
 
         signIn.setOnClickListener {
             externalIdSignInViewModel?.doSignIn()

@@ -90,7 +90,7 @@ class ExternalIdSignInViewModel @MainThread constructor(
     fun doSignIn() {
         Log.d(LOG_TAG, "doSignIn")
 
-        val externalIdNotNull = externalId ?: run {
+        val externalIdNotNull = externalId?.split("@")?.firstOrNull()?.replace(".", "") ?: run {
             Log.w(LOG_TAG, "Cannot sign in with null or empty external Id")
             isSignedInLiveData.postValue(false)
             errorMessageMutableLiveData.postValue("Cannot sign in with null or empty external Id")
@@ -98,14 +98,15 @@ class ExternalIdSignInViewModel @MainThread constructor(
         }
 
         // Enter a custom password, or use the auto-format
-        val password = customPassword ?: (externalIdNotNull + "foo#\$H0")
+        val password = customPassword ?: (externalIdNotNull + "#Mindkind1")
 
         compositeSubscription.add(
                 authenticationManager.signInWithExternalId(externalIdNotNull, password)
                         .doOnSubscribe { isLoadingMutableLiveData.postValue(true) }
                         .doAfterTerminate { isLoadingMutableLiveData.postValue(false) }
-                        .subscribe(
-                                { s: UserSessionInfo? -> isSignedInLiveData.postValue(true) }
+                        .subscribe({ s: UserSessionInfo? ->
+                            isSignedInLiveData.postValue(true)
+                        }
                         ) { t: Throwable ->
                             isSignedInLiveData.postValue(false)
                             errorMessageMutableLiveData.postValue(t.message)
