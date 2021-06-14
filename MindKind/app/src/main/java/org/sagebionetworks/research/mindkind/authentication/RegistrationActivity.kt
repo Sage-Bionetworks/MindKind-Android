@@ -1,7 +1,10 @@
 package org.sagebionetworks.research.mindkind
 
+import android.R.attr.button
+import android.app.Dialog
 import android.content.Context
 import android.content.Intent
+import android.graphics.Paint
 import android.net.Uri
 import android.os.Bundle
 import android.telephony.TelephonyManager
@@ -9,6 +12,11 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.View
+import android.view.Window
+import android.view.animation.AccelerateInterpolator
+import android.widget.LinearLayout
+import android.widget.TextView
+import android.widget.ToggleButton
 import androidx.annotation.MainThread
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -22,20 +30,20 @@ import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.activity_external_id_sign_in.*
 import kotlinx.android.synthetic.main.activity_external_id_sign_in.progressBar
 import kotlinx.android.synthetic.main.activity_registration.*
-import kotlinx.android.synthetic.main.activity_registration.submit_button
 import kotlinx.android.synthetic.main.activity_registration.web_consent_container
 import kotlinx.android.synthetic.main.activity_sms_code.*
 import org.sagebionetworks.bridge.android.manager.AuthenticationManager
 import org.sagebionetworks.bridge.researchstack.ApiUtils
 import org.sagebionetworks.bridge.rest.exceptions.InvalidEntityException
-import org.sagebionetworks.bridge.rest.model.Phone
-import org.sagebionetworks.bridge.rest.model.SignIn
 import org.sagebionetworks.bridge.rest.model.UserSessionInfo
 import org.sagebionetworks.researchstack.backbone.DataResponse
 import org.slf4j.LoggerFactory
 import rx.subscriptions.CompositeSubscription
 import java.util.*
 import javax.inject.Inject
+import kotlinx.android.synthetic.main.activity_registration.registration_message as registration_message1
+import kotlinx.android.synthetic.main.activity_sms_code.registration_title as registration_title1
+
 
 open class RegistrationActivity: AppCompatActivity() {
 
@@ -93,19 +101,16 @@ open class RegistrationActivity: AppCompatActivity() {
             onErrorMessage(errorMessage)
         })
 
-        submit_button.isEnabled = false
-        submit_button.alpha = 0.33f
         viewModel.isPhoneNumberValid.observe(this, { isValid: Boolean? ->
-            submit_button.isEnabled = isValid ?: false
-            submit_button.alpha = if (isValid == true) {
-                1.0f
-            } else {
-                0.33f
-            }
+            refreshPrimaryButtonVisibilty(isValid)
         })
 
-        submit_button.setOnClickListener {
-            viewModel.signInPhone(this)
+        primary_button.setOnClickListener {
+            if (phoneSignUpViewModel?.showingWelcomeView == true) {
+                joinStudy()
+            } else {
+                viewModel.signInPhone(this)
+            }
         }
 
         phone_number_text_input.addTextChangedListener(object : TextWatcher {
@@ -116,13 +121,37 @@ open class RegistrationActivity: AppCompatActivity() {
             }
         })
 
-        join_button.setOnClickListener {
-            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(
-                    "https://staging.wtgmhdc.synapse.org/eligibility "))
-            startActivity(browserIntent)
+        secondary_button.setOnClickListener {
+            if (phoneSignUpViewModel?.showingWelcomeView == true) {
+                phoneSignUpViewModel?.showingWelcomeView = false
+                showRegistrationView()
+            } else {
+                joinStudy()
+            }
         }
+        secondary_button.paintFlags = secondary_button.paintFlags or Paint.UNDERLINE_TEXT_FLAG
 
         phoneSignUpViewModel = viewModel
+    }
+
+    fun refreshPrimaryButtonVisibilty(isValid: Boolean?) {
+        if (phoneSignUpViewModel?.showingWelcomeView == true) {
+            primary_button.isEnabled = true
+            primary_button.alpha = 1.0f
+            return
+        }
+        primary_button.isEnabled = isValid ?: false
+        primary_button.alpha = if (isValid == true) {
+            1.0f
+        } else {
+            0.33f
+        }
+    }
+
+    fun joinStudy() {
+        val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(
+                "https://staging.wtgmhdc.synapse.org/eligibility "))
+        startActivity(browserIntent)
     }
 
     open fun handleIntent(intent: Intent): String? {
@@ -137,9 +166,53 @@ open class RegistrationActivity: AppCompatActivity() {
         return null
     }
 
+    override fun onBackPressed() {
+        if (phoneSignUpViewModel?.showingWelcomeView == true) {
+            super.onBackPressed()
+            return
+        }
+        phoneSignUpViewModel?.showingWelcomeView = true
+        showWelcomeView()
+    }
+
     override fun onResume() {
         super.onResume()
         web_consent_container.visibility = View.GONE
+
+        if (phoneSignUpViewModel?.showingWelcomeView == true) {
+            showWelcomeView()
+        } else {
+            showRegistrationView()
+        }
+    }
+
+    open fun showWelcomeView() {
+        phoneSignUpViewModel?.showingWelcomeView = true
+        registration_title.text = getString(R.string.registration_welcome_title)
+        registration_message.text = getString(R.string.registration_welcome_message)
+        primary_button.text = getString(R.string.registration_join_study)
+        secondary_button.text = getString(R.string.registration_continue_to_login)
+        header_layout.layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                resources.getDimensionPixelOffset(R.dimen.registration_welcome_header_height))
+        phone_text_field_layout.visibility = View.GONE
+        primary_button.isEnabled = true
+        primary_button.alpha = 1.0f
+        welcome_butterflies.alpha = 0.0f
+    }
+
+    open fun showRegistrationView() {
+        phoneSignUpViewModel?.showingWelcomeView = false
+        registration_title.text = getString(R.string.registration_title)
+        registration_message.text = getString(R.string.registration_message)
+        primary_button.text = getString(R.string.registration_continue)
+        secondary_button.text = getString(R.string.registration_join_study_link)
+        header_layout.layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                resources.getDimensionPixelOffset(R.dimen.registration_header_height))
+        phone_text_field_layout.visibility = View.VISIBLE
+        welcome_butterflies.animate().alpha(1f).setDuration(333)
+                .setInterpolator(AccelerateInterpolator()).start()
     }
 }
 
@@ -147,10 +220,24 @@ public fun AppCompatActivity.onErrorMessage(errorMessage: String?) {
     if (Strings.isNullOrEmpty(errorMessage)) {
         return
     }
-    AlertDialog.Builder(this)
-            .setTitle(R.string.consent_error_title)
-            .setNeutralButton(R.string.rsb_ok, null)
-            .create().show()
+    val dialog = Dialog(this)
+
+    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+    dialog.setCancelable(true)
+    dialog.setContentView(R.layout.dialog_basic_message)
+    dialog.window?.setBackgroundDrawableResource(android.R.color.white)
+
+    val title = dialog.findViewById<TextView>(R.id.dialog_title)
+    title?.text = getString(R.string.consent_error_title)
+
+    val msg = dialog.findViewById<TextView>(R.id.dialog_message)
+    msg?.text = getString(R.string.registration_error_msg)
+
+    dialog.findViewById<View>(R.id.close_button)?.setOnClickListener {
+        dialog.dismiss()
+    }
+
+    dialog.show()
 }
 
 public class PhoneSignUpViewModel @MainThread constructor(
@@ -182,6 +269,8 @@ public class PhoneSignUpViewModel @MainThread constructor(
             }
         }
     }
+
+    public var showingWelcomeView = true
 
     private val compositeSubscription = CompositeSubscription()
     private val errorMessageMutableLiveData: MutableLiveData<String?> = MutableLiveData()
@@ -257,23 +346,23 @@ public class PhoneSignUpViewModel @MainThread constructor(
         val phoneErrorMsg = context.getString(R.string.registration_phone_error)
         compositeSubscription.add(
                 authenticationManager.signInViaPhoneLink(regionCode, number, authToken)
-                .doOnSubscribe {
-                    isLoadingMutableLiveData.postValue(true)
-                }
-                .doAfterTerminate {
-                    isLoadingMutableLiveData.postValue(false)
-                }
-                .subscribe({ response: UserSessionInfo? ->
-                    isSignedUpLiveData.postValue(true)
-                }) { error: Throwable ->
-                    // 400 is the response for an invalid phone number
-                    if (error is InvalidEntityException) {
-                        errorMessageMutableLiveData.postValue(phoneErrorMsg)
-                        return@subscribe
-                    }
-                    isSignedUpLiveData.postValue(false)
-                    errorMessageMutableLiveData.postValue(error.message)
-                })
+                        .doOnSubscribe {
+                            isLoadingMutableLiveData.postValue(true)
+                        }
+                        .doAfterTerminate {
+                            isLoadingMutableLiveData.postValue(false)
+                        }
+                        .subscribe({ response: UserSessionInfo? ->
+                            isSignedUpLiveData.postValue(true)
+                        }) { error: Throwable ->
+                            // 400 is the response for an invalid phone number
+                            if (error is InvalidEntityException) {
+                                errorMessageMutableLiveData.postValue(phoneErrorMsg)
+                                return@subscribe
+                            }
+                            isSignedUpLiveData.postValue(false)
+                            errorMessageMutableLiveData.postValue(error.message)
+                        })
     }
 
     override fun onCleared() {

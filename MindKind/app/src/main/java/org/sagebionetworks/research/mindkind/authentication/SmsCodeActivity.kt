@@ -157,16 +157,6 @@ open class SmsCodeActivity : AppCompatActivity() {
         smsCodeViewModel = viewModel
     }
 
-    private fun onErrorMessage(errorMessage: String?) {
-        if (Strings.isNullOrEmpty(errorMessage)) {
-            return
-        }
-        AlertDialog.Builder(this)
-                .setTitle(R.string.consent_error_title)
-                .setNeutralButton(R.string.rsb_ok, null)
-                .create().show()
-    }
-
     private fun returnToEntryActivity() {
         val intent = Intent(this, EntryActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
