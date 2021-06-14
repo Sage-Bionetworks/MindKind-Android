@@ -28,4 +28,7 @@
 
     <dimen name="welcome_bullet_padding">5dp</dimen>
 
+    <dimen name="registration_header_height">80dp</dimen>
+    <dimen name="registration_welcome_header_height">120dp</dimen>
+
 </resources>

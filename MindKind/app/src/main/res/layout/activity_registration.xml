@@ -48,6 +48,7 @@
         android:orientation="vertical">
 
         <FrameLayout
+            android:id="@+id/header_layout"
             android:layout_width="match_parent"
             android:layout_height="80dp"
             android:background="@color/white"
@@ -68,7 +69,8 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:background="@color/ocean300"
-            android:paddingBottom="20dp">
+            android:paddingBottom="20dp"
+            android:animateLayoutChanges="true">
 
 
             <TextView
@@ -97,18 +99,10 @@
                 android:textColor="@color/dark_text"
                 android:textSize="18sp"/>
 
-            <com.google.android.material.button.MaterialButton
-                style="@style/Sage.MaterialButton.UnderlinedBorderless"
-                android:id="@+id/join_button"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:textSize="16sp"
-                android:text="@string/registration_link"/>
-
         </LinearLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/filledTextField"
+            android:id="@+id/phone_text_field_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
@@ -139,7 +133,7 @@
             android:indeterminate="true"
             android:visibility="invisible"/>
 
-        <FrameLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/white"
@@ -147,18 +141,30 @@
 
             <com.google.android.material.button.MaterialButton
                 style="@style/Sage.MaterialButton.Rounded"
-                android:id="@+id/submit_button"
+                android:id="@+id/primary_button"
                 android:layout_width="match_parent"
                 android:layout_height="54dp"
                 android:textSize="16sp"
                 android:text="@string/rsb_submit"
-                android:layout_gravity="bottom"/>
+                android:layout_gravity="bottom"
+                android:layout_above="@+id/secondary_button"/>
 
-        </FrameLayout>
+            <com.google.android.material.button.MaterialButton
+                style="@style/Sage.MaterialButton.UnderlinedBorderless"
+                android:id="@id/secondary_button"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:textSize="16sp"
+                android:textColor="@color/appTextDark"
+                android:text="@string/registration_link"
+                android:layout_alignParentBottom="true"/>
+
+        </RelativeLayout>
 
     </LinearLayout>
 
     <ImageView
+        android:id="@+id/welcome_butterflies"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingLeft="12dp"
