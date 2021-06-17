@@ -36,6 +36,7 @@ import kotlinx.android.synthetic.main.text_input.view.*
 import org.sagebionetworks.research.mindkind.R
 import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService
 import org.sagebionetworks.research.sageresearch.dao.room.AppConfigRepository
+import org.sagebionetworks.research.sageresearch.dao.room.ReportRepository
 import org.sagebionetworks.research.sageresearch_app_sdk.TaskResultUploader
 import java.text.SimpleDateFormat
 import java.util.*
@@ -79,6 +80,9 @@ open class ConversationSurveyActivity: AppCompatActivity() {
     @Inject
     lateinit var appConfigRepo: AppConfigRepository
 
+    @Inject
+    lateinit var reportRepo: ReportRepository
+
     // Create a ViewModel the first time the system calls an activity's onCreate() method.
     // Re-created activities receive the same ConversationSurveyViewModel
     // instance created by the first activity.
@@ -96,7 +100,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         sharedPrefs = BackgroundDataService.createSharedPrefs(this)
 
         viewModel = ViewModelProvider(this, ConversationSurveyViewModel.Factory(
-                taskResultUploader, appConfigRepo, cacheDir.absolutePath)).get()
+                taskResultUploader, appConfigRepo, cacheDir.absolutePath, reportRepo)).get()
 
         close_button.setOnClickListener {
             closeOrBackPressed()
@@ -136,6 +140,10 @@ open class ConversationSurveyActivity: AppCompatActivity() {
             } else {
                 conversation_progress_bar.progress = newProgress
             }
+        })
+
+        viewModel.getAllSurveyAnswers().observe(this, Observer {
+            // TODO: mdephillips 6/17/21 pre-computed the return of results for all questions
         })
 
         intent.extras?.getString(extraConversationId)?.let {

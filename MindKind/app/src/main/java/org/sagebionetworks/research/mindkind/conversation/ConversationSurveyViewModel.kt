@@ -1,6 +1,5 @@
 package org.sagebionetworks.research.mindkind.conversation
 
-import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -21,8 +20,12 @@ import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataServic
 import org.sagebionetworks.research.mindkind.research.SageTaskIdentifier
 import org.sagebionetworks.research.mindkind.room.BackgroundDataTypeConverters
 import org.sagebionetworks.research.sageresearch.dao.room.AppConfigRepository
+import org.sagebionetworks.research.sageresearch.dao.room.ReportEntity
+import org.sagebionetworks.research.sageresearch.dao.room.ReportRepository
+import org.sagebionetworks.research.sageresearch.viewmodel.ReportViewModel
 import org.sagebionetworks.research.sageresearch_app_sdk.TaskResultUploader
 import org.threeten.bp.Instant
+import org.threeten.bp.LocalDateTime
 import java.io.File
 import java.io.FileOutputStream
 import java.util.*
@@ -31,7 +34,8 @@ import javax.inject.Inject
 open class ConversationSurveyViewModel(
         private val taskResultUploader: TaskResultUploader,
         private val appConfigRepo: AppConfigRepository,
-        private val cacheDirAbsPath: String) : ViewModel() {
+        private val cacheDirAbsPath: String,
+        reportRepo: ReportRepository) : ReportViewModel(reportRepo = reportRepo) {
 
     companion object {
         private val TAG = ConversationSurveyViewModel::class.java.simpleName
@@ -50,14 +54,15 @@ open class ConversationSurveyViewModel(
     class Factory @Inject constructor(
             private val taskResultUploader: TaskResultUploader,
             private val appConfigRepo: AppConfigRepository,
-            private val cacheDirAbsPath: String):
+            private val cacheDirAbsPath: String,
+            private val reportRepo: ReportRepository):
             ViewModelProvider.Factory {
 
         // Suppress unchecked cast, pre-condition would catch it first anyways
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             Preconditions.checkArgument(modelClass.isAssignableFrom(ConversationSurveyViewModel::class.java))
-            return ConversationSurveyViewModel(taskResultUploader, appConfigRepo, cacheDirAbsPath) as T
+            return ConversationSurveyViewModel(taskResultUploader, appConfigRepo, cacheDirAbsPath, reportRepo) as T
         }
     }
 
@@ -71,6 +76,13 @@ open class ConversationSurveyViewModel(
 
     fun getConversationSurvey(): LiveData<ConversationSurvey> {
         return conversationSurvey
+    }
+
+    fun getAllSurveyAnswers(): LiveData<List<ReportEntity>> {
+        val endDate = LocalDateTime.now()
+        val studyStartDate = endDate.minusDays(
+                BackgroundDataService.studyDurationInWeeks * 7.toLong())
+        return reportsLiveData(SageTaskIdentifier.Surveys, studyStartDate, endDate)
     }
 
     fun isLastStep() {
@@ -259,6 +271,21 @@ open class ConversationSurveyViewModel(
                     Log.w(TAG, "Conversation Upload Failed ${it.localizedMessage}")
                     // Archive will upload eventually as we retry later
                 }))
+
+        // Convert to a task result, and process through the report entity
+        var taskResult = TaskResultBase(SageTaskIdentifier.Surveys, UUID.randomUUID())
+        answers.map {
+            when(it.type) {
+                AnswerResultType.STRING -> return@map AnswerResultBase<String>(
+                        it.identifier, it.startTime, it.endTime, it.answer as? String, it.type)
+                else /**AnswerResultType.INTEGER*/ -> return@map AnswerResultBase<Number>(
+                        it.identifier, it.startTime, it.endTime, it.answer as? Number, it.type)
+            }
+        }.forEach {
+            taskResult = taskResult.addStepHistory(it)
+        }
+
+        reportRepo.saveReports(taskResult)
     }
 
     /**
