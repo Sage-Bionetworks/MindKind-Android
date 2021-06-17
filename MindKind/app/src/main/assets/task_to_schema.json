@@ -18,5 +18,9 @@
   "DataUsage": {
     "id": "DataUsage",
     "revision": 1
+  },
+  "Surveys": {
+    "id": "Surveys",
+    "revision": 1
   }
 }
