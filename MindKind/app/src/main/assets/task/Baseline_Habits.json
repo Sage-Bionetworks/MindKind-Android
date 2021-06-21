@@ -1,0 +1,20 @@
+{
+  "identifier": "Baseline_Habits",
+  "type": "conversationSurvey",
+  "taskIdentifier": "Baseline_Habits",
+  "schemaIdentifier": "Baseline_Habits",
+  "isSchedule": true,
+  "steps": [
+    {
+      "identifier": "Baseline_Habits_All",
+      "schemaIdentifier": "Baseline_Habits_All",
+      "type": "nestedGroup",
+      "frequency": "once",
+      "startDay": 1,
+      "filenames": [
+        "BL_5_PhysicalActivity",
+        "BL_6_PhoneUse"
+      ]
+    }
+  ]
+}

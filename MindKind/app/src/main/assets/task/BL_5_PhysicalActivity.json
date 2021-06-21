@@ -1,0 +1,67 @@
+{
+  "identifier": "BL_5_PhysicalActivity",
+  "type": "conversationSurvey",
+  "taskIdentifier": "BL_5_PhysicalActivity",
+  "schemaIdentifier": "BL_5_PhysicalActivity",
+  "steps": [
+    {
+      "identifier": "PA_1_Fun",
+    "type": "multiChoice.checkbox.string",
+    "buttonTitle": "Ok",
+    "title": "What do you do for fun?",
+      "choices": [
+        { "text": "Sports/Exercise"},
+        { "text": "Movies/videos"},
+        { "text": "Art"},
+        { "text": "Music"},
+        { "text": "Hang out with friends"}
+     ]
+    },
+    {
+      "identifier": "PA_2_Exercise",
+    "type": "singleChoice.string",
+    "title": "Do you exercise?",
+      "ifUserAnswers": "0, skip to BL_5_PhysicalActivity_outtro",
+      "choices": [
+        { "text": "No Days", "value": "0" },
+        { "text": "1 Day", "value": "1" },
+        { "text": "2-3 Days", "value": "2.5" },
+        { "text": "4-5 Days", "value": "4.5" },
+        { "text": "6-7 Days", "value": "6.5" }
+
+     ]
+    },
+        {
+      "identifier": "PA_3_PROMIS",
+    "type": "singleChoice.string",
+    "title": "How many days did you exercise or play so hard that your body got tired?",
+      "choices": [
+        { "text": "No Days"   , "value": "0" },
+        { "text": "1 Day"     , "value": "1" },
+        { "text": "2-3 Days"  , "value": "2.5" },
+        { "text": "4-5 Days"  , "value": "4.5" },
+        { "text": "6-7 Days"  , "value": "6.5" }
+
+     ]
+    },
+      {
+      "identifier": "PA_4_PROMIS",
+    "type": "singleChoice.string",
+    "title": "How many days did you exercise really hard for 10 minutes or more?",
+      "choices": [
+        { "text": "No Days"   , "value": "0" },
+        { "text": "1 Day"     , "value": "1" },
+        { "text": "2-3 Days"  , "value": "2.5" },
+        { "text": "4-5 Days"  , "value": "4.5" },
+        { "text": "6-7 Days"  , "value": "6.5" }
+
+     ]
+    },
+    {
+      "identifier": "BL_5_PhysicalActivity_outtro",
+      "type": "instruction",
+      "title": "Thank you for taking the time to answer my questions about physical activity, now let's talk about phone use.",
+      "buttonTitle": "Ok"
+    }
+  ]
+}
