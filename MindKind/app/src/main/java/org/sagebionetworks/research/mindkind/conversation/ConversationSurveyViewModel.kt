@@ -137,8 +137,7 @@ open class ConversationSurveyViewModel(
         // Add split with | here
         val ifAnsweredOrSplit = lastStep.ifUserAnswers?.split("|")
 
-        if (ifAnsweredOrSplit != null && ifAnsweredOrSplit.size >= 2) {
-            // There was a | separator
+        if (ifAnsweredOrSplit != null) {
             val orIterator = ifAnsweredOrSplit.iterator()
             orIterator.forEach {
                 // Make sure it has a skip to (is this still necessary?)
@@ -146,7 +145,7 @@ open class ConversationSurveyViewModel(
 
                 // Must have format [Answer], skip to [Step Identifier]
                 if (ifAnsweredConditionalSplit.size < 2) {
-                    return
+                    return@forEach
                 }
 
                 if (lastAnswer == ifAnsweredConditionalSplit.firstOrNull()) {
@@ -159,28 +158,6 @@ open class ConversationSurveyViewModel(
                     if (nextStepIdx >= 0) {
                         itemCount = nextStepIdx
                     }
-                }
-            }
-        } else {
-            // No | separator so just look for a , skip to next step
-            // Check for next step conditionals
-            val ifAnsweredConditionalSplit = lastStep.ifUserAnswers?.split(", skip to ") ?: run {
-                return
-            }
-            // Must have format [Answer], skip to [Step Identifier]
-            if (ifAnsweredConditionalSplit.size < 2) {
-                return
-            }
-
-            if (lastAnswer == ifAnsweredConditionalSplit.firstOrNull()) {
-                val newNextStep = stepWith(ifAnsweredConditionalSplit.lastOrNull()) ?: run {
-                    return
-                }
-                val nextStepIdx = conversationSurvey.value?.steps?.indexOf(newNextStep) ?: run {
-                    return // Can't find the step
-                }
-                if (nextStepIdx >= 0) {
-                    itemCount = nextStepIdx
                 }
             }
         }
