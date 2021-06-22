@@ -154,6 +154,7 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
 
         public const val studyStartDateKey = "StudyStartDate"
         public const val completedTasksKey = "completeTasks"
+        public const val hasShownWithdrawalNotifKey = "hasShownWithdrawalNotif"
         public val dateFormatter = ISODateTimeFormat.dateTime().withOffsetParsed()
 
         public const val BASELINE_IDENTIFIER_KEY = "Baseline"
@@ -514,8 +515,12 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
     }
 
     private fun startForeground() {
-        val notification = createForegroundNotification(
-                "Monitoring for data changes.  We only collect data you have consented to sharing.")
+        val title = if (dataAllowedToBeTracked.isEmpty()) {
+            getString(string.foreground_notif_title_no_tracking)
+        } else {
+            getString(string.foreground_notif_title)
+        }
+        val notification = createForegroundNotification(title)
         startForeground(FOREGROUND_NOTIFICATION_ID, notification)
     }
 
@@ -695,14 +700,19 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
                 ConversationSurveyActivity.completedDateKey, null) ?: run {
             return
         }
+        val hasShownNotification = sharedPrefs.getBoolean(hasShownWithdrawalNotifKey, false)
         val lastConvoDate = LocalDateTime.parse(lastConversationCompleteStr)
         val daysFromLastConvo = ChronoUnit.DAYS.between(lastConvoDate, LocalDateTime.now())
-        if ((daysFromLastConvo >= ENGAGEMENT_TRIGGER_DAYS) || debugForceShow) {
+        if ((!hasShownNotification && daysFromLastConvo >= ENGAGEMENT_TRIGGER_DAYS) || debugForceShow) {
             val notification = createEngagementNotification(
                     getString(string.engagement_notification_title))
 
             val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.notify(ENGAGEMENT_REQUEST_CODE, notification)
+
+            if (!debugForceShow) {  // Mark notification as shown if not debugging
+                sharedPrefs.edit().putBoolean(hasShownWithdrawalNotifKey, true).apply()
+            }
         }
     }
 

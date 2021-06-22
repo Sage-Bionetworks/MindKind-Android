@@ -64,6 +64,9 @@
     <string name="foreground_channel_title">MindKind Passive Data Collection</string>
     <string name="foreground_channel_desc">The MindKind Study needs a foreground notification to allow our study app to be notified when your data changes.</string>
 
+    <string name="foreground_notif_title">Monitoring for data changes.  We only collect data you have consented to sharing.</string>
+    <string name="foreground_notif_title_no_tracking">Monitoring for end of study.</string>
+
     <string name="foreground_channel_engagement_title">MindKind Engagement</string>
     <string name="foreground_channel_engagement_desc">The MindKind Study uses notifications to keep the user engaged.</string>
 
