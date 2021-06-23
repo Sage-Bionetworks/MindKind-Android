@@ -1,0 +1,22 @@
+{
+  "identifier": "Baseline_Environment",
+  "type": "conversationSurvey",
+  "taskIdentifier": "Baseline_Environment",
+  "schemaIdentifier": "Baseline_Environment",
+  "isSchedule": true,
+  "steps": [
+    {
+      "identifier": "All",
+      "schemaIdentifier": "All",
+      "type": "nestedGroup",
+      "frequency": "once",
+      "startDay": 1,
+      "filenames": [
+        "BL_3_FoodInsecurity",
+        "BL_4.1_PHNXNeighborhood",
+        "BL_4.2_NeighborhoodCollective",
+        "BL_4.3_Violence"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,105 @@
+{
+  "identifier": "BL_4_Violence",
+  "type": "conversationSurvey",
+  "taskIdentifier": "BL_4_Violence",
+  "schemaIdentifier": "BL_4_Violence",
+  "steps": [
+      {
+        "identifier": "BL_4_Violence_Intro",
+        "type": "instruction",
+        "title": "The following questions may be triggering. Remember, you can skip any question you don't feel comfortable answering, and mental health resources can be found in the app menu or on the website.",
+        "continueAfterDelay": true
+      },
+      {
+        "identifier": "Violence_1_Home",
+        "type": "singleChoice.integer",
+        "title": "Within your home (either now or growing up), have you ever seen, heard or experienced any kind of violence or abuse (e.g. someone being hit, punched, kicked, or beaten, or verbal/emotional abuse)?",
+        "ifUserAnswers": "0, skip to Violence_6_OutsideHome_Negative|-1, skip to Violence_6_OutsideHome_Negative",
+        "choices": [
+          { "text": "Yes"                           ,               "value": 1 },
+          { "text": "No"                            ,               "value": 0 },
+          { "text": "Prefer not to say"             ,               "value": -1 }
+        ]
+      },
+      {
+        "identifier": "Violence_2_SelfInvolve",
+        "type": "singleChoice.integer",
+        "title": "Did it involve you personally?",
+        "ifUserAnswers": "0, skip to Violence_4_OthersInvolved|-1, skip to Violence_4_OthersInvolved",
+        "choices": [
+          { "text": "Yes"                           ,               "value": 1 },
+          { "text": "No"                            ,               "value": 0 },
+          { "text": "Prefer not to say"             ,               "value": -1 }
+        ]
+      },
+      {
+        "identifier": "Violence_3_SelfInvolveFreq",
+        "type": "singleChoice.integer",
+        "title": "How often?",
+        "choices": [
+          { "text": "Once"                           ,               "value": 1 },
+          { "text": "More than once"                 ,               "value": 2 },
+          { "text": "Don't know"                     ,               "value": 3 }
+        ]
+      },
+      {
+        "identifier": "Violence_4_OthersInvolved",
+        "type": "singleChoice.integer",
+        "title": "Did you witness violence involving people other than you?",
+        "ifUserAnswers": "0, skip to Violence_6_OutsideHome_Positive",
+        "choices": [
+          { "text": "Yes"                           ,               "value": 1 },
+          { "text": "No"                            ,               "value": 0 }
+        ]
+      },
+      {
+        "identifier": "Violence_5_OthersInvolveFreq",
+        "type": "singleChoice.integer",
+        "title": "How often?",
+        "choices": [
+          { "text": "Once"                           ,               "value": 1 },
+          { "text": "More than once"                 ,               "value": 2 },
+          { "text": "Don't know"                     ,               "value": 3 }
+        ]
+      },
+    {
+      "identifier": "Violence_6_OutsideHome_Positive",
+      "type": "singleChoice.integer",
+      "title": "Outside of your home or living situation, how many times did you see anyone get attacked?",
+      "skipTo": "BL_4_Violence_Outtro_Positive",
+      "choices": [
+        { "text": "Never"                          ,               "value": 0 },
+        { "text": "Once"                           ,               "value": 1 },
+        { "text": "More than once"                 ,               "value": 2 },
+        { "text": "Don't know"                     ,               "value": 3 }
+      ]
+    },
+      {
+        "identifier": "Violence_6_OutsideHome_Negative",
+        "type": "singleChoice.integer",
+        "title": "Outside of your home or living situation, how many times did you see anyone get attacked?",
+        "ifUserAnswers": "0, skip to BL_4_Violence_Outtro_Negative",
+        "choices": [
+          { "text": "Never"                          ,               "value": 0 },
+          { "text": "Once"                           ,               "value": 1 },
+          { "text": "More than once"                 ,               "value": 2 },
+          { "text": "Don't know"                     ,               "value": 3 }
+        ]
+      },
+    {
+      "identifier": "BL_4_Violence_Outtro_Positive",
+      "type": "instruction",
+      "optional": false,
+      "title": "Thank you. Remember, if you are ever experience distress or feel that you are going to hurt yourself or others, please contact your physician.\n\nYou can also find mental health resources in your region at https://befrienders.org or view the resources on the MindKind website: https://staging.wtgmhdc.synapse.org/contact",
+      "buttonTitle": "Ok"
+    },
+    {
+      "identifier": "BL_4_Violence_Outtro_Negative",
+      "type": "instruction",
+      "optional": false,
+      "title": "Thank you for taking the time to answer my questions.",
+      "buttonTitle": "Ok"
+    }
+  ]
+}
+

@@ -158,7 +158,9 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
         public val dateFormatter = ISODateTimeFormat.dateTime().withOffsetParsed()
 
         public const val BASELINE_IDENTIFIER_KEY = "Baseline"
-        public val ONE_TIME_SURVEYS = arrayOf(BASELINE_IDENTIFIER_KEY)
+        public const val BASELINE_ENVIRONMENT_IDENTIFIER_KEY = "Baseline_Environment"
+        public const val BASELINE_HABITS_IDENTIFIER_KEY = "Baseline_Habits"
+        public val ONE_TIME_SURVEYS = arrayOf(BASELINE_IDENTIFIER_KEY, BASELINE_ENVIRONMENT_IDENTIFIER_KEY)
 
         fun createSharedPrefs(context: Context): SharedPreferences {
             return context.getSharedPreferences("Mindkind", MODE_PRIVATE)

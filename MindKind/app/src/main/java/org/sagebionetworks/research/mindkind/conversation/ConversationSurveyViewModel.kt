@@ -129,29 +129,33 @@ open class ConversationSurveyViewModel(
 
         itemCount++ // go to next step in the list
 
-        // Check for next step conditionals
-        val ifAnsweredConditonalSplit = lastStep.ifUserAnswers?.split(", skip to ") ?: run {
-            return
-        }
-        // Must have format [Answer] skip to [Step Identifier]
-        if (ifAnsweredConditonalSplit.size < 2) {
-            return
-        }
-
         // Check conditional to see if we need to skip to anywhere
         val lastAnswer = stringAnswerForStep(lastStep.identifier) ?: run {
-            return // No answer to compare to
+            return // No answer to compare to, so remaining logic is irrelevant
         }
 
-        if (lastAnswer == ifAnsweredConditonalSplit.firstOrNull()) {
-            val newNextStep = stepWith(ifAnsweredConditonalSplit.lastOrNull()) ?: run {
-                return
+        // Add split with | here
+        val ifAnsweredOrSplit = lastStep.ifUserAnswers?.split("|")
+
+        ifAnsweredOrSplit?.forEach {
+            // Make sure it has a skip to (is this still necessary?)
+            val ifAnsweredConditionalSplit = it.split(", skip to ")
+
+            // Must have format [Answer], skip to [Step Identifier]
+            if (ifAnsweredConditionalSplit.size < 2) {
+                return@forEach
             }
-            val nextStepIdx = conversationSurvey.value?.steps?.indexOf(newNextStep) ?: run {
-                return // Can't find the step
-            }
-            if (nextStepIdx >= 0) {
-                itemCount = nextStepIdx
+
+            if (lastAnswer == ifAnsweredConditionalSplit.firstOrNull()) {
+                val newNextStep = stepWith(ifAnsweredConditionalSplit.lastOrNull()) ?: run {
+                    return@forEach
+                }
+                val nextStepIdx = conversationSurvey.value?.steps?.indexOf(newNextStep) ?: run {
+                    return@forEach // Can't find the step
+                }
+                if (nextStepIdx >= 0) {
+                    itemCount = nextStepIdx
+                }
             }
         }
     }

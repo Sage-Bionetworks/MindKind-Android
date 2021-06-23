@@ -103,11 +103,22 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
                         "Social",
                         false),
                 TaskItem(BackgroundDataService.BASELINE_IDENTIFIER_KEY,
-                        "Baseline Survey",
-                        "5 minutes",
+                        "About You",
+                        "4 minutes",
                         "Baseline",
+                        false),
+                TaskItem(BackgroundDataService.BASELINE_ENVIRONMENT_IDENTIFIER_KEY,
+                        "Your Environment",
+                        "3 minutes",
+                        "Baseline_Environment",
+                        false),
+                TaskItem(BackgroundDataService.BASELINE_HABITS_IDENTIFIER_KEY,
+                        "Your Habits",
+                        "3 minutes",
+                        "Baseline_Habits",
                         false)
-                )
+        )
+
         // Useful for development
 //          TaskItem("Playground",
 //                  "Ready to start your day.",

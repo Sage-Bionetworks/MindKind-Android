@@ -1,0 +1,92 @@
+{
+  "identifier": "BL_6_PhoneUse",
+  "type": "conversationSurvey",
+  "taskIdentifier": "BL_6_PhoneUse",
+  "schemaIdentifier": "BL_6_PhoneUse",
+  "steps": [
+    {
+      "identifier": "PU_1_HowMany",
+      "type": "integer",
+      "title": "How many smart phones, including this one, do you have access to?",
+      "buttonTitle": "Ok",
+      "min": 0,
+      "max": 9
+    },
+        {
+      "identifier": "PU_2_Owned",
+      "type": "singleChoice.string",
+      "title": "Is the smart phone you have access to owned by you? ",
+      "choices": [
+        { "text": "Yes", "value": "Yes" },
+        { "text": "No",  "value": "No" },
+        { "text": "Not Applicable",  "value": "Not Applicable" }
+      ]
+    },
+    {
+      "identifier": "PU_3_When",
+      "type": "multiChoice.checkbox.string",
+      "buttonTitle": "Ok",
+      "title": "For the phone you use the most, when are you most likely to have it with you?",
+      "choices": [
+        { "text": "Morning",      "value": "Morning" },
+        { "text": "Afternoon",    "value": "Afternoon" },
+        { "text": "Evening",      "value": "Evening" },
+        { "text": "Overnight",    "value": "Overnight" }
+      ]
+    },
+    {
+      "identifier": "PU_4_Carry",
+      "type": "singleChoice.string",
+      "title": "Do you carry your phone(s) with you at all times? ",
+      "choices": [
+        { "text": "Yes", "value": "Yes" },
+        { "text": "No",  "value": "No" },
+        { "text": "Not Applicable",  "value": "Not Applicable" }
+      ]
+    },
+    {
+      "identifier": "PU_5_OtherUsers",
+      "type": "integer",
+      "title": "How many other people use your phone?",
+      "buttonTitle": "Ok",
+      "min": 0,
+      "max": 9
+    },
+    {
+      "identifier": "PU_6_OtherUsers",
+      "type": "integer",
+      "title": "How often do you hand someone this phone on a given day?",
+      "buttonTitle": "Ok",
+      "min": 0,
+      "max": 20
+    },
+    {
+      "identifier": "PU_6_Sharing",
+      "type": "singleChoice.integer",
+      "title": "Where do you typically keep your phone?",
+      "choices": [
+        { "text": "On your person",                                            "value": 0 },
+        { "text": "Nearby, such as in a bag or on a work station",             "value": 1 },
+        { "text": "Somewhere else in the same building, but not near nearby",  "value": 2 },
+        { "text": "In a different space far away from you, such as leaving it at home, or in a different building",        "value": 3 }
+      ]
+    },
+    {
+      "identifier": "PU_7_Access",
+      "type": "singleChoice.integer",
+      "title": "Do you always have access to it?",
+      "choices": [
+        { "text": "Never",               "value": 0 },
+        { "text": "Seldom",              "value": 1 },
+        { "text": "Often",               "value": 2 },
+        { "text": "Always",              "value": 3 }
+      ]
+    },
+    {
+      "identifier": "BL_6_PhoneUse_outtro",
+      "type": "instruction",
+      "title": "Thank you for taking the time to answer my questions.",
+      "buttonTitle": "Ok"
+    }
+  ]
+}
