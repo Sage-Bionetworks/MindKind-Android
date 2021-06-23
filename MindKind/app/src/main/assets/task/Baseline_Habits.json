@@ -6,8 +6,8 @@
   "isSchedule": true,
   "steps": [
     {
-      "identifier": "Baseline_Habits_All",
-      "schemaIdentifier": "Baseline_Habits_All",
+      "identifier": "All",
+      "schemaIdentifier": "All",
       "type": "nestedGroup",
       "frequency": "once",
       "startDay": 1,
