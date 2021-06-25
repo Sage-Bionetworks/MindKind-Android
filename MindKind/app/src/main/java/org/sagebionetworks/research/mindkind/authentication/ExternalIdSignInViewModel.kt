@@ -37,7 +37,10 @@ import androidx.annotation.MainThread
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.common.base.Strings
+import org.joda.time.LocalDate
 import org.sagebionetworks.bridge.android.manager.AuthenticationManager
+import org.sagebionetworks.bridge.rest.exceptions.ConsentRequiredException
+import org.sagebionetworks.bridge.rest.model.SharingScope
 import org.sagebionetworks.bridge.rest.model.UserSessionInfo
 
 import rx.subscriptions.CompositeSubscription
@@ -75,14 +78,14 @@ class ExternalIdSignInViewModel @MainThread constructor(
 
     val isExternalIdValidLiveData: MutableLiveData<Boolean>
     val isLoadingMutableLiveData: MutableLiveData<Boolean>
-    val isSignedInLiveData: MutableLiveData<Boolean>
+    val isSignedInLiveData: MutableLiveData<UserSessionInfo?>
 
     init {
         errorMessageMutableLiveData = MutableLiveData()
         isLoadingMutableLiveData = MutableLiveData()
         isLoadingMutableLiveData.value = false
         isSignedInLiveData = MutableLiveData()
-        isSignedInLiveData.value = false
+        isSignedInLiveData.value = null
         isExternalIdValidLiveData = MutableLiveData()
         isExternalIdValidLiveData.value = false
     }
@@ -92,7 +95,7 @@ class ExternalIdSignInViewModel @MainThread constructor(
 
         val externalIdNotNull = externalId ?: run {
             Log.w(LOG_TAG, "Cannot sign in with null or empty external Id")
-            isSignedInLiveData.postValue(false)
+            isSignedInLiveData.postValue(null)
             errorMessageMutableLiveData.postValue("Cannot sign in with null or empty external Id")
             return
         }
@@ -104,10 +107,9 @@ class ExternalIdSignInViewModel @MainThread constructor(
                 authenticationManager.signInWithExternalId(externalIdNotNull, password)
                         .doOnSubscribe { isLoadingMutableLiveData.postValue(true) }
                         .doAfterTerminate { isLoadingMutableLiveData.postValue(false) }
-                        .subscribe(
-                                { s: UserSessionInfo? -> isSignedInLiveData.postValue(true) }
+                        .subscribe({ s: UserSessionInfo? -> isSignedInLiveData.postValue(s) }
                         ) { t: Throwable ->
-                            isSignedInLiveData.postValue(false)
+                            isSignedInLiveData.postValue(null)
                             errorMessageMutableLiveData.postValue(t.message)
                         })
     }

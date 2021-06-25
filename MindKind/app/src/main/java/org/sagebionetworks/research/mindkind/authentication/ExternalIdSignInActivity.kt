@@ -32,8 +32,10 @@
 
 package org.sagebionetworks.research.mindkind.authentication
 
+import android.annotation.SuppressLint
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -49,8 +51,15 @@ import org.sagebionetworks.research.mindkind.authentication.ExternalIdSignInView
 import kotlinx.android.synthetic.main.activity_external_id_sign_in.externalId
 import kotlinx.android.synthetic.main.activity_external_id_sign_in.progressBar
 import kotlinx.android.synthetic.main.activity_external_id_sign_in.signIn
+import org.joda.time.DateTime
+import org.joda.time.LocalDate
+import org.sagebionetworks.bridge.rest.model.UserSessionInfo
 import org.sagebionetworks.research.mindkind.R
 import org.sagebionetworks.research.mindkind.TaskListActivity
+import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService
+import org.sagebionetworks.research.mindkind.returnToEntryActivity
+import org.sagebionetworks.researchstack.backbone.DataProvider
+import org.sagebionetworks.researchstack.backbone.model.ConsentSignatureBody
 import javax.inject.Inject
 
 class ExternalIdSignInActivity : AppCompatActivity() {
@@ -64,15 +73,21 @@ class ExternalIdSignInActivity : AppCompatActivity() {
     var externalIdSignInViewModelFactory: Factory? = null
     var externalIdSignInViewModel: ExternalIdSignInViewModel? = null
 
+    lateinit var sharedPrefs: SharedPreferences
+
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_external_id_sign_in)
 
+        sharedPrefs = BackgroundDataService.createSharedPrefs(this)
+
         initViewModel()
         initView()
     }
 
+    // Need to sync user sign up date immediately
+    @SuppressLint("ApplySharedPref")
     private fun initViewModel() {
         val externalIdFactory = externalIdSignInViewModelFactory?.create() ?: run {
             Log.e(TAG, "Failed to create External ID View Model Factory")
@@ -83,9 +98,14 @@ class ExternalIdSignInActivity : AppCompatActivity() {
                 ViewModelProvider(this, externalIdFactory)
                         .get(ExternalIdSignInViewModel::class.java)
 
-        externalIdViewModel.isSignedInLiveData.observe(this, Observer { isSignedIn: Boolean ->
-            if (isSignedIn) {
-                proceedToTaskListActivity()
+        externalIdViewModel.isSignedInLiveData.observe(this, Observer { user: UserSessionInfo? ->
+            user?.let {
+                // Save study start date
+                val createdOnServerTimezone: DateTime = it.createdOn
+                val jsonString: String = BackgroundDataService.dateFormatter.print(createdOnServerTimezone)
+                sharedPrefs.edit().putString(BackgroundDataService.studyStartDateKey, jsonString).commit()
+                // Proceed to entry to re-evaluate bridge access
+                returnToEntryActivity()
             }
         })
 
@@ -125,13 +145,5 @@ class ExternalIdSignInActivity : AppCompatActivity() {
                 .setMessage(error)
                 .setNeutralButton(R.string.rsb_ok, null)
                 .show()
-    }
-
-    @VisibleForTesting
-    fun proceedToTaskListActivity() {
-        val intent = Intent(this, TaskListActivity::class.java)
-        startActivity(intent)
-        overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
-        finish()
     }
 }

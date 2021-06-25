@@ -1,9 +1,11 @@
 package org.sagebionetworks.research.mindkind
 
 import android.R.attr.button
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Paint
 import android.net.Uri
 import android.os.Bundle
@@ -25,6 +27,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.button.MaterialButton
 import com.google.common.base.Strings
 import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.activity_external_id_sign_in.*
@@ -32,10 +35,14 @@ import kotlinx.android.synthetic.main.activity_external_id_sign_in.progressBar
 import kotlinx.android.synthetic.main.activity_registration.*
 import kotlinx.android.synthetic.main.activity_registration.web_consent_container
 import kotlinx.android.synthetic.main.activity_sms_code.*
+import org.joda.time.DateTime
 import org.sagebionetworks.bridge.android.manager.AuthenticationManager
 import org.sagebionetworks.bridge.researchstack.ApiUtils
 import org.sagebionetworks.bridge.rest.exceptions.InvalidEntityException
 import org.sagebionetworks.bridge.rest.model.UserSessionInfo
+import org.sagebionetworks.research.mindkind.authentication.ExternalIdSignInActivity
+import org.sagebionetworks.research.mindkind.authentication.ExternalIdSignInViewModel
+import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService
 import org.sagebionetworks.researchstack.backbone.DataResponse
 import org.slf4j.LoggerFactory
 import rx.subscriptions.CompositeSubscription
@@ -109,6 +116,10 @@ open class RegistrationActivity: AppCompatActivity() {
             if (phoneSignUpViewModel?.showingWelcomeView == true) {
                 joinStudy()
             } else {
+                if (isSecretTestUserPhoneNumber()) {
+                    startTestUserSignInProcess()
+                    return@setOnClickListener
+                }
                 viewModel.signInPhone(this)
             }
         }
@@ -146,6 +157,15 @@ open class RegistrationActivity: AppCompatActivity() {
         } else {
             0.33f
         }
+    }
+
+    private fun sendToExternalIdActivity() {
+        val intent = Intent(this, ExternalIdSignInActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
+                Intent.FLAG_ACTIVITY_CLEAR_TASK or
+                Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        startActivity(intent)
+        finish()
     }
 
     fun joinStudy() {
@@ -214,6 +234,48 @@ open class RegistrationActivity: AppCompatActivity() {
         welcome_butterflies.animate().alpha(1f).setDuration(333)
                 .setInterpolator(AccelerateInterpolator()).start()
     }
+
+    private fun isSecretTestUserPhoneNumber(): Boolean {
+        var phone = phoneSignUpViewModel?.phoneNumber ?: ""
+        if (phone.length > 3) {
+            phone = phone.substring(0, phone.length - 2)
+            if (phone.endsWith("555-01") ||
+                    phone.endsWith("55501")) {
+                return true
+            }
+        }
+        return false
+    }
+
+    private fun startTestUserSignInProcess() {
+        val dialog = Dialog(this)
+
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setCancelable(true)
+        dialog.setContentView(R.layout.dialog_2_button_message)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.white)
+
+        val title = dialog.findViewById<TextView>(R.id.dialog_title)
+        title?.text = getString(R.string.tester_message)
+
+        val msg = dialog.findViewById<TextView>(R.id.dialog_message)
+        msg?.text = ""
+
+        val posButton = dialog.findViewById<MaterialButton>(R.id.confirm_button)
+        posButton?.text = getString(R.string.rsb_BOOL_YES)
+        posButton?.setOnClickListener {
+            dialog.dismiss()
+            sendToExternalIdActivity()
+        }
+
+        val negButton = dialog.findViewById<MaterialButton>(R.id.cancel_button)
+        negButton?.text = getString(R.string.rsb_BOOL_NO)
+        negButton?.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
+    }
 }
 
 public fun AppCompatActivity.onErrorMessage(errorMessage: String?) {
@@ -238,6 +300,15 @@ public fun AppCompatActivity.onErrorMessage(errorMessage: String?) {
     }
 
     dialog.show()
+}
+
+public fun AppCompatActivity.returnToEntryActivity() {
+    val intent = Intent(this, EntryActivity::class.java)
+    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
+            Intent.FLAG_ACTIVITY_CLEAR_TASK or
+            Intent.FLAG_ACTIVITY_CLEAR_TOP)
+    startActivity(intent)
+    finish()
 }
 
 public class PhoneSignUpViewModel @MainThread constructor(
