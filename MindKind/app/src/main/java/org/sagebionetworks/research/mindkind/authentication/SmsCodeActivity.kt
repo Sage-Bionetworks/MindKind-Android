@@ -156,15 +156,6 @@ open class SmsCodeActivity : AppCompatActivity() {
 
         smsCodeViewModel = viewModel
     }
-
-    private fun returnToEntryActivity() {
-        val intent = Intent(this, EntryActivity::class.java)
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
-                Intent.FLAG_ACTIVITY_CLEAR_TASK or
-                Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        startActivity(intent)
-        finish()
-    }
 }
 
 public class SmsCodeViewModel @MainThread constructor(
