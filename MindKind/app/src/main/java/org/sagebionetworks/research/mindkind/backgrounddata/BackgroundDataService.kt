@@ -517,11 +517,7 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
     }
 
     private fun startForeground() {
-        val title = if (dataAllowedToBeTracked.isEmpty()) {
-            getString(string.foreground_notif_title_no_tracking)
-        } else {
-            getString(string.foreground_notif_title)
-        }
+        val title = getString(string.foreground_notif_title)
         val notification = createForegroundNotification(title)
         startForeground(FOREGROUND_NOTIFICATION_ID, notification)
     }
