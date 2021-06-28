@@ -48,6 +48,7 @@ class ConversationGsonHelper {
             val gson = createGson()
             val json = stringFromJsonAsset(context, jsonFilename)
             val dataGroups = SageResearchStack.SageDataProvider.getInstance().userDataGroups
+            dataGroups.add("ARM2")
 
             val conversation: ConversationSurvey?
             try {
@@ -59,7 +60,7 @@ class ConversationGsonHelper {
 
             val filteredSteps = mutableListOf<ConversationStep>()
             filteredSteps.addAll(conversation.steps)
-            val newSteps = mutableListOf<ConversationStep>()
+            var newSteps = mutableListOf<ConversationStep>()
 
             // If this conversation is a schedule, there are multiple nestedGroup steps
             // that first need filtered based on the rules and priority
@@ -107,6 +108,14 @@ class ConversationGsonHelper {
                     newSteps.addAll(nestedConversation.steps)
                 }
             }
+
+            // Filter on data group
+            newSteps = newSteps.filter { step ->
+                (step as? StepNeedsDataGroup)?.let {
+                    return@filter dataGroups.contains(step.needsDataGroup)
+                }
+                return@filter true
+            }.toMutableList()
 
             return conversation.copy(
                     schemaIdentifier = conversationSchemaIdentifier,
@@ -158,8 +167,15 @@ class ConversationGsonHelper {
                     .registerSubtype(
                             ConversationMultiChoiceCheckboxStringStep::class.java,
                             ConversationStepType.multiChoiceCheckboxString.type)
+                    .registerSubtype(
+                            AssignRandomAiStep::class.java,
+                            ConversationStepType.assignRandomAi.type)
         }
     }
+}
+
+interface StepNeedsDataGroup {
+    val needsDataGroup: String?
 }
 
 data class ConversationSurvey(
@@ -236,10 +252,11 @@ data class ConversationSingleChoiceStringFormStep(
         override val type: String,
         override val title: String,
         override val buttonTitle: String,
+        override val optional: Boolean? = true,
         val choices: List<StringConversationInputFieldChoice>,
-        override val ifUserAnswers: String? = null,
-        override val optional: Boolean? = true
-): ConversationStep()
+        override val needsDataGroup: String?,
+        override val ifUserAnswers: String? = null
+): ConversationStep(), StepNeedsDataGroup
 
 data class ConversationSingleChoiceWheelStringStep(
         override val identifier: String,
@@ -309,6 +326,16 @@ data class RandomTitleStep(
         override val ifUserAnswers: String? = null,
         val titleList: List<String>): ConversationStep()
 
+data class AssignRandomAiStep(
+        override val identifier: String,
+        override val type: String,
+        override val title: String,
+        override val buttonTitle: String,
+        override val ifUserAnswers: String? = null,
+        override val optional: Boolean? = true,
+        override val needsDataGroup: String?,
+): ConversationStep(), StepNeedsDataGroup
+
 public enum class ConversationStepType(val type: String) {
     instruction("instruction"),
     singleChoiceInt("singleChoice.integer"),
@@ -321,7 +348,8 @@ public enum class ConversationStepType(val type: String) {
     nested("nested"),
     nestedGroup("nestedGroup"),
     randomTitle("instruction.random"),
-    multiChoiceCheckboxString("multiChoice.checkbox.string")
+    multiChoiceCheckboxString("multiChoice.checkbox.string"),
+    assignRandomAi("assignRandomAi")
 }
 
 public enum class NestedGroupFrequency(val type: String) {

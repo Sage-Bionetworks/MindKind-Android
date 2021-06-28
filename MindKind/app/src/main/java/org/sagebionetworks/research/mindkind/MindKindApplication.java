@@ -58,6 +58,15 @@ import dagger.android.support.HasSupportFragmentInjector;
 
 public class MindKindApplication extends BridgeSageResearchApp implements HasSupportFragmentInjector,
         HasActivityInjector, HasServiceInjector, Configuration.Provider {
+
+    public static final String DATAGROUP_ARM1 = "ARM1";
+    public static final String DATAGROUP_ARM2 = "ARM2";
+
+    public static final String SOCIAL_AI = "Social";
+    public static final String SLEEP_AI = "Sleep";
+    public static final String BODY_MOVEMENT_AI = "Movement";
+    public static final String POSITIVE_EXPERIENCES = "Experiences";
+
     @Inject
     DispatchingAndroidInjector<Activity> dispatchingActivityInjector;
 
@@ -96,5 +105,15 @@ public class MindKindApplication extends BridgeSageResearchApp implements HasSup
         return new Configuration.Builder()
                 .setMinimumLoggingLevel(android.util.Log.INFO)
                 .build();
+    }
+
+    public static String generateRandomAi() {
+        int randomAi = (int)(Math.random() * 4);
+        switch (randomAi) {
+            case 0: return SOCIAL_AI;
+            case 1: return SLEEP_AI;
+            case 2: return BODY_MOVEMENT_AI;
+            default: return POSITIVE_EXPERIENCES;
+        }
     }
 }
