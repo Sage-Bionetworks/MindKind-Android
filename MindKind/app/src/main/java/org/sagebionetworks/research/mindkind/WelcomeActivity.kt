@@ -82,8 +82,7 @@ open class WelcomeActivity: AppCompatActivity() {
     }
 
     fun onContinueClicked() {
-        startActivity(Intent(this, RegistrationActivity::class.java))
-        overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
+        returnToEntryActivity()
     }
 
     inner class WelcomeAdapter(private val mContext: Context) : PagerAdapter() {
