@@ -29,7 +29,7 @@ open class SettingsActivity: AppCompatActivity() {
         const val extraSettingsId = "EXTRA_SETTINGS_PAGE"
 
         fun logInfo(msg: String) {
-            Log.i(SettingsActivity::class.simpleName, msg)
+            Log.i(SettingsActivity::class.java.canonicalName, msg)
         }
 
         fun start(baseCtx: Context, settingsPage: String) {
@@ -66,11 +66,11 @@ open class SettingsActivity: AppCompatActivity() {
             SettingsItem("Background Data Collection", "What data are we collecting?", false, false))
 
     var backgroundItems = mutableListOf(
-            SettingsItem("Ambient Light", "Off", false, false, SageTaskIdentifier.AmbientLight),
-            SettingsItem("Screen Time", "Off", false, false, SageTaskIdentifier.ScreenTime),
-            SettingsItem("Charging Time", "Off", false, false, SageTaskIdentifier.ChargingTime),
-            SettingsItem("Battery Statistics", "Off", false, false, SageTaskIdentifier.BatteryStatistics),
-            SettingsItem("Data Usage", "Off", false, false, SageTaskIdentifier.DataUsage))
+            SettingsItem("Room Brightness", "Measure every 15 minutes to see if the light around you is becoming brighter or darker.", false, false, SageTaskIdentifier.AmbientLight, true),
+            SettingsItem("Screen Time", "How long you have your phone screen locked. We don't record what you are doing when your phone is unlocked.", false, false, SageTaskIdentifier.ScreenTime, true),
+            SettingsItem("Charging Time", "How long your phone is charging the battery.", false, false, SageTaskIdentifier.ChargingTime, true),
+            SettingsItem("Battery Statistics", "What percent of battery you have left on your phone.", false, false, SageTaskIdentifier.BatteryStatistics, true),
+            SettingsItem("Data Usage", "How much wifi and cellular data you use. We don't record where or how you use your data.", false, false, SageTaskIdentifier.DataUsage, true))
 
     @SuppressLint("UseCompatLoadingForDrawables")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -143,7 +143,7 @@ open class SettingsActivity: AppCompatActivity() {
     fun processDataTracking(item: SettingsItem?) {
         val itemUnwrapped = item ?: run { return }
         if (backgroundItems.map { it.identifier }.contains(itemUnwrapped.identifier)) {
-            showDataTrackingDialog(itemUnwrapped)
+            saveDataTrackingPermission(itemUnwrapped.identifier, itemUnwrapped.active)
         } else {
             Toast.makeText(this, "Not implemented yet.", Toast.LENGTH_LONG).show()
         }
