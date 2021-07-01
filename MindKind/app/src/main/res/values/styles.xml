@@ -132,4 +132,16 @@
         <item name="android:paddingLeft">12dp</item>
     </style>
 
+    <style name="SageSwitchStyle" parent="@style/Widget.AppCompat.CompoundButton.Switch">
+        <!-- do here for additional costumization on thumb, track background,text appearance -->
+
+
+    </style>
+    <style name="SageSwitchTheme" parent="ThemeOverlay.AppCompat.Light">
+        <item name="switchStyle">@style/SageSwitchStyle</item>
+        <item name="colorControlActivated">@color/ocean300</item>
+        <item name="colorControlNormal">@color/colorAccent</item>
+        <item name="trackTint">@color/ocean100</item>
+    </style>
+
 </resources>
