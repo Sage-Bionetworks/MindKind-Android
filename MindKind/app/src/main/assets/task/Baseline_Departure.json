@@ -5,7 +5,7 @@
   "schemaIdentifier": "Baseline_Departure",
   "steps": [
     {
-      "identifier": "Assign_AI",
+      "identifier": "Current_AI",
       "needsDataGroup": "ARM1",
       "type": "singleChoice.string",
       "title": "You get to choose your AI for the next 4 weeks, what would you like to do?",
@@ -18,7 +18,7 @@
       ]
     },
     {
-      "identifier": "Assign_AI",
+      "identifier": "Current_AI",
       "needsDataGroup": "ARM2",
       "type": "assignRandomAi",
       "optional": false

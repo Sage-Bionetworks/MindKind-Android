@@ -16,6 +16,8 @@ import org.sagebionetworks.research.domain.result.implementations.AnswerResultBa
 import org.sagebionetworks.research.domain.result.implementations.FileResultBase
 import org.sagebionetworks.research.domain.result.implementations.TaskResultBase
 import org.sagebionetworks.research.domain.result.interfaces.Result
+import org.sagebionetworks.research.mindkind.MindKindApplication
+import org.sagebionetworks.research.mindkind.MindKindApplication.CURRENT_AI_RESULT_ID
 import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService
 import org.sagebionetworks.research.mindkind.research.SageTaskIdentifier
 import org.sagebionetworks.research.mindkind.room.BackgroundDataTypeConverters
@@ -290,6 +292,16 @@ open class ConversationSurveyViewModel(
         }
 
         reportRepo.saveReports(taskResult)
+
+        // Create a new task result for the AI selection report if it's applicable
+        answers.firstOrNull { it.identifier == CURRENT_AI_RESULT_ID }?.let {
+            var aiTaskResult = TaskResultBase(SageTaskIdentifier.AI, UUID.randomUUID())
+            val aiResult = AnswerResultBase<String>(
+                    CURRENT_AI_RESULT_ID, it.startTime, it.endTime,
+                    it.answer.toString(), AnswerResultType.STRING)
+            aiTaskResult = aiTaskResult.addStepHistory(aiResult)
+            reportRepo.saveReports(aiTaskResult)
+        }
     }
 
     /**

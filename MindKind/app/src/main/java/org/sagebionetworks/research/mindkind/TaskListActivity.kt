@@ -43,13 +43,18 @@ import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat.OnRequestPermissionsResultCallback
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.*
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.common.base.Preconditions
 import dagger.android.AndroidInjection
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_task_list.*
+import org.sagebionetworks.research.domain.result.AnswerResultType
+import org.sagebionetworks.research.domain.result.implementations.AnswerResultBase
+import org.sagebionetworks.research.domain.result.implementations.TaskResultBase
 import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService
 import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService.Companion.SHOW_ENGAGEMENT_NOTIFICATION_ACTION
 import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService.Companion.isConversationComplete
@@ -58,7 +63,13 @@ import org.sagebionetworks.research.mindkind.research.SageTaskIdentifier
 import org.sagebionetworks.research.mindkind.researchstack.framework.SageResearchStack
 import org.sagebionetworks.research.mindkind.settings.SettingsActivity
 import org.sagebionetworks.research.sageresearch.dao.room.AppConfigRepository
+import org.sagebionetworks.research.sageresearch.dao.room.ReportEntity
 import org.sagebionetworks.research.sageresearch.dao.room.ReportRepository
+import org.sagebionetworks.research.sageresearch.viewmodel.ReportViewModel
+import org.sagebionetworks.research.sageresearch_app_sdk.TaskResultUploader
+import org.threeten.bp.Instant
+import org.threeten.bp.LocalDateTime
+import java.util.*
 import javax.inject.Inject
 
 /**
@@ -77,6 +88,7 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
 
     private val appConfigDisposable = CompositeDisposable()
 
+    private lateinit var viewModel: TaskListViewModel
     private lateinit var sharedPrefs: SharedPreferences
 
     @SuppressLint("SetTextI18n")
@@ -86,6 +98,9 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
         setContentView(R.layout.activity_task_list)
 
         sharedPrefs = BackgroundDataService.createSharedPrefs(this)
+
+        viewModel = ViewModelProvider(this, TaskListViewModel.Factory(
+                appConfigRepo, reportRepo)).get()
 
         val llm = LinearLayoutManager(this)
         llm.orientation = LinearLayoutManager.VERTICAL
@@ -243,5 +258,52 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
                 }
                 .setNegativeButton(R.string.rsb_BOOL_NO, null)
                 .show()
+    }
+}
+
+open class TaskListViewModel(
+        private val appConfigRepo: AppConfigRepository,
+        reportRepo: ReportRepository) : ReportViewModel(reportRepo = reportRepo) {
+
+    companion object {
+        private val TAG = TaskListViewModel::class.java.simpleName
+    }
+
+    class Factory @Inject constructor(
+            private val appConfigRepo: AppConfigRepository,
+            private val reportRepo: ReportRepository) :
+            ViewModelProvider.Factory {
+
+        // Suppress unchecked cast, pre-condition would catch it first anyways
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            Preconditions.checkArgument(modelClass.isAssignableFrom(TaskListViewModel::class.java))
+            return TaskListViewModel(appConfigRepo, reportRepo) as T
+        }
+    }
+
+    private val compositeDisposable = CompositeDisposable()
+
+    fun getAllSurveyAnswers(): LiveData<List<ReportEntity>> {
+        val endDate = LocalDateTime.now()
+        val studyStartDate = endDate.minusDays(
+                BackgroundDataService.studyDurationInWeeks * 7.toLong())
+        return reportsLiveData(SageTaskIdentifier.Surveys, studyStartDate, endDate)
+    }
+
+    fun getAiSurveyAnswers(): LiveData<List<ReportEntity>> {
+        val endDate = LocalDateTime.now()
+        val studyStartDate = endDate.minusDays(
+                (BackgroundDataService.studyDurationInWeeks + 1) * 7.toLong())
+        return reportsLiveData(SageTaskIdentifier.AI, studyStartDate, endDate)
+    }
+
+    fun saveAiAnswer(answer: String {
+        var aiTaskResult = TaskResultBase(SageTaskIdentifier.AI, UUID.randomUUID())
+        val aiResult = AnswerResultBase<String>(
+                MindKindApplication.CURRENT_AI_RESULT_ID, Instant.now(), Instant.now(),
+                answer, AnswerResultType.STRING)
+        aiTaskResult = aiTaskResult.addStepHistory(aiResult)
+        reportRepo.saveReports(aiTaskResult)
     }
 }

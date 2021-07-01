@@ -67,6 +67,8 @@ public class MindKindApplication extends BridgeSageResearchApp implements HasSup
     public static final String BODY_MOVEMENT_AI = "Movement";
     public static final String POSITIVE_EXPERIENCES = "Experiences";
 
+    public static final String CURRENT_AI_RESULT_ID = "Current_AI";
+
     @Inject
     DispatchingAndroidInjector<Activity> dispatchingActivityInjector;
 

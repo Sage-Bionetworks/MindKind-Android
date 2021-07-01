@@ -53,4 +53,5 @@ public @interface SageTaskIdentifier {
     String ScreenTime = "ScreenTime";
     String AmbientLight = "AmbientLight";
     String Surveys = "Surveys";
+    String AI = "AI";
 }
