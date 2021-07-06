@@ -5,6 +5,7 @@ import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -20,8 +21,11 @@ import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.activity_settings.*
 import org.sagebionetworks.research.mindkind.BuildConfig
 import org.sagebionetworks.research.mindkind.R
+import org.sagebionetworks.research.mindkind.R2.id.email
 import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService
+import org.sagebionetworks.research.mindkind.conversation.ConfirmationDialog
 import org.sagebionetworks.research.mindkind.research.SageTaskIdentifier
+
 
 open class SettingsActivity: AppCompatActivity() {
 
@@ -63,7 +67,8 @@ open class SettingsActivity: AppCompatActivity() {
             SettingsItem("Licenses & Copyright", null, false, false),
             SettingsItem("Options", null, false, true),
             SettingsItem("Withdraw From Study", "Currently enrolled", false, false),
-            SettingsItem("Background Data Collection", "What data are we collecting?", false, false))
+            SettingsItem("Background Data Collection", "What data are we collecting?", false, false),
+            SettingsItem("Delete My Data", "Request to have your data deleted", false, false))
 
     var backgroundItems = mutableListOf(
             SettingsItem("Room Brightness", "Measure every 15 minutes to see if the light around you is becoming brighter or darker.", false, false, SageTaskIdentifier.AmbientLight, true),
@@ -105,12 +110,13 @@ open class SettingsActivity: AppCompatActivity() {
             items = backgroundItems
         }
 
-        val adapter = SettingsAdapter(items, object: SettingsAdapterListener {
+        val adapter = SettingsAdapter(items, object : SettingsAdapterListener {
             override fun onItemClicked(item: SettingsItem?) {
                 logInfo("Item clicked $item.label")
                 when (item?.identifier) {
                     "Background Data Collection" -> goToBackgroundDataCollection()
                     "Withdraw From Study" -> goToWithdrawal()
+                    "Delete My Data" -> showDeleteMyDataContactUs()
                     else -> processDataTracking(item)
                 }
             }
@@ -138,6 +144,10 @@ open class SettingsActivity: AppCompatActivity() {
 
     fun goToWithdrawal() {
         startActivity(Intent(this, WithdrawalActivity::class.java))
+    }
+
+    fun showDeleteMyDataContactUs() {
+        showContactUsDialog()
     }
 
     fun processDataTracking(item: SettingsItem?) {
@@ -174,6 +184,40 @@ open class SettingsActivity: AppCompatActivity() {
         }
 
         dialog.show()
+    }
+
+    private fun showContactUsDialog() {
+        val fm = supportFragmentManager
+
+        val dialog = ConfirmationDialog.newInstance(
+                getString(R.string.settings_delete_your_data),
+                getString(R.string.settings_delete_your_data_desc),
+                getString(R.string.cancel),
+                getString(R.string.settings_contact_us))
+
+        dialog.show(fm, ConfirmationDialog.TAG)
+
+        dialog.setActionListener {
+            // Show email intent
+            val intent = Intent(Intent.ACTION_SENDTO)
+            intent.data = Uri.parse("mailto:") // only email apps should handle this
+            intent.putExtra(Intent.EXTRA_EMAIL, arrayOf("MindKindSupport@sagebionetworks.org"))
+            intent.putExtra(Intent.EXTRA_SUBJECT, "Delete My Data")
+            if (intent.resolveActivity(packageManager) != null) {
+                startActivity(intent)
+            } else {
+                Toast.makeText(this, "MindKindSupport@sagebionetworks.org " +
+                        "cannot send email", Toast.LENGTH_LONG)
+            }
+        }
+
+        dialog.skipButtonListener = View.OnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.cancelListener = View.OnClickListener {
+            dialog.dismiss()
+        }
     }
 
     fun saveDataTrackingPermission(identifier: String, newIsOn: Boolean) {
