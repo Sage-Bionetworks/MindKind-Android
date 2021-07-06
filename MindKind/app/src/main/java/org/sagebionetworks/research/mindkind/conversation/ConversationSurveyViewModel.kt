@@ -16,8 +16,7 @@ import org.sagebionetworks.research.domain.result.implementations.AnswerResultBa
 import org.sagebionetworks.research.domain.result.implementations.FileResultBase
 import org.sagebionetworks.research.domain.result.implementations.TaskResultBase
 import org.sagebionetworks.research.domain.result.interfaces.Result
-import org.sagebionetworks.research.mindkind.MindKindApplication
-import org.sagebionetworks.research.mindkind.MindKindApplication.CURRENT_AI_RESULT_ID
+import org.sagebionetworks.research.mindkind.MindKindApplication.REPORT_LOCAL_DATE_TIME
 import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService
 import org.sagebionetworks.research.mindkind.research.SageTaskIdentifier
 import org.sagebionetworks.research.mindkind.room.BackgroundDataTypeConverters
@@ -281,6 +280,7 @@ open class ConversationSurveyViewModel(
 
         // Convert to a task result, and process through the report entity
         var taskResult = TaskResultBase(conversationId, UUID.randomUUID())
+
         answers.map {
             when(it.type) {
                 AnswerResultType.STRING -> return@map AnswerResultBase<String>(
@@ -291,20 +291,11 @@ open class ConversationSurveyViewModel(
         }.forEach {
             taskResult = taskResult.addStepHistory(it)
         }
+        // Add local date time answer
+        taskResult = taskResult.addStepHistory(AnswerResultBase<String>(
+                REPORT_LOCAL_DATE_TIME, Instant.now(), Instant.now(),
+                LocalDateTime.now().toString(), AnswerResultType.STRING))
         reportRepo.saveReports(taskResult)
-
-        // Create a new task result for the AI selection report if it's applicable
-        answers.firstOrNull { it.identifier == CURRENT_AI_RESULT_ID }?.let {
-            var aiTaskResult = TaskResultBase(SageTaskIdentifier.AI, UUID.randomUUID())
-            val aiResult = AnswerResultBase<String>(
-                    CURRENT_AI_RESULT_ID, it.startTime, it.endTime,
-                    it.answer.toString(), AnswerResultType.STRING)
-            val aiResultLocalDateTime = AnswerResultBase<String>(
-                    CURRENT_AI_RESULT_ID, it.startTime, it.endTime,
-                    it.answer.toString(), AnswerResultType.STRING)
-            aiTaskResult = aiTaskResult.addStepHistory(aiResult)
-            reportRepo.saveReports(aiTaskResult)
-        }
     }
 
     /**

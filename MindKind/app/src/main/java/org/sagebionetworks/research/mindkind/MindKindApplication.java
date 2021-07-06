@@ -72,6 +72,7 @@ public class MindKindApplication extends BridgeSageResearchApp implements HasSup
     };
 
     public static final String CURRENT_AI_RESULT_ID = "Current_AI";
+    public static final String REPORT_LOCAL_DATE_TIME = "LocalDateTime";
 
     @Inject
     DispatchingAndroidInjector<Activity> dispatchingActivityInjector;
