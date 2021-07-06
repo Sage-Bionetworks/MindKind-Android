@@ -162,10 +162,13 @@
     <string name="welcome_3_message">Keeping up with your daily surveys and weekly check-ins gives the MindKind Study a better picture of your emotional health. You can skip any question you don\'t want to answer.</string>
     <string name="welcome_4_title">We protect your personal data</string>
     <string name="welcome_4_message">Your privacy is important to us. Encryption removes your name and encodes your data. This makes it difficult for people who view your data to be able to identify you.</string>
-    <string name="welcome_5_title">The choice is always up to you</string>
-    <string name="welcome_5_message">We are glad you’re here! You can withdraw from the MindKind Study at any time. You can ask us for a copy of your data or to delete your data.</string>
+    <string name="welcome_5_title">We only record phone data with your consent</string>
+    <string name="welcome_5_message">We record data from you phone usage. You can turn this off or on at any time and still be part of the study.</string>
+    <string name="welcome_6_title">The choice is always up to you</string>
+    <string name="welcome_6_message">We are glad you’re here! You can withdraw from the MindKind Study at any time. You can ask us for a copy of your data or to delete your data.</string>
     <string name="welcome_accept">Accept</string>
     <string name="welcome_cancel"><u>No Thanks</u></string>
+    <string name="cancel"><u>Cancel</u></string>
 
     <!-- Task List Activity -->
     <string name="day_x">Day %s</string>
@@ -182,6 +185,9 @@
     <string name="settings_withdrawal2_message">Before you go, we\'d like to ask you a few questions about your experience and reasons for leaving.  Would this be OK?</string>
     <string name="settings_withdrawal2_continue"><u>No Thanks</u></string>
     <string name="settings_withdrawal2_quit"><u>Yes, Take Survey</u></string>
+    <string name="settings_contact_us">Contact Us</string>
+    <string name="settings_delete_your_data">Delete Your Data</string>
+    <string name="settings_delete_your_data_desc">You can choose to withdraw from the study at any time. You can request a copy of your data and you can request that we delete the data we have already collected.  Contact us to withdraw from the study and request your data to be deleted or request a copy of your data.</string>
 
     <string name="settings_withdrawal_waiting_title">Withdrawing you from the MindKind study.</string>
     <string name="settings_withdrawal_waiting_message">Please wait a moment while we remove you from study.</string>

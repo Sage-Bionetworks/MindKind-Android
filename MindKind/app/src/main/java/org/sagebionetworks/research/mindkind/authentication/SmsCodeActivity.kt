@@ -85,8 +85,14 @@ open class SmsCodeActivity : AppCompatActivity() {
                 val createdOnServerTimezone: DateTime = it.createdOn
                 val jsonString: String = dateFormatter.print(createdOnServerTimezone)
                 sharedPrefs.edit().putString(studyStartDateKey, jsonString).commit()
-                // Proceed to entry to re-evaluate bridge access
-                returnToEntryActivity()
+
+                // Proceed to welcome activity
+                val intent = Intent(this, WelcomeActivity::class.java)
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
+                        Intent.FLAG_ACTIVITY_CLEAR_TASK or
+                        Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                startActivity(intent)
+                finish()
             }
         })
 

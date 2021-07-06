@@ -5,7 +5,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.widget.SwitchCompat
 import androidx.recyclerview.widget.RecyclerView
 import org.sagebionetworks.research.mindkind.R
 import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService
@@ -16,7 +18,9 @@ data class SettingsItem(
         var subtext: String?,
         val header: Boolean,
         val sectionHeader: Boolean,
-        val identifier: String = label)
+        val identifier: String = label,
+        val toggle: Boolean = false,
+        var active: Boolean = false)
 
 public interface SettingsAdapterListener {
     fun onItemClicked(item: SettingsItem?)
@@ -34,6 +38,8 @@ class SettingsAdapter(
     open class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val labelView: TextView = view.findViewById(R.id.settings_item_label)
         val subtextView: TextView? = view.findViewById(R.id.settings_item_subtext)
+        val toggleView: SwitchCompat? = view.findViewById(R.id.settings_toggle)
+        val actionView: ImageView? = view.findViewById(R.id.settings_action)
     }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): SettingsAdapter.ViewHolder {
@@ -52,16 +58,32 @@ class SettingsAdapter(
         val item = dataSet[position]
 
         viewHolder.labelView.text = item.label
+        Log.d(LOG_TAG, "Subtext: " + item.subtext)
         if(item.subtext != null) {
             viewHolder.subtextView?.text = item.subtext
             viewHolder.subtextView?.visibility = View. VISIBLE
         } else {
             viewHolder.subtextView?.visibility = View.GONE
         }
-        if(!item.header && !item.sectionHeader) {
+        if(!item.header && !item.sectionHeader && !item.toggle) {
             viewHolder.itemView.setOnClickListener {
                 listener.onItemClicked(item)
             }
+        }
+
+        if(item.toggle) {
+            viewHolder.actionView?.visibility = View.GONE
+            viewHolder.toggleView?.visibility = View.VISIBLE
+            viewHolder.toggleView?.setChecked(item.active)
+            
+            viewHolder.toggleView?.setOnCheckedChangeListener {
+                buttonView, isChecked ->
+                    item.active = isChecked
+                    listener.onItemClicked(item)
+            }
+        } else {
+            viewHolder.actionView?.visibility = View.VISIBLE
+            viewHolder.toggleView?.visibility = View.GONE
         }
     }
 
@@ -79,11 +101,7 @@ class SettingsAdapter(
     public fun updateDataTrackingItems(prefs: SharedPreferences) {
         val tracking = BackgroundDataService.loadDataAllowedToBeTracked(prefs)
         dataSet.forEach {
-            it.subtext = if (tracking.contains(it.identifier)) {
-                "On"
-            } else {
-                "Off"
-            }
+            it.active = tracking.contains(it.identifier)
         }
         notifyDataSetChanged()
     }
