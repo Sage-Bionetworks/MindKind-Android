@@ -48,7 +48,6 @@ class ConversationGsonHelper {
             val gson = createGson()
             val json = stringFromJsonAsset(context, jsonFilename)
             val dataGroups = SageResearchStack.SageDataProvider.getInstance().userDataGroups
-            dataGroups.add("ARM2")
 
             val conversation: ConversationSurvey?
             try {

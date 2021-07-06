@@ -56,6 +56,14 @@
     <string name="reminder_title_run_task">Time to complete the %s task</string>
     <string name="reminder_title_study_burst">Time to complete your study burst</string>
 
+    <!-- AI Titles -->
+    <string name="ai_social">Social Connections</string>
+    <string name="ai_sleep">Sleep</string>
+    <string name="ai_movements">Body Movements</string>
+    <string name="ai_experiences">Positive Experiences</string>
+    <string name="ai_title">Great job!</string>
+    <string name="ai_subtitle">You have completed 4 weeks of the study.  Please select the new AI for your next 4 weeks.</string>
+
     <!-- Notification Channel Strings -->
     <string name="reminder_notification_channel_id">mPower Channel</string>
     <string name="reminder_notification_channel_title">mPower Reminders</string>

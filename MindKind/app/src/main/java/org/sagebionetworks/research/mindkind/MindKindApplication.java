@@ -67,6 +67,10 @@ public class MindKindApplication extends BridgeSageResearchApp implements HasSup
     public static final String BODY_MOVEMENT_AI = "Movement";
     public static final String POSITIVE_EXPERIENCES = "Experiences";
 
+    public static final String[] AI = new String[] {
+        SOCIAL_AI, SLEEP_AI, BODY_MOVEMENT_AI, POSITIVE_EXPERIENCES
+    };
+
     public static final String CURRENT_AI_RESULT_ID = "Current_AI";
 
     @Inject
@@ -110,8 +114,12 @@ public class MindKindApplication extends BridgeSageResearchApp implements HasSup
     }
 
     public static String generateRandomAi() {
-        int randomAi = (int)(Math.random() * 4);
-        switch (randomAi) {
+        int randomAiIndex = (int)(Math.random() * 4);
+        return aiForIndex(randomAiIndex);
+    }
+
+    public static String aiForIndex(int index) {
+        switch (index) {
             case 0: return SOCIAL_AI;
             case 1: return SLEEP_AI;
             case 2: return BODY_MOVEMENT_AI;

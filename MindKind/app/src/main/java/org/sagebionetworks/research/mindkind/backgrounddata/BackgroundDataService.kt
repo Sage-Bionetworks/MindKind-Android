@@ -173,6 +173,10 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
             val studyStartDate = sharedPreferences.getString(studyStartDateKey, null)?.let {
                 dateFormatter.parseDateTime(it)
             } ?: now
+            return progressInStudy(now, studyStartDate)
+        }
+
+        fun progressInStudy(now: DateTime, studyStartDate: DateTime): ProgressInStudy {
             val week = Weeks.weeksBetween(studyStartDate.withTimeAtStartOfDay(), now).weeks + 1
             val daysFromStart = Days.daysBetween(studyStartDate.withTimeAtStartOfDay(), now).days + 1
             val dayOfWeek = (daysFromStart % 7) + 1

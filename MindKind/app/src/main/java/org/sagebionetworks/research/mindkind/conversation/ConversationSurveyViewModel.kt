@@ -254,9 +254,10 @@ open class ConversationSurveyViewModel(
                 folderPath + File.separator + "data.json")
         finalStepHistory.add(jsonFileResult)
 
-        // And the  answers map should have the dataType as it's own column in Synapse
+        // And the answers map should have the dataType as it's own column in Synapse
+        val dataType = conversationDataType()
         finalStepHistory.add(AnswerResultBase("dataType", startTime, endTime,
-                conversationDataType(), AnswerResultType.STRING))
+                dataType, AnswerResultType.STRING))
 
         // Upload the conversation result after looking for the current revision
         compositeDisposable.add(
@@ -279,7 +280,7 @@ open class ConversationSurveyViewModel(
                 }))
 
         // Convert to a task result, and process through the report entity
-        var taskResult = TaskResultBase(SageTaskIdentifier.Surveys, UUID.randomUUID())
+        var taskResult = TaskResultBase(conversationId, UUID.randomUUID())
         answers.map {
             when(it.type) {
                 AnswerResultType.STRING -> return@map AnswerResultBase<String>(
@@ -290,13 +291,15 @@ open class ConversationSurveyViewModel(
         }.forEach {
             taskResult = taskResult.addStepHistory(it)
         }
-
         reportRepo.saveReports(taskResult)
 
         // Create a new task result for the AI selection report if it's applicable
         answers.firstOrNull { it.identifier == CURRENT_AI_RESULT_ID }?.let {
             var aiTaskResult = TaskResultBase(SageTaskIdentifier.AI, UUID.randomUUID())
             val aiResult = AnswerResultBase<String>(
+                    CURRENT_AI_RESULT_ID, it.startTime, it.endTime,
+                    it.answer.toString(), AnswerResultType.STRING)
+            val aiResultLocalDateTime = AnswerResultBase<String>(
                     CURRENT_AI_RESULT_ID, it.startTime, it.endTime,
                     it.answer.toString(), AnswerResultType.STRING)
             aiTaskResult = aiTaskResult.addStepHistory(aiResult)
