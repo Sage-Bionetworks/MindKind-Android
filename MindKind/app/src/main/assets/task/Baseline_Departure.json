@@ -5,25 +5,6 @@
   "schemaIdentifier": "Baseline_Departure",
   "steps": [
     {
-      "identifier": "Current_AI",
-      "needsDataGroup": "ARM1",
-      "type": "singleChoice.string",
-      "title": "You get to choose your AI for the next 4 weeks, what would you like to do?",
-      "optional": false,
-      "choices": [
-        { "text": "Social Connections", "value": "Social" },
-        { "text": "Sleep", "value": "Sleep" },
-        { "text": "Body Movement", "value": "Movement" },
-        { "text": "Positive Experience", "value": "Experiences" }
-      ]
-    },
-    {
-      "identifier": "Current_AI",
-      "needsDataGroup": "ARM2",
-      "type": "assignRandomAi",
-      "optional": false
-    },
-    {
       "identifier": "Baseline_Departure_Instruction",
       "type": "instruction.random",
       "title": "Will be replaced with one from the titleList",

@@ -75,38 +75,11 @@
 
         <com.google.android.material.button.MaterialButton
             style="@style/Sage.MaterialButton.Rounded.Dark"
-            android:id="@+id/ai_social"
+            android:id="@+id/close_button"
             android:layout_width="match_parent"
             android:layout_height="54dp"
             android:textSize="16sp"
-            android:text="@string/ai_social"
-            android:paddingHorizontal="@dimen/margin_medium" />
-
-        <com.google.android.material.button.MaterialButton
-            style="@style/Sage.MaterialButton.Rounded.Dark"
-            android:id="@+id/ai_sleep"
-            android:layout_width="match_parent"
-            android:layout_height="54dp"
-            android:textSize="16sp"
-            android:text="@string/ai_sleep"
-            android:paddingHorizontal="@dimen/margin_medium" />
-
-        <com.google.android.material.button.MaterialButton
-            style="@style/Sage.MaterialButton.Rounded.Dark"
-            android:id="@+id/ai_movements"
-            android:layout_width="match_parent"
-            android:layout_height="54dp"
-            android:textSize="16sp"
-            android:text="@string/ai_movements"
-            android:paddingHorizontal="@dimen/margin_medium"/>
-
-        <com.google.android.material.button.MaterialButton
-            style="@style/Sage.MaterialButton.Rounded.Dark"
-            android:id="@+id/ai_experiences"
-            android:layout_width="match_parent"
-            android:layout_height="54dp"
-            android:textSize="16sp"
-            android:text="@string/ai_experiences"
+            android:text="@string/rsb_ok"
             android:paddingHorizontal="@dimen/margin_medium" />
 
     </LinearLayout>
