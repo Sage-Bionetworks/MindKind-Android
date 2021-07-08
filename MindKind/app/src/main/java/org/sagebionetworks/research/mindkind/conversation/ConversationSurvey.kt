@@ -328,7 +328,9 @@ data class RandomTitleStep(
         override val buttonTitle: String,
         override val optional: Boolean? = true,
         override val ifUserAnswers: String? = null,
-        val titleList: List<String>): ConversationStep()
+        val titleList: List<String>,
+        val useWeekNumberAsIndex: Boolean? = false,
+        val continueAfterDelay: Boolean? = false): ConversationStep()
 
 data class AssignRandomAiStep(
         override val identifier: String,

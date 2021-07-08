@@ -41,6 +41,7 @@ import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataServic
 import org.sagebionetworks.research.sageresearch.dao.room.AppConfigRepository
 import org.sagebionetworks.research.sageresearch.dao.room.ReportRepository
 import org.sagebionetworks.research.sageresearch_app_sdk.TaskResultUploader
+import java.lang.Math.max
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -92,6 +93,8 @@ open class ConversationSurveyActivity: AppCompatActivity() {
     // Use the 'by viewModels()' Kotlin property delegate
     // from the activity-ktx artifact
     lateinit var viewModel: ConversationSurveyViewModel
+
+    var weekInStudy = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
@@ -150,8 +153,8 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         })
 
         intent.extras?.getString(extraConversationId)?.let {
-
             val progress = TaskListViewModel.cachedProgressInStudy(sharedPrefs)
+            weekInStudy = progress?.week ?: 1
             val conversation = ConversationGsonHelper.createSurvey(this, it, progress) ?: run {
                 AlertDialog.Builder(this)
                         .setMessage(R.string.conversation_error_msg)
@@ -274,17 +277,32 @@ open class ConversationSurveyActivity: AppCompatActivity() {
 
         val adapter = recycler_view_conversation.adapter as ConversationAdapter
 
-        val shouldLinkWithNext = (true == (currentStep as? ConversationInstructionStep)?.continueAfterDelay)
-        val cannotEdit = currentStep is ConversationInstructionStep ||
-                currentStep is GifStep
+        val shouldLinkWithNext =
+                (true == (currentStep as? ConversationInstructionStep)?.continueAfterDelay) ||
+                (true == (currentStep as? RandomTitleStep)?.continueAfterDelay)
 
-                when (currentStep.type) {
+        val cannotEdit = currentStep is ConversationInstructionStep || currentStep is GifStep
+        when (currentStep.type) {
             ConversationStepType.randomTitle.type -> {
-                (currentStep as? RandomTitleStep)?.titleList?.shuffled()?.firstOrNull()
+                val randomTitleStep = (currentStep as? RandomTitleStep)
+                if (randomTitleStep?.useWeekNumberAsIndex == true) {
+                    val weekInStudyIdx = kotlin.math.max(weekInStudy - 1, 0)
+                    if (weekInStudyIdx < randomTitleStep.titleList.size) {
+                        randomTitleStep.titleList[weekInStudyIdx]
+                    } else {
+                        randomTitleStep.titleList.firstOrNull()
+                    }
+                } else {
+                    randomTitleStep?.titleList?.shuffled()?.firstOrNull()
+                }
             }
             ConversationStepType.gif.type -> null
             else -> currentStep.title
         }?.let {
+            // Add to the answer map which random title we showed the user
+            if (currentStep.type == ConversationStepType.randomTitle.type) {
+                viewModel.addAnswer(currentStep, it)
+            }
             adapter.addItem(currentStep.identifier, it, true, shouldLinkWithNext, cannotEdit)
         }
 
@@ -362,7 +380,8 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         button_container.removeAllViews()
 
         val continueAfterDelay =
-                (instructionStep as? ConversationInstructionStep)?.continueAfterDelay ?: false
+                ((instructionStep as? ConversationInstructionStep)?.continueAfterDelay ?: false) ||
+                ((instructionStep as? RandomTitleStep)?.continueAfterDelay ?: false)
 
         // If continuing after delay, we don't add the bottom button layout
         if (continueAfterDelay) {
@@ -673,7 +692,11 @@ open class ConversationSurveyActivity: AppCompatActivity() {
             (this.layoutInflater.inflate(R.layout.conversation_material_button,
                     button_container, false) as? MaterialButton)?.let {
 
-                it.text = getString(R.string.text_input_submit_button)
+                it.text = if (step.buttonTitle.isEmpty()) {
+                    getString(R.string.text_input_submit_button)
+                } else {
+                    step.buttonTitle
+                }
 
                 it.setOnClickListener {
                     disableAllButtons()

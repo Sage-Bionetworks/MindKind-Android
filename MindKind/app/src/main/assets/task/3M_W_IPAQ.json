@@ -1,0 +1,108 @@
+{
+  "identifier": "IPAQ_Physical",
+  "type": "conversationSurvey",
+  "taskIdentifier": "IPAQ_Physical",
+  "schemaIdentifier": "IPAQ_Physical",
+  "measureType": "Validated",
+  "steps": [
+    {
+      "identifier": "IPAQ_VigorousIntro",
+      "type": "instruction",
+      "title": "Think about all the VIGOROUS activities that you did in the last 7 days. VIGOROUS physical activities refer to activities that take hard physical effort and make you breathe much harder than normal. Think only about those physical activities that you did for at least 10 minutes at a time.",
+      "optional": false,
+      "continueAfterDelay": true
+    },
+    {
+      "identifier": "IPAQ_1_VigorousDays",
+      "type": "integer",
+      "title": "During the last 7 days, on how many days did you do vigorous physical activities like heavy lifting, digging, aerobics, or fast bicycling?",
+      "buttonTitle": "Ok",
+      "min": 0,
+      "max": 7,
+      "ifUserAnswers": "0, skip to IPAQ_ModerateIntro"
+    },
+    {
+      "identifier": "IPAQ_2_VigorousTime",
+      "title": "How much time did you usually spend doing vigorous physical activities on one of those days? (in minutes)",
+      "buttonTitle": "Ok",
+      "type": "text",
+      "ifUserAnswers": "0, skip to IPAQ_ModerateIntro",
+      "maxCharacters": 3,
+      "placeholderText": "Time (in minutes)",
+      "maxLines": 1,
+      "inputType": "integer"
+    },
+    {
+      "identifier": "IPAQ_ModerateIntro",
+      "type": "instruction",
+      "title": "Think about all the MODERATE activities that you did in the last 7 days. MODERATE activities refer to activities that take moderate physical effort and make you breathe somewhat harder than normal. Think only about those physical activities that you did for at least 10 minutes at a time.",
+      "optional": false,
+      "continueAfterDelay": true
+    },
+    {
+      "identifier": "IPAQ_3_ModerateDays",
+      "type": "integer",
+      "title": "During the last 7 days, on how many days did you do MODERATE physical activities like heavy lifting, digging, aerobics, or fast bicycling?",
+      "buttonTitle": "Ok",
+      "min": 0,
+      "max": 7,
+      "ifUserAnswers": "0, skip to IPAQ_WalkingIntro"
+    },
+    {
+      "identifier": "IPAQ_4_ModerateTime",
+      "title": "How much time did you usually spend doing MODERATE physical activities on one of those days? (in minutes)",
+      "buttonTitle": "Ok",
+      "ifUserAnswers": "0, skip to IPAQ_WalkingIntro",
+      "type": "text",
+      "maxCharacters": 3,
+      "placeholderText": "Time (in minutes)",
+      "maxLines": 1,
+      "inputType": "integer"
+    },
+    {
+      "identifier": "IPAQ_WalkingIntro",
+      "type": "instruction",
+      "title": "Think about the time you spent WALKING in the last 7 days. This includes at work and at home, walking to travel from place to place, and any other walking that you have done solely for recreation, sport, exercise, or leisure.",
+      "optional": false,
+      "continueAfterDelay": true
+    },
+    {
+      "identifier": "IPAQ_5_WalkDays",
+      "type": "integer",
+      "title": "During the last 7 days, on how many days did you WALK for at least 10 minutes at a time? ",
+      "buttonTitle": "Ok",
+      "min": 0,
+      "max": 7,
+      "ifUserAnswers": "0, skip to IPAQ_SITIntro"
+    },
+    {
+      "identifier": "IPAQ_6_WALKTime",
+      "title": "How much time did you usually spend WALKING on one of those days?",
+      "buttonTitle": "Ok",
+      "ifUserAnswers": "0, skip to IPAQ_SITIntro",
+      "type": "text",
+      "maxCharacters": 3,
+      "placeholderText": "Time (in minutes)",
+      "maxLines": 1,
+      "inputType": "integer"
+    },
+    {
+      "identifier": "IPAQ_SITIntro",
+      "type": "instruction",
+      "title": "The last question is about the time you spent SITTING on weekdays during the last 7 days. Include time spent at work, at home, while doing course work and during leisure time. This may include time spent SITTING at a desk, visiting friends, reading, or sitting or lying down to watch television.",
+      "optional": false,
+      "continueAfterDelay": true
+    },
+    {
+      "identifier": "IPAQ_7_SitTime",
+      "title": "During the last 7 days, how much time did you spend SITTING on a week day",
+      "buttonTitle": "Ok",
+      "ifUserAnswers": "0, skip to Next Activity",
+      "type": "text",
+      "maxCharacters": 3,
+      "placeholderText": "Time (in minutes)",
+      "maxLines": 1,
+      "inputType": "integer"
+    }
+  ]
+}

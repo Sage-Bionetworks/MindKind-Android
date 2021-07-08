@@ -429,6 +429,7 @@ open class TaskListViewModel(
                                  baselineEntities: List<ReportEntity>,
                                  completedAiToday: List<ReportEntity>): List<TaskListItem> {
 
+            return orderedTaskItemList()
             return orderedTaskItemList().filter { item ->
                 if (item.identifier.startsWith(SageTaskIdentifier.Baseline)) {
                     return@filter baselineEntities.firstOrNull {
@@ -500,7 +501,7 @@ open class TaskListViewModel(
                             R.string.movements_title,
                             R.string.three_to_seven_minutes,
                             R.string.movements_detail,
-                            "Body_Movements"),
+                            "BodyMovement"),
                     TaskListItem(MindKindApplication.SOCIAL_AI,
                             R.string.social_title,
                             R.string.three_to_seven_minutes,
@@ -567,6 +568,10 @@ open class TaskListViewModel(
             val aiReports = aiReportsLiveData?.value
             val completedAi = completedAiTodayLiveData?.value
 
+            // Edge case bug fix for when the ReportRepo clears out the db
+            // To Re-write reports that come down from the web
+            // The live data gets a call back that there are now zero ai reports
+            // which temporarily causes issues, so check to see if the ai state is stale
             val newBaselineCount = baselines?.size ?: -1
             val newAiReportsCount = aiReports?.size ?: -1
             val newCompletedAiCount = completedAi?.size ?: -1
@@ -584,11 +589,6 @@ open class TaskListViewModel(
                 lastCompletedAiReportCount = newCompletedAiCount
 
                 val aiState = consolidateAiValues(LocalDateTime.now(), baselines, aiReports)
-
-                // Edge case bug fix for when the ReportRepo clears out the db
-                // To Re-write reports that come down from the web
-                // The live data gets a call back that there are now zero ai reports
-                // which temporarily causes issues, so check to see if the ai state is stale
                 val taskItems = consolidateTaskItems(aiState, baselines, completedAi)
                 val state = TaskListState(aiState, taskItems)
                 mediator.postValue(state)

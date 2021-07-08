@@ -175,7 +175,7 @@
     <string name="week_x">Week %s</string>
     <string name="week_12">Week 12</string>
     <string name="arm1_week_1_ai_title">Let’s get started!</string>
-    <string name="arm1_week_1_ai_text">Choose one of these options.</string>
+    <string name="arm1_week_1_ai_text">Please choose one of the options for your first topic. If you want, you\’ll have the opportunity to try something else later.</string>
     <string name="arm1_other_weeks_ai_title">Great job completing the first section!</string>
     <string name="arm1_other_weeks_ai_text">Now you get to choose your topic for the next section.</string>
     <string name="arm2_week_1_ai_title">Let’s get started on your daily experience!</string>

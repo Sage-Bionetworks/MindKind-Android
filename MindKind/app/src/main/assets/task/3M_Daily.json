@@ -1,0 +1,38 @@
+{
+  "identifier": "3M_Daily",
+  "type": "conversationSurvey",
+  "taskIdentifier": "3M_Daily",
+  "schemaIdentifier": "3M_Daily",
+  "steps": [
+    {
+      "identifier": "3M_Daily_Y",
+      "type": "singleChoice.integer",
+      "title": "Did you exercise or play so hard that your body got tired?",
+      "ifUserAnswers": "No, skip to 3M_Dept",
+      "choices": [
+        { "text": "No"  ,               "value": 0 },
+        { "text": "Yes" ,               "value": 1 }
+      ]
+    },
+    {
+      "identifier": "3M_Daily_Locale",
+      "type": "singleChoice.integer",
+      "title": "How hard did you exercise today?",
+      "choices": [
+        { "text": "None"     ,          "value": 0 },
+        { "text": "Hard"     ,          "value": 1 },  
+        { "text": "Very Hard",          "value": 2 }
+      ]
+    },
+    {
+      "identifier": "3M_Daily_Enjoy",
+      "type": "singleChoice.integer",
+      "title": "How much did exercising help you with your feelings today?",
+      "choices": [
+        { "text": "Not at All"  ,         "value": 0 },
+        { "text": "A Little Bit",         "value": 1 },
+        { "text": "Very Much"   ,         "value": 2 }
+      ]
+    }
+  ]
+}
