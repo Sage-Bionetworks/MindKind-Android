@@ -429,7 +429,6 @@ open class TaskListViewModel(
                                  baselineEntities: List<ReportEntity>,
                                  completedAiToday: List<ReportEntity>): List<TaskListItem> {
 
-            return orderedTaskItemList()
             return orderedTaskItemList().filter { item ->
                 if (item.identifier.startsWith(SageTaskIdentifier.Baseline)) {
                     return@filter baselineEntities.firstOrNull {
