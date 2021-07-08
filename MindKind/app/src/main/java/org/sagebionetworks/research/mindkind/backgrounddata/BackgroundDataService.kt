@@ -152,63 +152,13 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
             }
         }
 
-        public const val studyStartDateKey = "StudyStartDate"
-        public const val completedTasksKey = "completeTasks"
         public const val hasShownWithdrawalNotifKey = "hasShownWithdrawalNotif"
-        public val dateFormatter = ISODateTimeFormat.dateTime().withOffsetParsed()
-
-        public const val BASELINE_IDENTIFIER_KEY = "Baseline"
-        public const val BASELINE_ENVIRONMENT_IDENTIFIER_KEY = "Baseline_Environment"
-        public const val BASELINE_HABITS_IDENTIFIER_KEY = "Baseline_Habits"
-        public val ONE_TIME_SURVEYS = arrayOf(BASELINE_IDENTIFIER_KEY, BASELINE_ENVIRONMENT_IDENTIFIER_KEY)
 
         fun createSharedPrefs(context: Context): SharedPreferences {
             return context.getSharedPreferences("Mindkind", MODE_PRIVATE)
         }
 
         public const val studyDurationInWeeks = 12
-
-        fun progressInStudy(sharedPreferences: SharedPreferences): ProgressInStudy {
-            val now = DateTime.now()
-            val studyStartDate = sharedPreferences.getString(studyStartDateKey, null)?.let {
-                dateFormatter.parseDateTime(it)
-            } ?: now
-            val week = Weeks.weeksBetween(studyStartDate.withTimeAtStartOfDay(), now).weeks + 1
-            val daysFromStart = Days.daysBetween(studyStartDate.withTimeAtStartOfDay(), now).days + 1
-            val dayOfWeek = (daysFromStart % 7) + 1
-            return ProgressInStudy(week, dayOfWeek, daysFromStart)
-        }
-
-        fun isConversationComplete(sharedPreferences: SharedPreferences, identifier: String): Boolean {
-            val progress = progressInStudy(sharedPreferences)
-            sharedPreferences.getStringSet(completedTasksKey, null)?.let {
-                return if (ONE_TIME_SURVEYS.contains(identifier)) {
-                    it.contains(identifier)
-                } else {
-                    it.contains("$identifier $progress")
-                }
-            }
-            return false
-        }
-
-        // We need the changes to be reflected immediately
-        @SuppressLint("ApplySharedPref")
-        fun markConversationComplete(sharedPreferences: SharedPreferences, identifier: String) {
-            val progress = progressInStudy(sharedPreferences)
-            val editPrefs = sharedPreferences.edit()
-            editPrefs.putString(ConversationSurveyActivity.completedDateKey, LocalDateTime.now().toString())
-
-            val prev = sharedPreferences.getStringSet(completedTasksKey, null)
-                    ?.toMutableSet() ?: mutableSetOf()
-            prev.add( if (ONE_TIME_SURVEYS.contains(identifier)) {
-                identifier
-            } else {
-                "$identifier $progress"
-            })
-            editPrefs.putStringSet(completedTasksKey, prev)
-
-            editPrefs.commit()
-        }
 
         // List of data types to track
         // This should be hooked up to the permission manager's list of data the user wants us to track
@@ -802,9 +752,13 @@ public data class ProgressInStudy(
          */
         val dayOfWeek: Int,
         /**
-         * @property daysFromStart of the study. Initial day is 1, not 0.
+         * @property daysFromStart of the study. Initial day is 0, not 1.
          */
-        val daysFromStart: Int) {
+        val daysFromStart: Int,
+        /**
+         * @property localStart the start of the next day after user completes the "About you" survey
+         */
+        val localStart: LocalDateTime) {
 
     override fun toString(): String {
         return "Week $week | Day $dayOfWeek"

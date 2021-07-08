@@ -56,6 +56,14 @@
     <string name="reminder_title_run_task">Time to complete the %s task</string>
     <string name="reminder_title_study_burst">Time to complete your study burst</string>
 
+    <!-- AI Titles -->
+    <string name="ai_social">Social Connections</string>
+    <string name="ai_sleep">Sleep</string>
+    <string name="ai_movements">Body Movements</string>
+    <string name="ai_experiences">Positive Experiences</string>
+    <string name="ai_title">Great job!</string>
+    <string name="ai_subtitle">You have completed 4 weeks of the study.  Please select the new AI for your next 4 weeks.</string>
+
     <!-- Notification Channel Strings -->
     <string name="reminder_notification_channel_id">mPower Channel</string>
     <string name="reminder_notification_channel_title">mPower Reminders</string>
@@ -166,6 +174,35 @@
     <string name="day_x">Day %s</string>
     <string name="week_x">Week %s</string>
     <string name="week_12">Week 12</string>
+    <string name="arm1_week_1_ai_title">Let’s get started!</string>
+    <string name="arm1_week_1_ai_text">Choose one of these options.</string>
+    <string name="arm1_other_weeks_ai_title">Great job completing the first section!</string>
+    <string name="arm1_other_weeks_ai_text">Now you get to choose your topic for the next section.</string>
+    <string name="arm2_week_1_ai_title">Let’s get started on your daily experience!</string>
+    <string name="arm2_week_1_ai_text">For the first section, we’ll ask you about your %s. Be sure to come back daily to tell us how things are going.</string>
+    <string name="arm2_other_weeks_ai_title">Great job completing the first section!</string>
+    <string name="arm2_other_weeks_ai_text">For the next section, your new topic is %s.</string>
+
+    <string name="three_minutes">3 minutes</string>
+    <string name="six_minutes">6 minutes</string>
+    <string name="three_to_seven_minutes">3–7 minutes</string>
+
+    <string name="about_you_title">About you</string>
+    <string name="about_you_detail">We would like to learn a little bit about you</string>
+    <string name="env_title">Your environment</string>
+    <string name="env_detail">Help us learn more about the world around you</string>
+    <string name="habits_title">Your habits</string>
+    <string name="habits_detail">Let us know what you do each day</string>
+    <string name="health_title">Your health</string>
+    <string name="health_detail">Tell us about your physical and mental health</string>
+    <string name="sleep_title">Sleep</string>
+    <string name="sleep_detail">Record your daily sleep patterns</string>
+    <string name="exp_title">Positive experiences</string>
+    <string name="exp_detail">Do positive experiences affect your outlook?</string>
+    <string name="movements_title">Body movement</string>
+    <string name="movements_detail">Does physical activity affect your happiness?</string>
+    <string name="social_title">Social connections</string>
+    <string name="social_detail">See if social connections make a difference in how you feel</string>
 
     <!-- Settings -->
     <string name="save_button">Save</string>

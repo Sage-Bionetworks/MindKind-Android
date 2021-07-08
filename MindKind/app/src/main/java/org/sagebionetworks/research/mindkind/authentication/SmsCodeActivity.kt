@@ -29,8 +29,6 @@ import org.sagebionetworks.bridge.rest.model.Phone
 import org.sagebionetworks.bridge.rest.model.SignUp
 import org.sagebionetworks.bridge.rest.model.UserSessionInfo
 import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService
-import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService.Companion.dateFormatter
-import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService.Companion.studyStartDateKey
 import org.sagebionetworks.researchstack.backbone.DataResponse
 import org.slf4j.LoggerFactory
 import rx.subscriptions.CompositeSubscription
@@ -81,11 +79,6 @@ open class SmsCodeActivity : AppCompatActivity() {
 
         viewModel.getIsSignedUpLiveData().observe(this, Observer { user ->
             user?.let {
-                // Save study start date
-                val createdOnServerTimezone: DateTime = it.createdOn
-                val jsonString: String = dateFormatter.print(createdOnServerTimezone)
-                sharedPrefs.edit().putString(studyStartDateKey, jsonString).commit()
-
                 // Proceed to welcome activity
                 val intent = Intent(this, WelcomeActivity::class.java)
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or

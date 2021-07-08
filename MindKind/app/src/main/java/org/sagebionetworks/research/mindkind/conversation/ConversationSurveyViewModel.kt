@@ -16,6 +16,9 @@ import org.sagebionetworks.research.domain.result.implementations.AnswerResultBa
 import org.sagebionetworks.research.domain.result.implementations.FileResultBase
 import org.sagebionetworks.research.domain.result.implementations.TaskResultBase
 import org.sagebionetworks.research.domain.result.interfaces.Result
+import org.sagebionetworks.research.mindkind.MindKindApplication.REPORT_LOCAL_DATE_TIME
+import org.sagebionetworks.research.mindkind.MindKindApplication.RESULT_DATA_TYPE
+import org.sagebionetworks.research.mindkind.TaskListViewModel
 import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService
 import org.sagebionetworks.research.mindkind.research.SageTaskIdentifier
 import org.sagebionetworks.research.mindkind.room.BackgroundDataTypeConverters
@@ -224,7 +227,7 @@ open class ConversationSurveyViewModel(
         val taskIdentifier = SageTaskIdentifier.Surveys
         val conversationId = conversationSurvey.value?.identifier ?: run { return }
 
-        BackgroundDataService.markConversationComplete(sharedPrefs, conversationId)
+        TaskListViewModel.markConversationComplete(sharedPrefs)
 
         val answers = answersLiveData.value ?: arrayListOf()
         val stepHistory = ArrayList(answers.sortedWith(compareBy { it.startTime }))
@@ -252,9 +255,10 @@ open class ConversationSurveyViewModel(
                 folderPath + File.separator + "data.json")
         finalStepHistory.add(jsonFileResult)
 
-        // And the  answers map should have the dataType as it's own column in Synapse
-        finalStepHistory.add(AnswerResultBase("dataType", startTime, endTime,
-                conversationDataType(), AnswerResultType.STRING))
+        // And the answers map should have the dataType as it's own column in Synapse
+        val dataType = conversationDataType()
+        finalStepHistory.add(AnswerResultBase(RESULT_DATA_TYPE, startTime, endTime,
+                dataType, AnswerResultType.STRING))
 
         // Upload the conversation result after looking for the current revision
         compositeDisposable.add(
@@ -277,7 +281,16 @@ open class ConversationSurveyViewModel(
                 }))
 
         // Convert to a task result, and process through the report entity
-        var taskResult = TaskResultBase(SageTaskIdentifier.Surveys, UUID.randomUUID())
+        val reportId = if(conversationId.startsWith(SageTaskIdentifier.Baseline)) {
+            SageTaskIdentifier.Baseline
+        } else {
+            SageTaskIdentifier.Surveys
+        }
+        var taskResult = TaskResultBase(reportId, UUID.randomUUID())
+        taskResult = taskResult.addStepHistory(
+                AnswerResultBase(RESULT_DATA_TYPE, startTime, endTime,
+                        stripCountry(dataType), AnswerResultType.STRING))
+
         answers.map {
             when(it.type) {
                 AnswerResultType.STRING -> return@map AnswerResultBase<String>(
@@ -288,8 +301,19 @@ open class ConversationSurveyViewModel(
         }.forEach {
             taskResult = taskResult.addStepHistory(it)
         }
-
+        // Add local date time answer
+        taskResult = taskResult.addStepHistory(AnswerResultBase<String>(
+                REPORT_LOCAL_DATE_TIME, Instant.now(), Instant.now(),
+                LocalDateTime.now().toString(), AnswerResultType.STRING))
         reportRepo.saveReports(taskResult)
+    }
+
+    fun stripCountry(dataType: String): String {
+        return dataType
+                .replace("UK", "")
+                .replace("SA", "")
+                .replace("IN", "")
+                .replace("USTest", "")
     }
 
     /**

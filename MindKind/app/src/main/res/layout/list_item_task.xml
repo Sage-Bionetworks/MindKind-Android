@@ -27,7 +27,7 @@
                 android:id="@+id/survey_detail_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="GAD-7 Anxiety"
+                android:text=""
                 android:textSize="18sp"
                 android:textColor="@color/dark_text"
                 android:textStyle="bold"
@@ -35,10 +35,10 @@
                 android:paddingBottom="8dp"/>
 
             <TextView
-                android:id="@+id/survey_detail_label"
+                android:id="@+id/survey_time_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Ready to start your day!?  "
+                android:text=""
                 android:textSize="16sp"
                 android:textColor="@color/light_text"
                 android:textStyle="italic"
@@ -46,9 +46,10 @@
                 android:layout_marginVertical="8dp"/>
 
             <TextView
+                android:id="@+id/survey_detail_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="See how your daily life affects your stress levels and happiness."
+                android:text=""
                 android:textSize="18sp"
                 android:textColor="@color/dark_text"
                 android:fontFamily="@font/lato"
@@ -66,16 +67,6 @@
             android:paddingRight="16dp"
             android:paddingBottom="8dp"
             app:tint="@color/denim" />
-
-        <ImageView
-            android:id="@+id/done_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_done"
-            android:contentDescription="@string/rsb_done"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentBottom="true"
-            android:paddingRight="8dp"/>
 
     </RelativeLayout>
 </com.google.android.material.card.MaterialCardView>

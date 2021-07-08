@@ -96,7 +96,8 @@
         android:layout_height="wrap_content"
         android:background="@color/sageResearchSecondary"
         android:layout_below="@id/task_list_header"
-        android:layout_margin="10dp">
+        android:layout_margin="10dp"
+        android:visibility="gone">
 
         <ProgressBar
             android:id="@+id/task_progress_bar"
@@ -138,6 +139,7 @@
             android:text="@string/week_12"
             android:textSize="14dp"
             android:textColor="@color/dark_text" />
+
     </RelativeLayout>
 
     <androidx.recyclerview.widget.RecyclerView
@@ -147,5 +149,13 @@
         android:layout_below="@id/task_progress_container"
         android:background="@color/splash"/>
 
+    <ProgressBar
+        android:id="@+id/loading_progress"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:visibility="gone"
+        android:layout_below="@id/task_progress_container"/>
 
 </RelativeLayout>

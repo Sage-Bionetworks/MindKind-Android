@@ -100,10 +100,6 @@ class ExternalIdSignInActivity : AppCompatActivity() {
 
         externalIdViewModel.isSignedInLiveData.observe(this, Observer { user: UserSessionInfo? ->
             user?.let {
-                // Save study start date
-                val createdOnServerTimezone: DateTime = it.createdOn
-                val jsonString: String = BackgroundDataService.dateFormatter.print(createdOnServerTimezone)
-                sharedPrefs.edit().putString(BackgroundDataService.studyStartDateKey, jsonString).commit()
                 // Proceed to entry to re-evaluate bridge access
                 returnToEntryActivity()
             }

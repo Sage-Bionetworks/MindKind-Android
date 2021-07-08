@@ -45,6 +45,7 @@ import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataServic
 import org.sagebionetworks.research.mindkind.research.SageTaskIdentifier
 import org.sagebionetworks.research.mindkind.room.BackgroundDataEntity
 import org.threeten.bp.LocalDateTime
+import org.threeten.bp.ZoneId
 
 @RunWith(AndroidJUnit4::class)
 // ran into multi-dex issues moving this to a library project, leaving it here for now
@@ -59,7 +60,7 @@ class BackgroundDataRoomTests: RoomTestHelper() {
                 3,
                 7,
                 12,
-                0)
+                0).atZone(ZoneId.systemDefault())
 
         // 1pm on 3/7/21
         private val march7th1PM = LocalDateTime.of(
@@ -67,7 +68,7 @@ class BackgroundDataRoomTests: RoomTestHelper() {
                 3,
                 7,
                 13,
-                0)
+                0).atZone(ZoneId.systemDefault())
 
         // 2pm on 3/7/21
         private val march7th2PM = LocalDateTime.of(
@@ -75,7 +76,7 @@ class BackgroundDataRoomTests: RoomTestHelper() {
                 3,
                 7,
                 14,
-                0)
+                0).atZone(ZoneId.systemDefault())
 
         private val userPresentData = BackgroundDataEntity(
                 primaryKey = 0,

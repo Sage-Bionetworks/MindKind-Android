@@ -33,7 +33,10 @@ import kotlinx.android.synthetic.main.activity_conversation_survey.*
 import kotlinx.android.synthetic.main.integer_input.view.*
 import kotlinx.android.synthetic.main.number_picker.view.*
 import kotlinx.android.synthetic.main.text_input.view.*
+import org.sagebionetworks.research.mindkind.MindKindApplication
 import org.sagebionetworks.research.mindkind.R
+import org.sagebionetworks.research.mindkind.TaskListActivity
+import org.sagebionetworks.research.mindkind.TaskListViewModel
 import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService
 import org.sagebionetworks.research.sageresearch.dao.room.AppConfigRepository
 import org.sagebionetworks.research.sageresearch.dao.room.ReportRepository
@@ -148,7 +151,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
 
         intent.extras?.getString(extraConversationId)?.let {
 
-            val progress = BackgroundDataService.progressInStudy(sharedPrefs)
+            val progress = TaskListViewModel.cachedProgressInStudy(sharedPrefs)
             val conversation = ConversationGsonHelper.createSurvey(this, it, progress) ?: run {
                 AlertDialog.Builder(this)
                         .setMessage(R.string.conversation_error_msg)
@@ -254,10 +257,18 @@ open class ConversationSurveyActivity: AppCompatActivity() {
     }
 
     private fun addQuestion(scroll: Boolean) {
+
         viewModel.goToNextStep()
 
         val currentStep = viewModel.getCurrentStep() ?: run {
             completeConversation()
+            return
+        }
+
+        // Edge case treatment of random AI assignment, assign the AI, and go to next step
+        if (currentStep.type == ConversationStepType.assignRandomAi.type) {
+            handleRandomAi(currentStep as? AssignRandomAiStep)
+            addQuestion(scroll)
             return
         }
 
@@ -738,6 +749,12 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         val adapter = recycler_view_conversation.adapter as ConversationAdapter
         val gifTitle: String? = gifStep.title
         adapter.addGif(gifStep.identifier, gifTitle ?: "", step.gifUrl)
+    }
+
+    private fun handleRandomAi(randomAiStep: AssignRandomAiStep?) {
+        val step = randomAiStep ?: run { return }
+        val randomAi = MindKindApplication.generateRandomAi()
+        viewModel.addAnswer(step, randomAi)
     }
 }
 
