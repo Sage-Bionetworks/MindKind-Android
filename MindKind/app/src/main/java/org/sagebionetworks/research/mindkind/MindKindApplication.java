@@ -48,7 +48,6 @@ import org.sagebionetworks.research.sageresearch.BridgeSageResearchApp;
 import javax.inject.Inject;
 
 import androidx.work.Configuration;
-import androidx.work.WorkerFactory;
 import dagger.android.AndroidInjector;
 import dagger.android.DispatchingAndroidInjector;
 import dagger.android.HasActivityInjector;
@@ -59,20 +58,21 @@ import dagger.android.support.HasSupportFragmentInjector;
 public class MindKindApplication extends BridgeSageResearchApp implements HasSupportFragmentInjector,
         HasActivityInjector, HasServiceInjector, Configuration.Provider {
 
-    public static final String DATAGROUP_ARM1 = "ARM1";
-    public static final String DATAGROUP_ARM2 = "ARM2";
+    public static final String DATAGROUP_ARM1 = "ARM1_choice";
+    public static final String DATAGROUP_ARM2 = "ARM2_assigned";
 
     public static final String SOCIAL_AI = "Social";
     public static final String SLEEP_AI = "Sleep";
     public static final String BODY_MOVEMENT_AI = "Movement";
-    public static final String POSITIVE_EXPERIENCES = "Experiences";
+    public static final String POSITIVE_EXPERIENCES_AI = "Experiences";
 
     public static final String[] AI = new String[] {
-        SOCIAL_AI, SLEEP_AI, BODY_MOVEMENT_AI, POSITIVE_EXPERIENCES
+        SOCIAL_AI, SLEEP_AI, BODY_MOVEMENT_AI, POSITIVE_EXPERIENCES_AI
     };
 
     public static final String CURRENT_AI_RESULT_ID = "Current_AI";
     public static final String REPORT_LOCAL_DATE_TIME = "LocalDateTime";
+    public static final String RESULT_DATA_TYPE = "dataType";
 
     @Inject
     DispatchingAndroidInjector<Activity> dispatchingActivityInjector;
@@ -124,7 +124,7 @@ public class MindKindApplication extends BridgeSageResearchApp implements HasSup
             case 0: return SOCIAL_AI;
             case 1: return SLEEP_AI;
             case 2: return BODY_MOVEMENT_AI;
-            default: return POSITIVE_EXPERIENCES;
+            default: return POSITIVE_EXPERIENCES_AI;
         }
     }
 }

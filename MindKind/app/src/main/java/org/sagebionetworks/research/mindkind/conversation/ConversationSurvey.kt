@@ -44,7 +44,7 @@ class ConversationGsonHelper {
          * @param jsonFilename json filename without the ".json" file extension
          * @return a parsed ConversationSurvey that has all it's nested steps expanded
          */
-        fun createSurvey(context: Context, jsonFilename: String, progress: ProgressInStudy): ConversationSurvey? {
+        fun createSurvey(context: Context, jsonFilename: String, progress: ProgressInStudy?): ConversationSurvey? {
             val gson = createGson()
             val json = stringFromJsonAsset(context, jsonFilename)
             val dataGroups = SageResearchStack.SageDataProvider.getInstance().userDataGroups
@@ -121,12 +121,17 @@ class ConversationGsonHelper {
                     steps = newSteps)
         }
 
-        fun shouldInclude(step: NestedGroupStep, progress: ProgressInStudy): Boolean {
+        fun shouldInclude(step: NestedGroupStep, progress: ProgressInStudy?): Boolean {
+            if (progress == null) {
+                Log.w(TAG, "Study progress is null, we shouldn't be here")
+                return step.frequency == NestedGroupFrequency.once ||
+                        step.frequency == NestedGroupFrequency.daily
+            }
             return when(step.frequency) {
                 NestedGroupFrequency.weekly -> progress.dayOfWeek == step.startDay
                 NestedGroupFrequency.weeklyRandom -> progress.dayOfWeek == (1..7).shuffled().first()
                 NestedGroupFrequency.once -> true
-                else /* .daily */ -> progress.daysFromStart >= step.startDay
+                else /* .daily */ -> (progress.daysFromStart + 1) >= step.startDay
             }
         }
 

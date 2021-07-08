@@ -35,6 +35,8 @@ import kotlinx.android.synthetic.main.number_picker.view.*
 import kotlinx.android.synthetic.main.text_input.view.*
 import org.sagebionetworks.research.mindkind.MindKindApplication
 import org.sagebionetworks.research.mindkind.R
+import org.sagebionetworks.research.mindkind.TaskListActivity
+import org.sagebionetworks.research.mindkind.TaskListViewModel
 import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService
 import org.sagebionetworks.research.sageresearch.dao.room.AppConfigRepository
 import org.sagebionetworks.research.sageresearch.dao.room.ReportRepository
@@ -149,7 +151,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
 
         intent.extras?.getString(extraConversationId)?.let {
 
-            val progress = BackgroundDataService.progressInStudy(sharedPrefs)
+            val progress = TaskListViewModel.cachedProgressInStudy(sharedPrefs)
             val conversation = ConversationGsonHelper.createSurvey(this, it, progress) ?: run {
                 AlertDialog.Builder(this)
                         .setMessage(R.string.conversation_error_msg)

@@ -8,19 +8,19 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-open class TaskItem(
-    val identifier: String,
-    val title: String,
-    val label: String,
-    val jsonResourceName: String?,
-    var isComplete: Boolean)
+open class TaskListItem(
+        val identifier: String,
+        val titleResId: Int,
+        val timeResId: Int,
+        val detailResId: Int,
+        val jsonResourceName: String)
 
 public interface TaskAdapterListener {
     fun onTaskClicked(jsonResourceName: String?)
 }
 
 class TaskAdapter(
-        var dataSet: MutableList<TaskItem>,
+        var dataSet: MutableList<TaskListItem>,
         private val listener: TaskAdapterListener) :
         RecyclerView.Adapter<TaskAdapter.ViewHolder>() {
 
@@ -30,8 +30,8 @@ class TaskAdapter(
 
     open class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val title: TextView = view.findViewById(R.id.survey_detail_title)
-        val label: TextView = view.findViewById(R.id.survey_detail_label)
-        val doneIcon: ImageView = view.findViewById(R.id.done_icon)
+        val text: TextView = view.findViewById(R.id.survey_detail_text)
+        val timeLabel: TextView = view.findViewById(R.id.survey_time_label)
     }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): ViewHolder {
@@ -44,16 +44,15 @@ class TaskAdapter(
         Log.i(LOG_TAG, "onBindViewHolder(): $position")
         val item = dataSet[position]
 
-        viewHolder.title.text = item.title
-        viewHolder.label.text = item.label
-        viewHolder.itemView.isEnabled = true
+        val context = viewHolder.title.context
+
+        viewHolder.title.text = context.getString(item.titleResId)
+        viewHolder.timeLabel.text = context.getString(item.timeResId)
+        viewHolder.text.text = context.getString(item.detailResId)
         viewHolder.itemView.setOnClickListener {
-            it.isEnabled = false
             listener.onTaskClicked(item.jsonResourceName)
         }
-        viewHolder.doneIcon.visibility = if(item.isComplete) { View.VISIBLE } else { View.GONE }
     }
 
     override fun getItemCount() = dataSet.size
-
 }

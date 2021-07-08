@@ -183,6 +183,27 @@
     <string name="arm2_other_weeks_ai_title">Great job completing the first section!</string>
     <string name="arm2_other_weeks_ai_text">For the next section, your new topic is %s.</string>
 
+    <string name="three_minutes">3 minutes</string>
+    <string name="six_minutes">6 minutes</string>
+    <string name="three_to_seven_minutes">3–7 minutes</string>
+
+    <string name="about_you_title">About you</string>
+    <string name="about_you_detail">We would like to learn a little bit about you</string>
+    <string name="env_title">Your environment</string>
+    <string name="env_detail">Help us learn more about the world around you</string>
+    <string name="habits_title">Your habits</string>
+    <string name="habits_detail">Let us know what you do each day</string>
+    <string name="health_title">Your health</string>
+    <string name="health_detail">Tell us about your physical and mental health</string>
+    <string name="sleep_title">Sleep</string>
+    <string name="sleep_detail">Record your daily sleep patterns</string>
+    <string name="exp_title">Positive experiences</string>
+    <string name="exp_detail">Do positive experiences affect your outlook?</string>
+    <string name="movements_title">Body movement</string>
+    <string name="movements_detail">Does physical activity affect your happiness?</string>
+    <string name="social_title">Social connections</string>
+    <string name="social_detail">See if social connections make a difference in how you feel</string>
+
     <!-- Settings -->
     <string name="save_button">Save</string>
     <string name="settings_withdrawal_title">Withdraw From MindKind Study</string>
