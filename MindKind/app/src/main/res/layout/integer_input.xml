@@ -4,7 +4,8 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:gravity="center_horizontal"
-    tools:ignore="HardcodedText">
+    tools:ignore="HardcodedText"
+    android:padding="@dimen/margin_small">
 
     <TextView
         android:id="@+id/integer_negative"
