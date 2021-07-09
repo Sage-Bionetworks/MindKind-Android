@@ -200,7 +200,7 @@ open class ConversationSurveyViewModel(
     }
 
     fun hasAnswers(): Boolean {
-        return (answersLiveData.value?.size ?: 0) > 0
+        return (answersLiveData.value?.size ?: 0) > 1  // first answer is usually a random greeting
     }
 
     fun stepWith(identifier: String?): ConversationStep? {
