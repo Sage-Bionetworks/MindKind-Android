@@ -44,6 +44,8 @@ open class SettingsActivity: AppCompatActivity() {
     }
 
     lateinit var sharedPrefs: SharedPreferences
+    lateinit var settingsItems: MutableList<SettingsItem>
+    lateinit var backgroundItems: MutableList<SettingsItem>
 
     var settingsTitle: String? = null
 
@@ -57,26 +59,6 @@ open class SettingsActivity: AppCompatActivity() {
             .replace("-debug", "")
             .replace("-release", "")
 
-    var settingsItems = mutableListOf(
-            SettingsItem("About MindKind App", versionStr, true, false),
-            SettingsItem("About our team", null, false, false),
-            SettingsItem("FAQ", null, false, false),
-            SettingsItem("Feedback for Us", null, false, false),
-            SettingsItem("Privacy Policy", null, false, false),
-            SettingsItem("Study Information Sheet", null, false, false),
-            SettingsItem("Licenses & Copyright", null, false, false),
-            SettingsItem("Options", null, false, true),
-            SettingsItem("Withdraw From Study", "Currently enrolled", false, false),
-            SettingsItem("Background Data Collection", "What data are we collecting?", false, false),
-            SettingsItem("Delete My Data", "Request to have your data deleted", false, false))
-
-    var backgroundItems = mutableListOf(
-            SettingsItem("Room Brightness", "Measure every 15 minutes to see if the light around you is becoming brighter or darker.", false, false, SageTaskIdentifier.AmbientLight, true),
-            SettingsItem("Screen Time", "How long you have your phone screen locked. We don't record what you are doing when your phone is unlocked.", false, false, SageTaskIdentifier.ScreenTime, true),
-            SettingsItem("Charging Time", "How long your phone is charging the battery.", false, false, SageTaskIdentifier.ChargingTime, true),
-            SettingsItem("Battery Statistics", "What percent of battery you have left on your phone.", false, false, SageTaskIdentifier.BatteryStatistics, true),
-            SettingsItem("Data Usage", "How much wifi and cellular data you use. We don't record where or how you use your data.", false, false, SageTaskIdentifier.DataUsage, true))
-
     @SuppressLint("UseCompatLoadingForDrawables")
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
@@ -85,6 +67,26 @@ open class SettingsActivity: AppCompatActivity() {
         setContentView(R.layout.activity_settings)
 
         sharedPrefs = BackgroundDataService.createSharedPrefs(this)
+        settingsItems = mutableListOf(
+                SettingsItem(getString(R.string.settings_about_app_title), versionStr, true, false),
+                SettingsItem(getString(R.string.settings_mental_health_resources_title), null, false, false),
+                SettingsItem(getString(R.string.settings_about_study_title), null, false, false),
+                SettingsItem(getString(R.string.settings_about_team_title), null, false, false),
+                SettingsItem(getString(R.string.settings_informed_consent_title), null, false, false),
+                SettingsItem(getString(R.string.settings_privacy_policy_title), null, false, false),
+                SettingsItem(getString(R.string.settings_terms_of_service_title), null, false, false),
+                SettingsItem(getString(R.string.settings_contact_us_title), null, false, false),
+                SettingsItem(getString(R.string.settings_licenses), null, false, false),
+                SettingsItem(getString(R.string.settings_options_title), null, false, true),
+                SettingsItem(getString(R.string.settings_withdraw_title), getString(R.string.settings_withdraw_detail), false, false),
+                SettingsItem(getString(R.string.settings_background_collection_title), getString(R.string.settings_background_collection_detail), false, false),
+                SettingsItem(getString(R.string.settings_delete_data_title), getString(R.string.settings_delete_data_detail), false, false))
+        backgroundItems = mutableListOf(
+                SettingsItem(getString(R.string.settings_room_brightness_title), getString(R.string.settings_room_brightness_detail), false, false, SageTaskIdentifier.AmbientLight, true),
+                SettingsItem(getString(R.string.settings_screen_time_title), getString(R.string.settings_screen_time_detail), false, false, SageTaskIdentifier.ScreenTime, true),
+                SettingsItem(getString(R.string.settings_charging_time_title), getString(R.string.settings_charging_time_detail), false, false, SageTaskIdentifier.ChargingTime, true),
+                SettingsItem(getString(R.string.settings_battery_stats_title), getString(R.string.settings_battery_stats_detail), false, false, SageTaskIdentifier.BatteryStatistics, true),
+                SettingsItem(getString(R.string.settings_data_usage_title), getString(R.string.settings_data_usage_detail), false, false, SageTaskIdentifier.DataUsage, true))
 
         back_button.setOnClickListener {
             finish()
@@ -114,9 +116,17 @@ open class SettingsActivity: AppCompatActivity() {
             override fun onItemClicked(item: SettingsItem?) {
                 logInfo("Item clicked $item.label")
                 when (item?.identifier) {
-                    "Background Data Collection" -> goToBackgroundDataCollection()
-                    "Withdraw From Study" -> goToWithdrawal()
-                    "Delete My Data" -> showDeleteMyDataContactUs()
+                    getString(R.string.settings_background_collection_title) -> goToBackgroundDataCollection()
+                    getString(R.string.settings_withdraw_title) -> goToWithdrawal()
+                    getString(R.string.settings_delete_data_title) -> showDeleteMyDataContactUs()
+                    getString(R.string.settings_mental_health_resources_title) -> goToWebpage(getString(R.string.settings_url_mental_health))
+                    getString(R.string.settings_about_study_title) -> goToWebpage(getString(R.string.settings_url_about_study))
+                    getString(R.string.settings_about_team_title) -> goToWebpage(getString(R.string.settings_url_about_team))
+                    getString(R.string.settings_informed_consent_title) -> goToWebpage(getString(R.string.settings_url_informed_consent))
+                    getString(R.string.settings_privacy_policy_title) -> goToWebpage(getString(R.string.settings_url_privacy_policy))
+                    getString(R.string.settings_terms_of_service_title) -> goToWebpage(getString(R.string.settings_url_terms_of_service))
+                    getString(R.string.settings_contact_us_title) -> sendEmail(getString(R.string.settings_email_contact_us),
+                                                                        getString(R.string.settings_email_contact_us_subject))
                     else -> processDataTracking(item)
                 }
             }
@@ -148,6 +158,24 @@ open class SettingsActivity: AppCompatActivity() {
 
     fun showDeleteMyDataContactUs() {
         showContactUsDialog()
+    }
+
+    fun goToWebpage(uriString: String) {
+        val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(uriString))
+        startActivity(browserIntent)
+    }
+
+    fun sendEmail(emailAddress: String, subject: String) {
+        val intent = Intent(Intent.ACTION_SENDTO)
+        intent.data = Uri.parse("mailto:") // only email apps should handle this
+        intent.putExtra(Intent.EXTRA_EMAIL, arrayOf(emailAddress))
+        intent.putExtra(Intent.EXTRA_SUBJECT, subject)
+        if (intent.resolveActivity(packageManager) != null) {
+            startActivity(intent)
+        } else {
+            Toast.makeText(this, emailAddress +
+                    " cannot send email", Toast.LENGTH_LONG)
+        }
     }
 
     fun processDataTracking(item: SettingsItem?) {
@@ -198,17 +226,8 @@ open class SettingsActivity: AppCompatActivity() {
         dialog.show(fm, ConfirmationDialog.TAG)
 
         dialog.setActionListener {
-            // Show email intent
-            val intent = Intent(Intent.ACTION_SENDTO)
-            intent.data = Uri.parse("mailto:") // only email apps should handle this
-            intent.putExtra(Intent.EXTRA_EMAIL, arrayOf("MindKindSupport@sagebionetworks.org"))
-            intent.putExtra(Intent.EXTRA_SUBJECT, "Delete My Data")
-            if (intent.resolveActivity(packageManager) != null) {
-                startActivity(intent)
-            } else {
-                Toast.makeText(this, "MindKindSupport@sagebionetworks.org " +
-                        "cannot send email", Toast.LENGTH_LONG)
-            }
+            // Send email to delete data
+            sendEmail("MindKindSupport@sagebionetworks.org", "Delete My Data")
         }
 
         dialog.skipButtonListener = View.OnClickListener {
