@@ -495,7 +495,7 @@ open class TaskListViewModel(
                             R.string.exp_title,
                             R.string.three_to_seven_minutes,
                             R.string.exp_detail,
-                            "Positive_Experiences"),
+                            "PositiveExperiences"),
                     TaskListItem(MindKindApplication.BODY_MOVEMENT_AI,
                             R.string.movements_title,
                             R.string.three_to_seven_minutes,

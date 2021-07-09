@@ -1,0 +1,46 @@
+{
+  "identifier": "PositiveExperiences",
+  "type": "conversationSurvey",
+  "taskIdentifier": "PositiveExperiences",
+  "schemaIdentifier": "PositiveExperiences",
+  "isSchedule": true,
+  "steps": [
+    {
+      "identifier": "Daily",
+      "schemaIdentifier": "Daily",
+      "type": "nestedGroup",
+      "frequency": "daily",
+      "startDay": 1,
+      "filenames": [
+          "4P_Greet",
+          "4P_Daily",
+          "All_Depart"
+      ]
+    },
+    {
+      "identifier": "JournalDay",
+      "schemaIdentifier": "Daily",
+      "type": "nestedGroup",
+      "frequency": "weeklyRandom",
+      "startDay": 1,
+      "filenames": [
+          "4P_Greet",
+          "4P_Daily",
+          "4P_Journal",
+          "All_Depart"
+      ]
+    },
+    {
+      "identifier": "Weekly",
+      "schemaIdentifier": "Weekly",
+      "type": "nestedGroup",
+      "frequency": "weekly",
+      "startDay": 7,
+      "filenames": [
+          "4P_Greet",
+          "4P_W_BADS",
+          "All_Depart"
+      ]
+    }
+  ]
+}
