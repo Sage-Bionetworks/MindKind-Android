@@ -166,8 +166,7 @@
     <string name="welcome_5_message">We record data from you phone usage. You can turn this off or on at any time and still be part of the study.</string>
     <string name="welcome_6_title">The choice is always up to you</string>
     <string name="welcome_6_message">We are glad you’re here! You can withdraw from the MindKind Study at any time. You can ask us for a copy of your data or to delete your data.</string>
-    <string name="welcome_accept">Accept</string>
-    <string name="welcome_cancel"><u>No Thanks</u></string>
+    <string name="welcome_accept">Continue</string>
     <string name="cancel"><u>Cancel</u></string>
 
     <!-- Task List Activity -->

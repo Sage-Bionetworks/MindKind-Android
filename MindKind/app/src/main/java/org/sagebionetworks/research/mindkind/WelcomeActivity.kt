@@ -107,9 +107,6 @@ open class WelcomeActivity: AppCompatActivity() {
             val layout = inflater.inflate(resId, collection, false) as ViewGroup
 
             if (resId == R.layout.welcome_6) {
-                layout.confirmation_quit.setOnClickListener {
-                    onQuitClicked()
-                }
                 layout.confirmation_continue.setOnClickListener {
                     onContinueClicked()
                 }
