@@ -131,6 +131,9 @@ open class RegistrationActivity: AppCompatActivity() {
                 phoneSignUpViewModel?.phoneNumber = phoneNumber?.toString() ?: ""
             }
         })
+        val countryCode = PhoneSignUpViewModel.countryCode(this)
+        phone_number_text_input.setText(countryCode)
+        phoneSignUpViewModel?.phoneNumber = countryCode
 
         secondary_button.setOnClickListener {
             if (phoneSignUpViewModel?.showingWelcomeView == true) {
@@ -317,7 +320,25 @@ public class PhoneSignUpViewModel @MainThread constructor(
     companion object {
         private val LOGGER = LoggerFactory.getLogger(PhoneSignUpViewModel::class.java)
         const val US_REGION_CODE = "US"
-        const val NETHERLANDS_REGION_CODE = "NL"
+        const val US_COUNTRY_CODE = "+1"
+
+        const val UK_REGION_CODE = "GB" // (UK excluding Isle of Man)
+        const val UK_COUNTRY_CODE = "+44"
+
+        const val INDIA_REGION_CODE = "IN"
+        const val INDIA_COUNTRY_CODE = "+91"
+
+        const val SOUTH_AFRICA_REGION_CODE = "ZA"
+        const val SOUTH_AFRICA_COUNTRY_CODE = "+27"
+
+        fun countryCode(context: Context): String {
+            return when(phoneRegion(context)) {
+                UK_REGION_CODE -> UK_COUNTRY_CODE
+                INDIA_REGION_CODE -> INDIA_COUNTRY_CODE
+                SOUTH_AFRICA_REGION_CODE -> SOUTH_AFRICA_COUNTRY_CODE
+                else -> US_COUNTRY_CODE
+            }
+        }
 
         fun phoneRegion(context: Context): String {
             // Here we attempt to get the user's phone region, if it is correct and shows up, we should use it
