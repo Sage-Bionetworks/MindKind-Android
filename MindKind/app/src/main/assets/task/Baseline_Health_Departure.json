@@ -1,0 +1,18 @@
+{
+  "identifier": "Baseline_Health_Departure",
+  "type": "conversationSurvey",
+  "taskIdentifier": "Baseline_Health_Departure",
+  "schemaIdentifier": "Baseline_Health_Departure",
+  "steps": [
+    {
+      "identifier": "Baseline_Health_Departure_Instruction",
+      "type": "instruction.random",
+      "title": "Will be replaced with one from the titleList",
+      "buttonTitle": "Done",
+      "optional": false,
+      "titleList": [
+        "Thank you for taking the time to answer my questions about your health."
+      ]
+    }
+  ]
+}
