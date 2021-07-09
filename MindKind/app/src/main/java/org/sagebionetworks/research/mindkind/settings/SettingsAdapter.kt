@@ -14,6 +14,7 @@ import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataServic
 
 
 data class SettingsItem(
+        val type: LayoutType,
         val label: String,
         var subtext: String?,
         val header: Boolean,
@@ -21,6 +22,10 @@ data class SettingsItem(
         val identifier: String = label,
         val toggle: Boolean = false,
         var active: Boolean = false)
+
+enum class LayoutType {
+    HEADER_WITH_BACKGROUND, HEADER, SECTION_HEADER, ITEM
+}
 
 public interface SettingsAdapterListener {
     fun onItemClicked(item: SettingsItem?)
@@ -45,8 +50,10 @@ class SettingsAdapter(
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): SettingsAdapter.ViewHolder {
         return when (viewType) {
             0-> SettingsAdapter.ViewHolder(LayoutInflater.from(viewGroup.context).inflate(
-                    R.layout.list_item_settings_header, viewGroup, false))
+                    R.layout.list_item_settings_header_background, viewGroup, false))
             1-> SettingsAdapter.ViewHolder(LayoutInflater.from(viewGroup.context).inflate(
+                    R.layout.list_item_settings_header, viewGroup, false))
+            2-> SettingsAdapter.ViewHolder(LayoutInflater.from(viewGroup.context).inflate(
                     R.layout.list_item_settings_section_header, viewGroup, false))
             else -> SettingsAdapter.ViewHolder(LayoutInflater.from(viewGroup.context).inflate(
                     R.layout.list_item_settings, viewGroup, false))
@@ -79,8 +86,13 @@ class SettingsAdapter(
             viewHolder.toggleView?.setOnCheckedChangeListener {
                 buttonView, isChecked ->
                     item.active = isChecked
-                    listener.onItemClicked(item)
+                    if(item.label == "Allow all") {
+                        processAllowAll(isChecked)
+                    } else {
+                        listener.onItemClicked(item)
+                    }
             }
+
         } else {
             viewHolder.actionView?.visibility = View.VISIBLE
             viewHolder.toggleView?.visibility = View.GONE
@@ -91,11 +103,15 @@ class SettingsAdapter(
 
     override fun getItemViewType(position: Int): Int {
         val item = dataSet[position]
-        return when {
-            item.header -> 0
-            item.sectionHeader -> 1
-            else -> 2
+        return item.type.ordinal
+    }
+
+    public fun processAllowAll(activate: Boolean) {
+        dataSet.forEach {
+            it.active = activate
         }
+
+        // TODO: need to update and save changes
     }
 
     public fun updateDataTrackingItems(prefs: SharedPreferences) {

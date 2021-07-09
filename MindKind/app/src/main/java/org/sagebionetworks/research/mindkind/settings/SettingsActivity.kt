@@ -58,24 +58,26 @@ open class SettingsActivity: AppCompatActivity() {
             .replace("-release", "")
 
     var settingsItems = mutableListOf(
-            SettingsItem("About MindKind App", versionStr, true, false),
-            SettingsItem("About our team", null, false, false),
-            SettingsItem("FAQ", null, false, false),
-            SettingsItem("Feedback for Us", null, false, false),
-            SettingsItem("Privacy Policy", null, false, false),
-            SettingsItem("Study Information Sheet", null, false, false),
-            SettingsItem("Licenses & Copyright", null, false, false),
-            SettingsItem("Options", null, false, true),
-            SettingsItem("Withdraw From Study", "Currently enrolled", false, false),
-            SettingsItem("Background Data Collection", "What data are we collecting?", false, false),
-            SettingsItem("Delete My Data", "Request to have your data deleted", false, false))
+            SettingsItem(LayoutType.HEADER_WITH_BACKGROUND, "About MindKind App", versionStr, true, false),
+            SettingsItem(LayoutType.ITEM,"About our team", null, false, false),
+            SettingsItem(LayoutType.ITEM,"FAQ", null, false, false),
+            SettingsItem(LayoutType.ITEM,"Feedback for Us", null, false, false),
+            SettingsItem(LayoutType.ITEM,"Privacy Policy", null, false, false),
+            SettingsItem(LayoutType.ITEM,"Study Information Sheet", null, false, false),
+            SettingsItem(LayoutType.ITEM,"Licenses & Copyright", null, false, false),
+            SettingsItem(LayoutType.ITEM,"Options", null, false, true),
+            SettingsItem(LayoutType.ITEM,"Withdraw From Study", "Currently enrolled", false, false),
+            SettingsItem(LayoutType.ITEM, "Background Data Collection", "What data are we collecting?", false, false),
+            SettingsItem(LayoutType.ITEM, "Delete My Data", "Request to have your data deleted", false, false))
 
     var backgroundItems = mutableListOf(
-            SettingsItem("Room Brightness", "Measure every 15 minutes to see if the light around you is becoming brighter or darker.", false, false, SageTaskIdentifier.AmbientLight, true),
-            SettingsItem("Screen Time", "How long you have your phone screen locked. We don't record what you are doing when your phone is unlocked.", false, false, SageTaskIdentifier.ScreenTime, true),
-            SettingsItem("Charging Time", "How long your phone is charging the battery.", false, false, SageTaskIdentifier.ChargingTime, true),
-            SettingsItem("Battery Statistics", "What percent of battery you have left on your phone.", false, false, SageTaskIdentifier.BatteryStatistics, true),
-            SettingsItem("Data Usage", "How much wifi and cellular data you use. We don't record where or how you use your data.", false, false, SageTaskIdentifier.DataUsage, true))
+            SettingsItem(LayoutType.HEADER, "Your Data Settings", "This is the data we record. You can turn the recorders on or off now. You can make changes anytime during the study", true, false),
+            SettingsItem(LayoutType.ITEM, "Allow all", null, false, false, "", true),
+            SettingsItem(LayoutType.ITEM, "Room Brightness", "Measure every 15 minutes to see if the light around you is becoming brighter or darker.", false, false, SageTaskIdentifier.AmbientLight, true),
+            SettingsItem(LayoutType.ITEM, "Screen Time", "How long you have your phone screen locked. We don't record what you are doing when your phone is unlocked.", false, false, SageTaskIdentifier.ScreenTime, true),
+            SettingsItem(LayoutType.ITEM,"Charging Time", "How long your phone is charging the battery.", false, false, SageTaskIdentifier.ChargingTime, true),
+            SettingsItem(LayoutType.ITEM,"Battery Statistics", "What percent of battery you have left on your phone.", false, false, SageTaskIdentifier.BatteryStatistics, true),
+            SettingsItem(LayoutType.ITEM, "Data Usage", "How much wifi and cellular data you use. We don't record where or how you use your data.", false, false, SageTaskIdentifier.DataUsage, true))
 
     @SuppressLint("UseCompatLoadingForDrawables")
     override fun onCreate(savedInstanceState: Bundle?) {
