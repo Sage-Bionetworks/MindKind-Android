@@ -13,15 +13,15 @@ import org.sagebionetworks.research.mindkind.R
 import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService
 
 
-data class SettingsItem(
-        val type: LayoutType,
-        val label: String,
-        var subtext: String?,
-        val header: Boolean,
-        val sectionHeader: Boolean,
-        val identifier: String = label,
-        val toggle: Boolean = false,
-        var active: Boolean = false)
+class SettingsItem(
+    val type: LayoutType,
+    val label: String,
+    var subtext: String?,
+    val header: Boolean,
+    val sectionHeader: Boolean,
+    val identifier: String = label,
+    val toggle: Boolean = false,
+    var active: Boolean = false)
 
 enum class LayoutType {
     HEADER_WITH_BACKGROUND, HEADER, SECTION_HEADER, ITEM
@@ -32,13 +32,15 @@ public interface SettingsAdapterListener {
 }
 
 class SettingsAdapter(
-        private val dataSet: MutableList<SettingsItem>,
+        var dataSet: List<SettingsItem>,
         private val listener: SettingsAdapterListener) :
         RecyclerView.Adapter<SettingsAdapter.ViewHolder>() {
 
     companion object {
         private val LOG_TAG = this::class.java.canonicalName
     }
+
+    var isListenerPaused = false
 
     open class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val labelView: TextView = view.findViewById(R.id.settings_item_label)
@@ -81,16 +83,16 @@ class SettingsAdapter(
         if(item.toggle) {
             viewHolder.actionView?.visibility = View.GONE
             viewHolder.toggleView?.visibility = View.VISIBLE
+            isListenerPaused = true
             viewHolder.toggleView?.setChecked(item.active)
-            
-            viewHolder.toggleView?.setOnCheckedChangeListener {
-                buttonView, isChecked ->
-                    item.active = isChecked
-                    if(item.label == "Allow all") {
-                        processAllowAll(isChecked)
-                    } else {
-                        listener.onItemClicked(item)
-                    }
+            isListenerPaused = false
+
+            viewHolder.toggleView?.setOnCheckedChangeListener { buttonView, isChecked ->
+                if (isListenerPaused) {
+                    return@setOnCheckedChangeListener // skip if we paused listeners
+                }
+                item.active = isChecked
+                listener.onItemClicked(item)
             }
 
         } else {
@@ -104,21 +106,5 @@ class SettingsAdapter(
     override fun getItemViewType(position: Int): Int {
         val item = dataSet[position]
         return item.type.ordinal
-    }
-
-    public fun processAllowAll(activate: Boolean) {
-        dataSet.forEach {
-            it.active = activate
-        }
-
-        // TODO: need to update and save changes
-    }
-
-    public fun updateDataTrackingItems(prefs: SharedPreferences) {
-        val tracking = BackgroundDataService.loadDataAllowedToBeTracked(prefs)
-        dataSet.forEach {
-            it.active = tracking.contains(it.identifier)
-        }
-        notifyDataSetChanged()
     }
 }

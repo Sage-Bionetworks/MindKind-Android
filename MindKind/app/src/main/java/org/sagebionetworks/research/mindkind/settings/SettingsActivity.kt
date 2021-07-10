@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
 import android.view.View
 import android.view.Window
@@ -18,6 +19,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.android.AndroidInjection
+import kotlinx.android.synthetic.main.activity_conversation_survey.*
 import kotlinx.android.synthetic.main.activity_settings.*
 import org.sagebionetworks.research.mindkind.BuildConfig
 import org.sagebionetworks.research.mindkind.R
@@ -31,6 +33,7 @@ open class SettingsActivity: AppCompatActivity() {
 
     companion object {
         const val extraSettingsId = "EXTRA_SETTINGS_PAGE"
+        const val allowAllIdentifier = "AllowAll"
 
         fun logInfo(msg: String) {
             Log.i(SettingsActivity::class.java.canonicalName, msg)
@@ -44,6 +47,8 @@ open class SettingsActivity: AppCompatActivity() {
     }
 
     lateinit var sharedPrefs: SharedPreferences
+
+    var handler: Handler? = null
 
     var settingsTitle: String? = null
 
@@ -70,14 +75,22 @@ open class SettingsActivity: AppCompatActivity() {
             SettingsItem(LayoutType.ITEM, "Background Data Collection", "What data are we collecting?", false, false),
             SettingsItem(LayoutType.ITEM, "Delete My Data", "Request to have your data deleted", false, false))
 
-    var backgroundItems = mutableListOf(
+    val backgroundPermissionItems = listOf(
             SettingsItem(LayoutType.HEADER, "Your Data Settings", "This is the data we record. You can turn the recorders on or off now. You can make changes anytime during the study", true, false),
-            SettingsItem(LayoutType.ITEM, "Allow all", null, false, false, "", true),
+            SettingsItem(LayoutType.ITEM, "Allow all", null, false, false, allowAllIdentifier, true),
             SettingsItem(LayoutType.ITEM, "Room Brightness", "Measure every 15 minutes to see if the light around you is becoming brighter or darker.", false, false, SageTaskIdentifier.AmbientLight, true),
             SettingsItem(LayoutType.ITEM, "Screen Time", "How long you have your phone screen locked. We don't record what you are doing when your phone is unlocked.", false, false, SageTaskIdentifier.ScreenTime, true),
             SettingsItem(LayoutType.ITEM,"Charging Time", "How long your phone is charging the battery.", false, false, SageTaskIdentifier.ChargingTime, true),
             SettingsItem(LayoutType.ITEM,"Battery Statistics", "What percent of battery you have left on your phone.", false, false, SageTaskIdentifier.BatteryStatistics, true),
             SettingsItem(LayoutType.ITEM, "Data Usage", "How much wifi and cellular data you use. We don't record where or how you use your data.", false, false, SageTaskIdentifier.DataUsage, true))
+
+    fun backgroundItems(): List<SettingsItem> {
+        return (settingsRecycler.adapter as? SettingsAdapter)?.dataSet ?: listOf()
+    }
+
+    fun settingsAdapter(): SettingsAdapter? {
+        return settingsRecycler.adapter as? SettingsAdapter
+    }
 
     @SuppressLint("UseCompatLoadingForDrawables")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -85,6 +98,8 @@ open class SettingsActivity: AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_settings)
+
+        handler = Handler()
 
         sharedPrefs = BackgroundDataService.createSharedPrefs(this)
 
@@ -109,7 +124,7 @@ open class SettingsActivity: AppCompatActivity() {
         if(isSettingsMain) {
             items = settingsItems
         } else {
-            items = backgroundItems
+            items = backgroundPermissionItems
         }
 
         val adapter = SettingsAdapter(items, object : SettingsAdapterListener {
@@ -126,7 +141,7 @@ open class SettingsActivity: AppCompatActivity() {
         settingsRecycler.adapter = adapter
 
         if (isDataTracking) {
-            adapter.updateDataTrackingItems(sharedPrefs)
+            refreshBackgroundItems()
         }
     }
 
@@ -153,39 +168,21 @@ open class SettingsActivity: AppCompatActivity() {
     }
 
     fun processDataTracking(item: SettingsItem?) {
-        val itemUnwrapped = item ?: run { return }
-        if (backgroundItems.map { it.identifier }.contains(itemUnwrapped.identifier)) {
-            saveDataTrackingPermission(itemUnwrapped.identifier, itemUnwrapped.active)
-        } else {
-            Toast.makeText(this, "Not implemented yet.", Toast.LENGTH_LONG).show()
-        }
-    }
-
-    fun showDataTrackingDialog(item: SettingsItem) {
-        val dialog = Dialog(this)
-
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setCancelable(true)
-        dialog.setContentView(R.layout.dialog_data_tracking)
-        dialog.window?.setBackgroundDrawableResource(android.R.color.white)
-
-        val title = dialog.findViewById<TextView>(R.id.data_tracking_title)
-        title?.text = item.label
-
-        val toggleButton = dialog.findViewById<ToggleButton>(R.id.toggle_button)
-        toggleButton?.textOn = "ON"
-        toggleButton?.textOff = "OFF"
-        toggleButton?.isChecked = item.subtext == "On"
-
-        dialog.findViewById<View>(R.id.cancel_button)?.setOnClickListener {
-            dialog.dismiss()
-        }
-        dialog.findViewById<View>(R.id.save_button)?.setOnClickListener {
-            saveDataTrackingPermission(item.identifier, toggleButton?.isChecked ?: false)
-            dialog.dismiss()
-        }
-
-        dialog.show()
+        // Bug fix for RecyclerView needing time to animate the Toggle button
+        handler?.postDelayed({
+            val itemUnwrapped = item ?: run { return@postDelayed }
+            if (itemUnwrapped.identifier == allowAllIdentifier) {
+                toggleAllowBackgroundItems(itemUnwrapped.active)
+            } else if (backgroundItems().map { it.identifier }.contains(itemUnwrapped.identifier)) {
+                saveDataTrackingPermission(itemUnwrapped.identifier, itemUnwrapped.active)
+                settingsAdapter()?.isListenerPaused = true
+                allowAllItem()?.active = isBackgroundDataAllActive()
+                settingsAdapter()?.isListenerPaused = false
+                settingsRecycler.adapter?.notifyDataSetChanged()
+            } else {
+                Toast.makeText(this, "Not implemented yet.", Toast.LENGTH_LONG).show()
+            }
+        }, 100)
     }
 
     private fun showContactUsDialog() {
@@ -222,8 +219,46 @@ open class SettingsActivity: AppCompatActivity() {
         }
     }
 
+    private fun toggleableItems(): List<SettingsItem> {
+        val allowAllIdx = backgroundItems().map {it.identifier}.indexOf(allowAllIdentifier) + 1
+        val size = backgroundItems().size
+        return backgroundItems().subList(allowAllIdx, size)
+    }
+
+    private fun isBackgroundDataAllActive(): Boolean {
+        return toggleableItems().none { !it.active }
+    }
+
+    private fun allowAllItem(): SettingsItem? {
+        return backgroundItems().firstOrNull { it.identifier == allowAllIdentifier }
+    }
+
+    private fun toggleAllowBackgroundItems(newActiveState: Boolean) {
+        settingsAdapter()?.isListenerPaused = true
+        backgroundItems().forEach {
+            if (it.identifier != allowAllIdentifier) {
+                saveDataTrackingPermission(it.identifier, newActiveState)
+                it.active = newActiveState
+            }
+        }
+        settingsAdapter()?.isListenerPaused = false
+        settingsRecycler.adapter?.notifyDataSetChanged()
+    }
+
+    fun refreshBackgroundItems() {
+        val items = BackgroundDataService.loadDataAllowedToBeTracked(sharedPrefs)
+        settingsAdapter()?.isListenerPaused = true
+        backgroundItems().forEach {
+            if (it.identifier != allowAllIdentifier) {
+                it.active = items.contains(it.identifier)
+            }
+        }
+        allowAllItem()?.active = isBackgroundDataAllActive()
+        settingsAdapter()?.isListenerPaused = false
+        settingsAdapter()?.notifyDataSetChanged()
+    }
+
     fun saveDataTrackingPermission(identifier: String, newIsOn: Boolean) {
         BackgroundDataService.setDataAllowedToBeTracked(sharedPrefs, identifier, newIsOn)
-        (settingsRecycler.adapter as? SettingsAdapter)?.updateDataTrackingItems(sharedPrefs)
     }
 }
