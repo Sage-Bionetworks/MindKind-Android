@@ -71,7 +71,7 @@
         android:layout_margin="60dp">
 
         <com.google.android.material.button.MaterialButton
-            style="@style/Sage.MaterialButton.Rounded"
+            style="@style/Sage.MaterialButton.Rounded.Dark"
             android:id="@+id/confirmation_continue"
             android:layout_width="match_parent"
             android:layout_height="54dp"

@@ -22,28 +22,36 @@ import org.sagebionetworks.research.mindkind.R
 import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService
 import org.sagebionetworks.research.mindkind.conversation.ConfirmationDialog
 import org.sagebionetworks.research.mindkind.research.SageTaskIdentifier
+import org.sagebionetworks.research.mindkind.returnToEntryActivity
 
 
 open class SettingsActivity: AppCompatActivity() {
 
     companion object {
         const val extraSettingsId = "EXTRA_SETTINGS_PAGE"
+        const val extraSettingsInitialId = "EXTRA_SETTINGS_INITIAL"
         const val allowAllIdentifier = "AllowAll"
+        const val dataSettingsTitle = "Data Settings"
 
         fun logInfo(msg: String) {
             Log.i(SettingsActivity::class.java.canonicalName, msg)
         }
 
-        fun start(baseCtx: Context, settingsPage: String) {
+        fun startDataSettings(baseCtx: Context) {
             val intent = Intent(baseCtx, SettingsActivity::class.java)
-            intent.putExtra(SettingsActivity.extraSettingsId, settingsPage)
+            intent.putExtra(SettingsActivity.extraSettingsId, dataSettingsTitle)
+            baseCtx.startActivity(intent)
+        }
+
+        fun startInitialDataTracking(baseCtx: Context) {
+            val intent = Intent(baseCtx, SettingsActivity::class.java)
+            intent.putExtra(SettingsActivity.extraSettingsId, dataSettingsTitle)
+            intent.putExtra(SettingsActivity.extraSettingsInitialId, dataSettingsTitle)
             baseCtx.startActivity(intent)
         }
     }
 
     lateinit var sharedPrefs: SharedPreferences
-    lateinit var settingsItems: MutableList<SettingsItem>
-    lateinit var backgroundItems: MutableList<SettingsItem>
 
     var handler: Handler? = null
 
@@ -77,7 +85,7 @@ open class SettingsActivity: AppCompatActivity() {
         handler = Handler()
 
         sharedPrefs = BackgroundDataService.createSharedPrefs(this)
-        settingsItems = mutableListOf(
+        val settingsItems = mutableListOf(
                 SettingsItem(LayoutType.HEADER_WITH_BACKGROUND, getString(R.string.settings_about_app_title),
                         versionStr, true, false),
                 SettingsItem(LayoutType.ITEM, getString(R.string.settings_mental_health_resources_title),
@@ -96,7 +104,7 @@ open class SettingsActivity: AppCompatActivity() {
                         null, false, false),
                 SettingsItem(LayoutType.ITEM, getString(R.string.settings_licenses),
                         null, false, false),
-                SettingsItem(LayoutType.ITEM, getString(R.string.settings_options_title),
+                SettingsItem(LayoutType.HEADER, getString(R.string.settings_options_title),
                         null, false, true),
                 SettingsItem(LayoutType.ITEM, getString(R.string.settings_withdraw_title),
                         getString(R.string.settings_withdraw_detail),
@@ -108,8 +116,14 @@ open class SettingsActivity: AppCompatActivity() {
                         getString(R.string.settings_delete_data_detail),
                         false, false))
 
-        backgroundItems = mutableListOf(
-                SettingsItem(LayoutType.HEADER, getString(R.string.settings_room_brightness_title),
+        val backgroundItems = mutableListOf(
+                SettingsItem(LayoutType.HEADER,
+                        getString(R.string.settings_recorders_title),
+                        getString(R.string.settings_recorders_detail),
+                        true, false),
+                SettingsItem(LayoutType.ITEM, getString(R.string.settings_allow_all),
+                        null, false, false, allowAllIdentifier, true),
+                SettingsItem(LayoutType.ITEM, getString(R.string.settings_room_brightness_title),
                         getString(R.string.settings_room_brightness_detail), false,
                         false, SageTaskIdentifier.AmbientLight, true),
                 SettingsItem(LayoutType.ITEM, getString(R.string.settings_screen_time_title),
@@ -125,6 +139,10 @@ open class SettingsActivity: AppCompatActivity() {
                         getString(R.string.settings_data_usage_detail), false,
                         false, SageTaskIdentifier.DataUsage, true))
 
+        val footerItem = SettingsItem(LayoutType.FOOTER, "", "", false,
+                false, SageTaskIdentifier.DataUsage, true, false,
+                        getString(R.string.settings_continue))
+
         back_button.setOnClickListener {
             finish()
         }
@@ -139,14 +157,15 @@ open class SettingsActivity: AppCompatActivity() {
         }
         settingsRecycler.addItemDecoration(itemDecorator)
 
-        var items: List<SettingsItem>? = null
         settingsTitle = intent.extras?.getString(extraSettingsId)
         settings_title.text = settingsTitle
 
-        if(isSettingsMain) {
-            items = settingsItems
+        val items = if(isSettingsMain) {
+            settingsItems
+        } else if (null != intent.extras?.getString(extraSettingsInitialId)) {
+            backgroundItems + listOf(footerItem)
         } else {
-            items = backgroundItems
+            backgroundItems
         }
 
         val adapter = SettingsAdapter(items, object : SettingsAdapterListener {
@@ -167,6 +186,11 @@ open class SettingsActivity: AppCompatActivity() {
                     else -> processDataTracking(item)
                 }
             }
+
+            override fun onFooterClicked(item: SettingsItem?) {
+                // Currently this is only used after welcome screen, so now go to the home screen
+                returnToEntryActivity()
+            }
         })
         settingsRecycler.adapter = adapter
 
@@ -183,10 +207,14 @@ open class SettingsActivity: AppCompatActivity() {
         }
     }
 
+    fun safeToggleChange(operation: (() -> Unit)) {
+        settingsAdapter()?.isListenerPaused = true
+        operation.invoke()
+        settingsAdapter()?.isListenerPaused = false
+    }
+
     fun goToBackgroundDataCollection() {
-        val intent = Intent(this, SettingsActivity::class.java)
-        intent.putExtra(extraSettingsId, "Data Settings")
-        startActivity(intent)
+        SettingsActivity.startDataSettings(this)
     }
 
     fun goToWithdrawal() {
@@ -223,9 +251,9 @@ open class SettingsActivity: AppCompatActivity() {
                 toggleAllowBackgroundItems(itemUnwrapped.active)
             } else if (backgroundItems().map { it.identifier }.contains(itemUnwrapped.identifier)) {
                 saveDataTrackingPermission(itemUnwrapped.identifier, itemUnwrapped.active)
-                settingsAdapter()?.isListenerPaused = true
-                allowAllItem()?.active = isBackgroundDataAllActive()
-                settingsAdapter()?.isListenerPaused = false
+                safeToggleChange {
+                    allowAllItem()?.active = isBackgroundDataAllActive()
+                }
                 settingsRecycler.adapter?.notifyDataSetChanged()
             } else {
                 Toast.makeText(this, "Not implemented yet.", Toast.LENGTH_LONG).show()
@@ -262,6 +290,7 @@ open class SettingsActivity: AppCompatActivity() {
         val allowAllIdx = backgroundItems().map {it.identifier}.indexOf(allowAllIdentifier) + 1
         val size = backgroundItems().size
         return backgroundItems().subList(allowAllIdx, size)
+                .filter { it.type != LayoutType.FOOTER }
     }
 
     private fun isBackgroundDataAllActive(): Boolean {
@@ -273,27 +302,27 @@ open class SettingsActivity: AppCompatActivity() {
     }
 
     private fun toggleAllowBackgroundItems(newActiveState: Boolean) {
-        settingsAdapter()?.isListenerPaused = true
-        backgroundItems().forEach {
-            if (it.identifier != allowAllIdentifier) {
-                saveDataTrackingPermission(it.identifier, newActiveState)
-                it.active = newActiveState
+        safeToggleChange {
+            backgroundItems().forEach {
+                if (it.identifier != allowAllIdentifier) {
+                    saveDataTrackingPermission(it.identifier, newActiveState)
+                    it.active = newActiveState
+                }
             }
         }
-        settingsAdapter()?.isListenerPaused = false
         settingsRecycler.adapter?.notifyDataSetChanged()
     }
 
     fun refreshBackgroundItems() {
         val items = BackgroundDataService.loadDataAllowedToBeTracked(sharedPrefs)
-        settingsAdapter()?.isListenerPaused = true
-        backgroundItems().forEach {
-            if (it.identifier != allowAllIdentifier) {
-                it.active = items.contains(it.identifier)
+        safeToggleChange {
+            backgroundItems().forEach {
+                if (it.identifier != allowAllIdentifier) {
+                    it.active = items.contains(it.identifier)
+                }
             }
+            allowAllItem()?.active = isBackgroundDataAllActive()
         }
-        allowAllItem()?.active = isBackgroundDataAllActive()
-        settingsAdapter()?.isListenerPaused = false
         settingsAdapter()?.notifyDataSetChanged()
     }
 

@@ -238,6 +238,9 @@
     <string name="settings_delete_data_title">Delete My Data</string>
     <string name="settings_delete_data_detail">Request to have your data deleted</string>
 
+    <string name="settings_allow_all">Allow all</string>
+    <string name="settings_recorders_title">Your Data Settings</string>
+    <string name="settings_recorders_detail">This is the data we record. You can turn the recorders on or off now. You can make changes anytime during the study.</string>
     <string name="settings_room_brightness_title">Room Brightness</string>
     <string name="settings_room_brightness_detail">Measure every 15 minutes to see if the light around you is becoming brighter or darker.</string>
     <string name="settings_screen_time_title">Screen Time</string>
@@ -248,6 +251,7 @@
     <string name="settings_battery_stats_detail">What percent of battery you have left on your phone.</string>
     <string name="settings_data_usage_title">Data Usage</string>
     <string name="settings_data_usage_detail">How much wifi and cellular data you use. We don\'t record where or how you use your data.</string>
+    <string name="settings_continue">Continue</string>
 
     <!-- Settings Links -->
     <string name="settings_url_mental_health">https://staging.wtgmhdc.synapse.org/contact</string>
