@@ -3,12 +3,15 @@ package org.sagebionetworks.research.mindkind
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.method.LinkMovementMethod
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.res.ResourcesCompat
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
@@ -110,6 +113,12 @@ open class WelcomeActivity: AppCompatActivity() {
                 layout.confirmation_continue.setOnClickListener {
                     onContinueClicked()
                 }
+            }
+
+            if (resId == R.layout.welcome_2) {
+                // Make the link in the textView clickable
+                val textView: TextView = layout.findViewById(R.id.welcome_2_detailText_textView)
+                textView.movementMethod = LinkMovementMethod.getInstance()
             }
 
             collection.addView(layout)

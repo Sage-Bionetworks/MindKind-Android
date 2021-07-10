@@ -1,0 +1,30 @@
+{
+	"identifier": "4P_DR_Greet",
+	"type": "conversationSurvey",
+	"taskIdentifier": "4P_DR_Greet",
+	"schemaIdentifier": "4P_DR_Greet",
+	"steps": [
+		{
+			"identifier": "4P_DR_Greet",
+			"type": "instruction.random",
+			"title": "Will be replaced with one from the 4P_DR_Greet_list",
+			"buttonTitle": "Begin",
+			"optional": false,
+			"useWeekNumberAsIndex": true,
+			"titleList": [
+				"Would you like to see how your positive activity and mood were last week?",
+				"Let's begin! It's week 2 of 12. Would you like to see what your positive activity and mood looked like last week?",
+				"Here is what your positive activity and mood looked like last week.",
+				"Welcome to week 4! Here is what your positive activity and mood looked like last week.",
+				"Hello and welcome to week 5. You are half way there! ",
+				"Here is what your positive activity and mood looked like last week.",
+				"Its week 7! Here is what your positive activity and mood looked like last week. ",
+				"Week 8, you are almost there!  Here is what your positive activity and mood looked like last week.",
+				"Its week 9! Are you ready for another week? We sure are.  Here is what your positive activity and mood looked like last week. ",
+				"Hey there! Here is what your positive activity and mood looked like last week.",
+				"Welcome to the week!",
+				"This is week 12! You're almost there!"
+			]
+		}
+	]
+}

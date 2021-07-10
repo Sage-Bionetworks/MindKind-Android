@@ -157,7 +157,7 @@
     <string name="welcome_1_title">Welcome to the MindKind Study!</string>
     <string name="welcome_1_message">Your experience will help researchers better understand the emotional health of young people.</string>
     <string name="welcome_2_title">Interacting with the MindKind Study</string>
-    <string name="welcome_2_message">Although MindKind Study surveys may look like a text chat - MindKind is a computer, not a person.\n\nIf you experience distress or thoughts of harming yourself, contact your physician or click the resources link for ways to find help.</string>
+    <string name="welcome_2_message">Although MindKind Study surveys may look like a text chat - MindKind is a computer, not a person.\n\nIf you experience distress or thoughts of harming yourself, contact your physician or \<a href='https://staging.wtgmhdc.synapse.org/contact'>find local mental health resources\</a> for ways to find help.</string>
     <string name="welcome_3_title">Your responses\nare important</string>
     <string name="welcome_3_message">Keeping up with your daily surveys and weekly check-ins gives the MindKind Study a better picture of your emotional health. You can skip any question you don\'t want to answer.</string>
     <string name="welcome_4_title">We protect your personal data</string>
@@ -220,4 +220,42 @@
     <string name="settings_withdrawal_waiting_title">Withdrawing you from the MindKind study.</string>
     <string name="settings_withdrawal_waiting_message">Please wait a moment while we remove you from study.</string>
 
+    <!-- Settings Items -->
+    <string name="settings_about_app_title">About MindKind App</string>
+    <string name="settings_mental_health_resources_title">Mental health resources</string>
+    <string name="settings_about_study_title">About the study</string>
+    <string name="settings_about_team_title">About our team</string>
+    <string name="settings_informed_consent_title">Informed Consent</string>
+    <string name="settings_privacy_policy_title">Privacy Policy</string>
+    <string name="settings_terms_of_service_title">Terms of service</string>
+    <string name="settings_contact_us_title">Contact us</string>
+    <string name="settings_licenses">Licenses &amp; Copyright</string>
+    <string name="settings_options_title">Options</string>
+    <string name="settings_withdraw_title">Withdraw From Study</string>
+    <string name="settings_withdraw_detail">Currently enrolled</string>
+    <string name="settings_background_collection_title">Background Data Collection</string>
+    <string name="settings_background_collection_detail">What data are we collecting?</string>
+    <string name="settings_delete_data_title">Delete My Data</string>
+    <string name="settings_delete_data_detail">Request to have your data deleted</string>
+
+    <string name="settings_room_brightness_title">Room Brightness</string>
+    <string name="settings_room_brightness_detail">Measure every 15 minutes to see if the light around you is becoming brighter or darker.</string>
+    <string name="settings_screen_time_title">Screen Time</string>
+    <string name="settings_screen_time_detail">How long you have your phone screen locked. We don\'t record what you are doing when your phone is unlocked.</string>
+    <string name="settings_charging_time_title">Charging Time</string>
+    <string name="settings_charging_time_detail">How long your phone is charging the battery.</string>
+    <string name="settings_battery_stats_title">Battery Statistics</string>
+    <string name="settings_battery_stats_detail">What percent of battery you have left on your phone.</string>
+    <string name="settings_data_usage_title">Data Usage</string>
+    <string name="settings_data_usage_detail">How much wifi and cellular data you use. We don\'t record where or how you use your data.</string>
+
+    <!-- Settings Links -->
+    <string name="settings_url_mental_health">https://staging.wtgmhdc.synapse.org/contact</string>
+    <string name="settings_url_about_study">https://staging.wtgmhdc.synapse.org/about</string>
+    <string name="settings_url_about_team">https://staging.wtgmhdc.synapse.org/research</string>
+    <string name="settings_url_informed_consent">https://staging.wtgmhdc.synapse.org/consent-info</string>
+    <string name="settings_url_privacy_policy">https://staging.wtgmhdc.synapse.org/privacy-policy</string>
+    <string name="settings_url_terms_of_service">https://staging.wtgmhdc.synapse.org/terms</string>
+    <string name="settings_email_contact_us">MindKindSupport@sagebionetworks.org</string>
+    <string name="settings_email_contact_us_subject">Contacting Support</string>
 </resources>

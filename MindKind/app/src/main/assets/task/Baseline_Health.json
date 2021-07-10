@@ -1,0 +1,22 @@
+{
+  "identifier": "Baseline_Health",
+  "type": "conversationSurvey",
+  "taskIdentifier": "Baseline_Health",
+  "schemaIdentifier": "Baseline_Health",
+  "isSchedule": true,
+  "steps": [
+    {
+      "identifier": "All",
+      "schemaIdentifier": "All",
+      "type": "nestedGroup",
+      "frequency": "once",
+      "startDay": 1,
+      "filenames": [
+        "BL_WHODAS",
+        "BL_PHQ9_FULL",
+        "BL_GAD7_Full",
+        "Baseline_Health_Departure"
+      ]
+    }
+  ]
+}

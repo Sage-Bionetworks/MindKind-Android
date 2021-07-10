@@ -40,8 +40,8 @@
       "startDay": 7,
       "filenames": [
           "2C_Greet",
-          "BL_GAD7_Full",
           "BL_PHQ9_FULL",
+          "BL_GAD7_Full",
           "2C_Depart"
       ]
     }

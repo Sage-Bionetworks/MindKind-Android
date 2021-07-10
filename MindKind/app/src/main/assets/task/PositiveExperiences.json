@@ -1,8 +1,8 @@
 {
-  "identifier": "Sleep",
+  "identifier": "PositiveExperiences",
   "type": "conversationSurvey",
-  "taskIdentifier": "Sleep",
-  "schemaIdentifier": "Sleep",
+  "taskIdentifier": "PositiveExperiences",
+  "schemaIdentifier": "PositiveExperiences",
   "isSchedule": true,
   "steps": [
     {
@@ -12,10 +12,9 @@
       "frequency": "daily",
       "startDay": 1,
       "filenames": [
-          "1S_Greet",
-          "Mood_Daily",
-          "1S_Daily",
-          "1S_Depart"
+          "4P_Greet",
+          "4P_Daily",
+          "All_Depart"
       ]
     },
     {
@@ -25,11 +24,10 @@
       "frequency": "weeklyRandom",
       "startDay": 1,
       "filenames": [
-          "1S_Greet",
-          "Mood_Daily",
-          "1S_Daily",
-          "All_Journal",
-          "1S_Depart"
+          "4P_Greet",
+          "4P_Daily",
+          "4P_Journal",
+          "All_Depart"
       ]
     },
     {
@@ -39,11 +37,9 @@
       "frequency": "weekly",
       "startDay": 7,
       "filenames": [
-          "1S_Greet",
-          "1S_ISI",
-          "BL_PHQ9_FULL",
-          "BL_GAD7_Full",
-          "1S_Depart"
+          "4P_Greet",
+          "4P_W_BADS",
+          "All_Depart"
       ]
     }
   ]
