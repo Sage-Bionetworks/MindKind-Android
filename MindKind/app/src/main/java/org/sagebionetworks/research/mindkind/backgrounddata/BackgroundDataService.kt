@@ -171,9 +171,7 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
 
         fun loadDataAllowedToBeTracked(sharedPrefs: SharedPreferences): List<String> {
             return allDataTypes.filter {
-                // TODO: mdephillips 5/24/21 switch back to default to false before launch
-                //sharedPrefs.getBoolean("DataTracking$it", false)
-                sharedPrefs.getBoolean("DataTracking$it", true)
+                sharedPrefs.getBoolean("DataTracking$it", false)
             }
         }
 

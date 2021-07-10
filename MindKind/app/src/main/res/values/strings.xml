@@ -166,8 +166,7 @@
     <string name="welcome_5_message">We record data from you phone usage. You can turn this off or on at any time and still be part of the study.</string>
     <string name="welcome_6_title">The choice is always up to you</string>
     <string name="welcome_6_message">We are glad you’re here! You can withdraw from the MindKind Study at any time. You can ask us for a copy of your data or to delete your data.</string>
-    <string name="welcome_accept">Accept</string>
-    <string name="welcome_cancel"><u>No Thanks</u></string>
+    <string name="welcome_accept">Continue</string>
     <string name="cancel"><u>Cancel</u></string>
 
     <!-- Task List Activity -->
@@ -239,6 +238,9 @@
     <string name="settings_delete_data_title">Delete My Data</string>
     <string name="settings_delete_data_detail">Request to have your data deleted</string>
 
+    <string name="settings_allow_all">Allow all</string>
+    <string name="settings_recorders_title">Your Data Settings</string>
+    <string name="settings_recorders_detail">This is the data we record. You can turn the recorders on or off now. You can make changes anytime during the study.</string>
     <string name="settings_room_brightness_title">Room Brightness</string>
     <string name="settings_room_brightness_detail">Measure every 15 minutes to see if the light around you is becoming brighter or darker.</string>
     <string name="settings_screen_time_title">Screen Time</string>
@@ -249,6 +251,7 @@
     <string name="settings_battery_stats_detail">What percent of battery you have left on your phone.</string>
     <string name="settings_data_usage_title">Data Usage</string>
     <string name="settings_data_usage_detail">How much wifi and cellular data you use. We don\'t record where or how you use your data.</string>
+    <string name="settings_continue">Continue</string>
 
     <!-- Settings Links -->
     <string name="settings_url_mental_health">https://staging.wtgmhdc.synapse.org/contact</string>

@@ -1,51 +1,59 @@
 package org.sagebionetworks.research.mindkind.settings
 
 import android.annotation.SuppressLint
-import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
 import android.view.View
-import android.view.Window
-import android.widget.TextView
 import android.widget.Toast
-import android.widget.ToggleButton
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.android.AndroidInjection
+import kotlinx.android.synthetic.main.activity_conversation_survey.*
 import kotlinx.android.synthetic.main.activity_settings.*
 import org.sagebionetworks.research.mindkind.BuildConfig
 import org.sagebionetworks.research.mindkind.R
-import org.sagebionetworks.research.mindkind.R2.id.email
 import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService
 import org.sagebionetworks.research.mindkind.conversation.ConfirmationDialog
 import org.sagebionetworks.research.mindkind.research.SageTaskIdentifier
+import org.sagebionetworks.research.mindkind.returnToEntryActivity
 
 
 open class SettingsActivity: AppCompatActivity() {
 
     companion object {
         const val extraSettingsId = "EXTRA_SETTINGS_PAGE"
+        const val extraSettingsInitialId = "EXTRA_SETTINGS_INITIAL"
+        const val allowAllIdentifier = "AllowAll"
+        const val dataSettingsTitle = "Data Settings"
 
         fun logInfo(msg: String) {
             Log.i(SettingsActivity::class.java.canonicalName, msg)
         }
 
-        fun start(baseCtx: Context, settingsPage: String) {
+        fun startDataSettings(baseCtx: Context) {
             val intent = Intent(baseCtx, SettingsActivity::class.java)
-            intent.putExtra(SettingsActivity.extraSettingsId, settingsPage)
+            intent.putExtra(SettingsActivity.extraSettingsId, dataSettingsTitle)
+            baseCtx.startActivity(intent)
+        }
+
+        fun startInitialDataTracking(baseCtx: Context) {
+            val intent = Intent(baseCtx, SettingsActivity::class.java)
+            intent.putExtra(SettingsActivity.extraSettingsId, dataSettingsTitle)
+            intent.putExtra(SettingsActivity.extraSettingsInitialId, dataSettingsTitle)
             baseCtx.startActivity(intent)
         }
     }
 
     lateinit var sharedPrefs: SharedPreferences
-    lateinit var settingsItems: MutableList<SettingsItem>
-    lateinit var backgroundItems: MutableList<SettingsItem>
+
+    var handler: Handler? = null
 
     var settingsTitle: String? = null
 
@@ -59,6 +67,14 @@ open class SettingsActivity: AppCompatActivity() {
             .replace("-debug", "")
             .replace("-release", "")
 
+    fun backgroundItems(): List<SettingsItem> {
+        return (settingsRecycler.adapter as? SettingsAdapter)?.dataSet ?: listOf()
+    }
+
+    fun settingsAdapter(): SettingsAdapter? {
+        return settingsRecycler.adapter as? SettingsAdapter
+    }
+
     @SuppressLint("UseCompatLoadingForDrawables")
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
@@ -66,27 +82,66 @@ open class SettingsActivity: AppCompatActivity() {
 
         setContentView(R.layout.activity_settings)
 
+        handler = Handler()
+
         sharedPrefs = BackgroundDataService.createSharedPrefs(this)
-        settingsItems = mutableListOf(
-                SettingsItem(getString(R.string.settings_about_app_title), versionStr, true, false),
-                SettingsItem(getString(R.string.settings_mental_health_resources_title), null, false, false),
-                SettingsItem(getString(R.string.settings_about_study_title), null, false, false),
-                SettingsItem(getString(R.string.settings_about_team_title), null, false, false),
-                SettingsItem(getString(R.string.settings_informed_consent_title), null, false, false),
-                SettingsItem(getString(R.string.settings_privacy_policy_title), null, false, false),
-                SettingsItem(getString(R.string.settings_terms_of_service_title), null, false, false),
-                SettingsItem(getString(R.string.settings_contact_us_title), null, false, false),
-                SettingsItem(getString(R.string.settings_licenses), null, false, false),
-                SettingsItem(getString(R.string.settings_options_title), null, false, true),
-                SettingsItem(getString(R.string.settings_withdraw_title), getString(R.string.settings_withdraw_detail), false, false),
-                SettingsItem(getString(R.string.settings_background_collection_title), getString(R.string.settings_background_collection_detail), false, false),
-                SettingsItem(getString(R.string.settings_delete_data_title), getString(R.string.settings_delete_data_detail), false, false))
-        backgroundItems = mutableListOf(
-                SettingsItem(getString(R.string.settings_room_brightness_title), getString(R.string.settings_room_brightness_detail), false, false, SageTaskIdentifier.AmbientLight, true),
-                SettingsItem(getString(R.string.settings_screen_time_title), getString(R.string.settings_screen_time_detail), false, false, SageTaskIdentifier.ScreenTime, true),
-                SettingsItem(getString(R.string.settings_charging_time_title), getString(R.string.settings_charging_time_detail), false, false, SageTaskIdentifier.ChargingTime, true),
-                SettingsItem(getString(R.string.settings_battery_stats_title), getString(R.string.settings_battery_stats_detail), false, false, SageTaskIdentifier.BatteryStatistics, true),
-                SettingsItem(getString(R.string.settings_data_usage_title), getString(R.string.settings_data_usage_detail), false, false, SageTaskIdentifier.DataUsage, true))
+        val settingsItems = mutableListOf(
+                SettingsItem(LayoutType.HEADER_WITH_BACKGROUND, getString(R.string.settings_about_app_title),
+                        versionStr, true, false),
+                SettingsItem(LayoutType.ITEM, getString(R.string.settings_mental_health_resources_title),
+                        null, false, false),
+                SettingsItem(LayoutType.ITEM, getString(R.string.settings_about_study_title),
+                        null, false, false),
+                SettingsItem(LayoutType.ITEM, getString(R.string.settings_about_team_title),
+                        null, false, false),
+                SettingsItem(LayoutType.ITEM, getString(R.string.settings_informed_consent_title),
+                        null, false, false),
+                SettingsItem(LayoutType.ITEM, getString(R.string.settings_privacy_policy_title),
+                        null, false, false),
+                SettingsItem(LayoutType.ITEM, getString(R.string.settings_terms_of_service_title),
+                        null, false, false),
+                SettingsItem(LayoutType.ITEM, getString(R.string.settings_contact_us_title),
+                        null, false, false),
+                SettingsItem(LayoutType.ITEM, getString(R.string.settings_licenses),
+                        null, false, false),
+                SettingsItem(LayoutType.HEADER, getString(R.string.settings_options_title),
+                        null, false, true),
+                SettingsItem(LayoutType.ITEM, getString(R.string.settings_withdraw_title),
+                        getString(R.string.settings_withdraw_detail),
+                        false, false),
+                SettingsItem(LayoutType.ITEM, getString(R.string.settings_background_collection_title),
+                        getString(R.string.settings_background_collection_detail),
+                        false, false),
+                SettingsItem(LayoutType.ITEM, getString(R.string.settings_delete_data_title),
+                        getString(R.string.settings_delete_data_detail),
+                        false, false))
+
+        val backgroundItems = mutableListOf(
+                SettingsItem(LayoutType.HEADER,
+                        getString(R.string.settings_recorders_title),
+                        getString(R.string.settings_recorders_detail),
+                        true, false),
+                SettingsItem(LayoutType.ITEM, getString(R.string.settings_allow_all),
+                        null, false, false, allowAllIdentifier, true),
+                SettingsItem(LayoutType.ITEM, getString(R.string.settings_room_brightness_title),
+                        getString(R.string.settings_room_brightness_detail), false,
+                        false, SageTaskIdentifier.AmbientLight, true),
+                SettingsItem(LayoutType.ITEM, getString(R.string.settings_screen_time_title),
+                        getString(R.string.settings_screen_time_detail), false,
+                        false, SageTaskIdentifier.ScreenTime, true),
+                SettingsItem(LayoutType.ITEM, getString(R.string.settings_charging_time_title),
+                        getString(R.string.settings_charging_time_detail), false,
+                        false, SageTaskIdentifier.ChargingTime, true),
+                SettingsItem(LayoutType.ITEM, getString(R.string.settings_battery_stats_title),
+                        getString(R.string.settings_battery_stats_detail), false,
+                        false, SageTaskIdentifier.BatteryStatistics, true),
+                SettingsItem(LayoutType.ITEM, getString(R.string.settings_data_usage_title),
+                        getString(R.string.settings_data_usage_detail), false,
+                        false, SageTaskIdentifier.DataUsage, true))
+
+        val footerItem = SettingsItem(LayoutType.FOOTER, "", "", false,
+                false, SageTaskIdentifier.DataUsage, true, false,
+                        getString(R.string.settings_continue))
 
         back_button.setOnClickListener {
             finish()
@@ -102,14 +157,15 @@ open class SettingsActivity: AppCompatActivity() {
         }
         settingsRecycler.addItemDecoration(itemDecorator)
 
-        var items: List<SettingsItem>? = null
         settingsTitle = intent.extras?.getString(extraSettingsId)
         settings_title.text = settingsTitle
 
-        if(isSettingsMain) {
-            items = settingsItems
+        val items = if(isSettingsMain) {
+            settingsItems
+        } else if (null != intent.extras?.getString(extraSettingsInitialId)) {
+            backgroundItems + listOf(footerItem)
         } else {
-            items = backgroundItems
+            backgroundItems
         }
 
         val adapter = SettingsAdapter(items, object : SettingsAdapterListener {
@@ -130,11 +186,16 @@ open class SettingsActivity: AppCompatActivity() {
                     else -> processDataTracking(item)
                 }
             }
+
+            override fun onFooterClicked(item: SettingsItem?) {
+                // Currently this is only used after welcome screen, so now go to the home screen
+                returnToEntryActivity()
+            }
         })
         settingsRecycler.adapter = adapter
 
         if (isDataTracking) {
-            adapter.updateDataTrackingItems(sharedPrefs)
+            refreshBackgroundItems()
         }
     }
 
@@ -146,10 +207,14 @@ open class SettingsActivity: AppCompatActivity() {
         }
     }
 
+    fun safeToggleChange(operation: (() -> Unit)) {
+        settingsAdapter()?.isListenerPaused = true
+        operation.invoke()
+        settingsAdapter()?.isListenerPaused = false
+    }
+
     fun goToBackgroundDataCollection() {
-        val intent = Intent(this, SettingsActivity::class.java)
-        intent.putExtra(extraSettingsId, "Data Settings")
-        startActivity(intent)
+        SettingsActivity.startDataSettings(this)
     }
 
     fun goToWithdrawal() {
@@ -179,39 +244,21 @@ open class SettingsActivity: AppCompatActivity() {
     }
 
     fun processDataTracking(item: SettingsItem?) {
-        val itemUnwrapped = item ?: run { return }
-        if (backgroundItems.map { it.identifier }.contains(itemUnwrapped.identifier)) {
-            saveDataTrackingPermission(itemUnwrapped.identifier, itemUnwrapped.active)
-        } else {
-            Toast.makeText(this, "Not implemented yet.", Toast.LENGTH_LONG).show()
-        }
-    }
-
-    fun showDataTrackingDialog(item: SettingsItem) {
-        val dialog = Dialog(this)
-
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setCancelable(true)
-        dialog.setContentView(R.layout.dialog_data_tracking)
-        dialog.window?.setBackgroundDrawableResource(android.R.color.white)
-
-        val title = dialog.findViewById<TextView>(R.id.data_tracking_title)
-        title?.text = item.label
-
-        val toggleButton = dialog.findViewById<ToggleButton>(R.id.toggle_button)
-        toggleButton?.textOn = "ON"
-        toggleButton?.textOff = "OFF"
-        toggleButton?.isChecked = item.subtext == "On"
-
-        dialog.findViewById<View>(R.id.cancel_button)?.setOnClickListener {
-            dialog.dismiss()
-        }
-        dialog.findViewById<View>(R.id.save_button)?.setOnClickListener {
-            saveDataTrackingPermission(item.identifier, toggleButton?.isChecked ?: false)
-            dialog.dismiss()
-        }
-
-        dialog.show()
+        // Bug fix for RecyclerView needing time to animate the Toggle button
+        handler?.postDelayed({
+            val itemUnwrapped = item ?: run { return@postDelayed }
+            if (itemUnwrapped.identifier == allowAllIdentifier) {
+                toggleAllowBackgroundItems(itemUnwrapped.active)
+            } else if (backgroundItems().map { it.identifier }.contains(itemUnwrapped.identifier)) {
+                saveDataTrackingPermission(itemUnwrapped.identifier, itemUnwrapped.active)
+                safeToggleChange {
+                    allowAllItem()?.active = isBackgroundDataAllActive()
+                }
+                settingsRecycler.adapter?.notifyDataSetChanged()
+            } else {
+                Toast.makeText(this, "Not implemented yet.", Toast.LENGTH_LONG).show()
+            }
+        }, 100)
     }
 
     private fun showContactUsDialog() {
@@ -239,8 +286,47 @@ open class SettingsActivity: AppCompatActivity() {
         }
     }
 
+    private fun toggleableItems(): List<SettingsItem> {
+        val allowAllIdx = backgroundItems().map {it.identifier}.indexOf(allowAllIdentifier) + 1
+        val size = backgroundItems().size
+        return backgroundItems().subList(allowAllIdx, size)
+                .filter { it.type != LayoutType.FOOTER }
+    }
+
+    private fun isBackgroundDataAllActive(): Boolean {
+        return toggleableItems().none { !it.active }
+    }
+
+    private fun allowAllItem(): SettingsItem? {
+        return backgroundItems().firstOrNull { it.identifier == allowAllIdentifier }
+    }
+
+    private fun toggleAllowBackgroundItems(newActiveState: Boolean) {
+        safeToggleChange {
+            backgroundItems().forEach {
+                if (it.identifier != allowAllIdentifier) {
+                    saveDataTrackingPermission(it.identifier, newActiveState)
+                    it.active = newActiveState
+                }
+            }
+        }
+        settingsRecycler.adapter?.notifyDataSetChanged()
+    }
+
+    fun refreshBackgroundItems() {
+        val items = BackgroundDataService.loadDataAllowedToBeTracked(sharedPrefs)
+        safeToggleChange {
+            backgroundItems().forEach {
+                if (it.identifier != allowAllIdentifier) {
+                    it.active = items.contains(it.identifier)
+                }
+            }
+            allowAllItem()?.active = isBackgroundDataAllActive()
+        }
+        settingsAdapter()?.notifyDataSetChanged()
+    }
+
     fun saveDataTrackingPermission(identifier: String, newIsOn: Boolean) {
         BackgroundDataService.setDataAllowedToBeTracked(sharedPrefs, identifier, newIsOn)
-        (settingsRecycler.adapter as? SettingsAdapter)?.updateDataTrackingItems(sharedPrefs)
     }
 }

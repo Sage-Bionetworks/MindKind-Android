@@ -1,7 +1,7 @@
 package org.sagebionetworks.research.mindkind
 
 import android.content.Context
-import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
 import android.util.Log
@@ -11,24 +11,43 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.res.ResourcesCompat
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.get
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
 import dagger.android.AndroidInjection
+import kotlinx.android.synthetic.main.activity_task_list.*
 import kotlinx.android.synthetic.main.activity_welcome.*
 import kotlinx.android.synthetic.main.welcome_6.view.*
+import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService
+import org.sagebionetworks.research.mindkind.settings.SettingsActivity
+import org.sagebionetworks.research.sageresearch.dao.room.AppConfigRepository
+import org.sagebionetworks.research.sageresearch.dao.room.ReportRepository
+import org.threeten.bp.LocalDateTime
+import javax.inject.Inject
 
 open class WelcomeActivity: AppCompatActivity() {
 
     var bullets = ArrayList<ImageView>()
 
     companion object {
+        private val TAG = WelcomeActivity::class.java.simpleName
         private var NUM_ITEMS = 6
         fun logInfo(msg: String) {
             Log.i(WelcomeActivity::class.simpleName, msg)
         }
     }
+
+    @Inject
+    lateinit var reportRepo: ReportRepository
+
+    @Inject
+    lateinit var appConfigRepo: AppConfigRepository
+
+    private lateinit var initializeAppViewModel: TaskListViewModel
+    private lateinit var sharedPrefs: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
@@ -78,6 +97,26 @@ open class WelcomeActivity: AppCompatActivity() {
             img.setPadding(padding, padding, padding, padding)
             container.addView(img)
         }
+
+        sharedPrefs = BackgroundDataService.createSharedPrefs(this)
+
+        // View Model logic is empty, but set them up to pre-load all the data
+        initializeAppViewModel = ViewModelProvider(this, TaskListViewModel.Factory(
+                appConfigRepo, reportRepo)).get()
+        initializeAppViewModel.taskListLiveData().observe(this, Observer {
+            Log.i(TAG, "At ${LocalDateTime.now()} AI state is ${it.aiState}")
+        })
+        initializeAppViewModel.studyProgressLiveData().observe(this, Observer {
+            // Progress in study is null until the day after they completed their baseline
+            val progressInStudy = it ?: run {
+                return@Observer
+            }
+            if (!sharedPrefs.contains(TaskListViewModel.studyStartDateKey)) {
+                val localStartStr = progressInStudy.localStart.toString()
+                Log.i(TAG, "First save of existing study date $localStartStr")
+                sharedPrefs.edit().putString(TaskListViewModel.studyStartDateKey, localStartStr).apply()
+            }
+        })
     }
 
     fun onQuitClicked() {
@@ -85,7 +124,7 @@ open class WelcomeActivity: AppCompatActivity() {
     }
 
     fun onContinueClicked() {
-        returnToEntryActivity()
+        SettingsActivity.startInitialDataTracking(this)
     }
 
     inner class WelcomeAdapter(private val mContext: Context) : PagerAdapter() {
@@ -110,9 +149,6 @@ open class WelcomeActivity: AppCompatActivity() {
             val layout = inflater.inflate(resId, collection, false) as ViewGroup
 
             if (resId == R.layout.welcome_6) {
-                layout.confirmation_quit.setOnClickListener {
-                    onQuitClicked()
-                }
                 layout.confirmation_continue.setOnClickListener {
                     onContinueClicked()
                 }
