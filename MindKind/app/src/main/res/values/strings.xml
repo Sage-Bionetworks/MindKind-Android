@@ -242,7 +242,7 @@
     <string name="settings_recorders_title">Your Data Settings</string>
     <string name="settings_recorders_detail">This is the data we record. You can turn the recorders on or off now. You can make changes anytime during the study.</string>
     <string name="settings_room_brightness_title">Room Brightness</string>
-    <string name="settings_room_brightness_detail">Measure every 15 minutes to see if the light around you is becoming brighter or darker.</string>
+    <string name="settings_room_brightness_detail">Measure every 5 minutes to see if the light around you is becoming brighter or darker.</string>
     <string name="settings_screen_time_title">Screen Time</string>
     <string name="settings_screen_time_detail">How long you have your phone screen locked. We don\'t record what you are doing when your phone is unlocked.</string>
     <string name="settings_charging_time_title">Charging Time</string>

@@ -254,7 +254,7 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
     private var ambientLightValues = ArrayList<Float>()
     private var ambientLightKickoffTime: Long? = null
     private val ambientLightDuration = 1000L * 10L // 10 seconds
-    private val ambientLightFreq = 1000L * 60L * 2 // 2 minutes
+    private val ambientLightFreq = 1000L * 60L * 5 // 5 minutes
     private val ambientLightRunnable = Runnable() {
         kickOffAmbientLightUpdates()
     }
