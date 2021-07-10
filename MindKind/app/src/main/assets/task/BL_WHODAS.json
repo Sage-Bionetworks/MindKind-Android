@@ -1,123 +1,323 @@
 {
-  "identifier": "PHQ9",
+  "identifier": "BL_WHODAS",
   "type": "conversationSurvey",
-  "taskIdentifier": "PHQ9",
-  "schemaIdentifier": "PHQ9",
-  "measureType": "Validated", 
+  "taskIdentifier": "BL_WHODAS",
+  "schemaIdentifier": "BL_WHODAS",
+  "measureType": "Validated",
   "steps": [
     {
-      "identifier": "PHQ_Intro",
+      "identifier": "WHO_Intro",
       "type": "instruction",
-      "title": "Over the last two weeks, how often have you been bothered by the following problems?"
+      "title": "Think back over the past 30 days and answer these questions, thinking about how much difficulty you had doing the following activities.",
+      "optional": false,
+      "buttonTitle": "Ok"
     },
     {
-      "identifier": "PHQ_1_Interest",
+      "identifier": "WHO_1_Standing",
       "type": "singleChoice.integer",
-      "title": "Little interest or pleasure in doing things?",
-      "choices": [
-        { "text": "Not at all"             ,       "value": 0 },
-        { "text": "Several days"           ,       "value": 1 },
-        { "text": "More than half the days",       "value": 2 },
-        { "text": "Nearly every day"       ,       "value": 3 }
+      "title": "Standing for long periods such as 30 minutes?",
+      "choices": [{
+        "text": "None",
+        "value": 0
+      },
+        {
+          "text": "Mild",
+          "value": 1
+        },
+        {
+          "text": "Moderate",
+          "value": 2
+        },
+        {
+          "text": "Severe",
+          "value": 3
+        },
+        {
+          "text": "Extreme or can not do",
+          "value": 4
+        }
       ]
     },
     {
-      "identifier": "PHQ_2_Down",
+      "identifier": "WHO_2_Household",
       "type": "singleChoice.integer",
-      "title": "Feeling down, depressed, or hopeless?",
-      "choices": [
-        { "text": "Not at all"             ,       "value": 0 },
-        { "text": "Several days"           ,       "value": 1 },
-        { "text": "More than half the days",       "value": 2 },
-        { "text": "Nearly every day"       ,       "value": 3 }
+      "title": "Taking care of your household responsibilities?",
+      "choices": [{
+        "text": "None",
+        "value": 0
+      },
+        {
+          "text": "Mild",
+          "value": 1
+        },
+        {
+          "text": "Moderate",
+          "value": 2
+        },
+        {
+          "text": "Severe",
+          "value": 3
+        },
+        {
+          "text": "Extreme or can not do",
+          "value": 4
+        }
       ]
     },
     {
-      "identifier": "PHQ_3_Sleep",
+      "identifier": "WHO_3_Learning",
       "type": "singleChoice.integer",
-      "title": "Trouble falling or staying asleep, or sleeping too much?",
-      "choices": [
-        { "text": "Not at all"             ,       "value": 0 },
-        { "text": "Several days"           ,       "value": 1 },
-        { "text": "More than half the days",       "value": 2 },
-        { "text": "Nearly every day"       ,       "value": 3 }
+      "title": "Learning a new task, for example, learning how to get to a new place? ",
+      "choices": [{
+        "text": "None",
+        "value": 0
+      },
+        {
+          "text": "Mild",
+          "value": 1
+        },
+        {
+          "text": "Moderate",
+          "value": 2
+        },
+        {
+          "text": "Severe",
+          "value": 3
+        },
+        {
+          "text": "Extreme or can not do",
+          "value": 4
+        }
       ]
     },
     {
-      "identifier": "PHQ_4_Energy",
+      "identifier": "WHO_4_Activities",
       "type": "singleChoice.integer",
-      "title": "Feeling tired or having little energy?",
-      "choices": [
-        { "text": "Not at all"             ,       "value": 0 },
-        { "text": "Several days"           ,       "value": 1 },
-        { "text": "More than half the days",       "value": 2 },
-        { "text": "Nearly every day"       ,       "value": 3 }
+      "title": "How much of a problem did you have in joining in community activities (for example, festivities, religious or other activities) in the same way as anyone else can? ",
+      "choices": [{
+        "text": "None",
+        "value": 0
+      },
+        {
+          "text": "Mild",
+          "value": 1
+        },
+        {
+          "text": "Moderate",
+          "value": 2
+        },
+        {
+          "text": "Severe",
+          "value": 3
+        },
+        {
+          "text": "Extreme or can not do",
+          "value": 4
+        }
       ]
     },
     {
-      "identifier": "PHQ_5_Eat",
+      "identifier": "WHO_5_Emotion",
       "type": "singleChoice.integer",
-      "title": "Poor appetite or overeating?",
-      "choices": [
-        { "text": "Not at all"             ,       "value": 0 },
-        { "text": "Several days"           ,       "value": 1 },
-        { "text": "More than half the days",       "value": 2 },
-        { "text": "Nearly every day"       ,       "value": 3 }
+      "title": "How much have you been emotionally affected by your health problems? ",
+      "choices": [{
+        "text": "None",
+        "value": 0
+      },
+        {
+          "text": "Mild",
+          "value": 1
+        },
+        {
+          "text": "Moderate",
+          "value": 2
+        },
+        {
+          "text": "Severe",
+          "value": 3
+        },
+        {
+          "text": "Extreme or can not do",
+          "value": 4
+        }
       ]
     },
     {
-      "identifier": "PHQ_6_Failure",
+      "identifier": "WHO_6_Concentration",
       "type": "singleChoice.integer",
-      "title": "Feeling bad about yourself — or that you are a failure or have let yourself or your family down?",
-      "choices": [
-        { "text": "Not at all"             ,       "value": 0 },
-        { "text": "Several days"           ,       "value": 1 },
-        { "text": "More than half the days",       "value": 2 },
-        { "text": "Nearly every day"       ,       "value": 3 }
+      "title": "Concentrating on doing something for ten minutes?",
+      "choices": [{
+        "text": "None",
+        "value": 0
+      },
+        {
+          "text": "Mild",
+          "value": 1
+        },
+        {
+          "text": "Moderate",
+          "value": 2
+        },
+        {
+          "text": "Severe",
+          "value": 3
+        },
+        {
+          "text": "Extreme or can not do",
+          "value": 4
+        }
       ]
     },
     {
-      "identifier": "PHQ_7_Concentration",
+      "identifier": "WHO_7_Walking",
       "type": "singleChoice.integer",
-      "title": "Trouble concentrating on things, such as reading the newspaper or watching television?",
-      "choices": [
-        { "text": "Not at all"             ,       "value": 0 },
-        { "text": "Several days"           ,       "value": 1 },
-        { "text": "More than half the days",       "value": 2 },
-        { "text": "Nearly every day"       ,       "value": 3 }
+      "title": "Walking a long distance such as a kilometer (or equivalent)? ",
+      "choices": [{
+        "text": "None",
+        "value": 0
+      },
+        {
+          "text": "Mild",
+          "value": 1
+        },
+        {
+          "text": "Moderate",
+          "value": 2
+        },
+        {
+          "text": "Severe",
+          "value": 3
+        },
+        {
+          "text": "Extreme or can not do",
+          "value": 4
+        }
       ]
     },
     {
-      "identifier": "PHQ_8_Motor",
+      "identifier": "WHO_8_Wash",
       "type": "singleChoice.integer",
-      "title": "Moving or speaking so slowly that other people could have noticed? Or the opposite — being so fidgety or restless that you have been moving around a lot more than usual?",
-      "choices": [
-        { "text": "Not at all"             ,       "value": 0 },
-        { "text": "Several days"           ,       "value": 1 },
-        { "text": "More than half the days",       "value": 2 },
-        { "text": "Nearly every day"       ,       "value": 3 }
+      "title": "Washing your whole body?",
+      "choices": [{
+        "text": "None",
+        "value": 0
+      },
+        {
+          "text": "Mild",
+          "value": 1
+        },
+        {
+          "text": "Moderate",
+          "value": 2
+        },
+        {
+          "text": "Severe",
+          "value": 3
+        },
+        {
+          "text": "Extreme or can not do",
+          "value": 4
+        }
       ]
     },
     {
-      "identifier": "PHQ_9_SI",
+      "identifier": "WHO_9_Strangers",
       "type": "singleChoice.integer",
-      "title": "Thoughts that you would be better off dead or of hurting yourself in some way?",
-      "choices": [
-        { "text": "Not at all"             ,       "value": 0 },
-        { "text": "Several days"           ,       "value": 1 },
-        { "text": "More than half the days",       "value": 2 },
-        { "text": "Nearly every day"       ,       "value": 3 }
+      "title": "Dealing with people you do not know?",
+      "choices": [{
+        "text": "None",
+        "value": 0
+      },
+        {
+          "text": "Mild",
+          "value": 1
+        },
+        {
+          "text": "Moderate",
+          "value": 2
+        },
+        {
+          "text": "Severe",
+          "value": 3
+        },
+        {
+          "text": "Extreme or can not do",
+          "value": 4
+        }
       ]
     },
     {
-      "identifier": "PHQ_10_Impair",
+      "identifier": "WHO_10_Friends",
+      "type": "singleChoice.integer",
+      "title": "Maintaining a friendship? ",
+      "choices": [{
+        "text": "None",
+        "value": 0
+      },
+        {
+          "text": "Mild",
+          "value": 1
+        },
+        {
+          "text": "Moderate",
+          "value": 2
+        },
+        {
+          "text": "Severe",
+          "value": 3
+        },
+        {
+          "text": "Extreme or can not do",
+          "value": 4
+        }
+      ]
+    },
+    {
+      "identifier": "WHO_11_Strangers",
+      "type": "singleChoice.integer",
+      "title": "Your day-to-day work?",
+      "choices": [{
+        "text": "None",
+        "value": 0
+      },
+        {
+          "text": "Mild",
+          "value": 1
+        },
+        {
+          "text": "Moderate",
+          "value": 2
+        },
+        {
+          "text": "Severe",
+          "value": 3
+        },
+        {
+          "text": "Extreme or can not do",
+          "value": 4
+        }
+      ]
+    },
+    {
+      "identifier": "WHO_10_Impair",
       "type": "singleChoice.integer",
       "title": "If you checked off any problems, how difficult have these problems made it for your work, take care of things at home, or get along with other people?",
-      "choices": [
-        { "text": "Not difficult at all "   ,       "value": 0 },
-        { "text": "Somewhat difficult  "    ,       "value": 1 },
-        { "text": "Very difficult "         ,       "value": 2 },
-        { "text": "Extremely difficult "    ,       "value": 3 }
+      "choices": [{
+        "text": "Not difficult at all ",
+        "value": 0
+      },
+        {
+          "text": "Somewhat difficult  ",
+          "value": 1
+        },
+        {
+          "text": "Very difficult ",
+          "value": 2
+        },
+        {
+          "text": "Extremely difficult ",
+          "value": 3
+        }
       ]
     }
   ]
