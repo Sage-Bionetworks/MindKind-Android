@@ -6,6 +6,19 @@
   "measureType": "MindKindInternal", 
   "steps": [
     {
+      "identifier": "DEMOG_UK_HOUSE",
+      "type": "singleChoice.wheel.string",
+      "title": "Do you live in a...",
+      "buttonTitle": "Ok",
+      "choices": [
+        "House (own, rent, other)",
+        "Apartment (own, rent, other)",
+        "Dormitory",
+        "Shelter",
+        "No fixed address"
+      ]
+    },
+    {
       "identifier": "DEMOG_UK_EDU",
       "type": "singleChoice.integer",
       "title": "What is your highest level of education?",
