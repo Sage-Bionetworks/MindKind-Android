@@ -79,6 +79,7 @@
     {
       "identifier": "GAD_7_Fear",
       "type": "singleChoice.integer",
+      "ifUserAnswers": "0, skip to GAD_8_Impair",
       "title": "Feeling afraid, as if something awful might happen?",
       "choices": [
         { "text": "Not at all"             ,       "value": 0 },
@@ -86,6 +87,13 @@
         { "text": "More than half the days",       "value": 2 },
         { "text": "Nearly every day"       ,       "value": 3 }
       ]
+    },
+    {
+      "identifier": "GAD_Self_Harm_Positive",
+      "type": "instruction",
+      "optional": false,
+      "title": "Thank you. Remember, if you ever experience distress or feel that you are going to hurt yourself or others, please contact your physician.\n\nYou can also view the mental health resources on the MindKind website: https://staging.wtgmhdc.synapse.org/contact",
+      "buttonTitle": "Ok"
     },
     {
       "identifier": "GAD_8_Impair",

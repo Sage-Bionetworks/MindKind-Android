@@ -103,12 +103,20 @@
       "identifier": "PHQ_9_SelfHarm",
       "type": "singleChoice.integer",
       "title": "Thoughts that you would be better off dead or of hurting yourself in some way?",
+      "ifUserAnswers": "0, skip to PHQ_10_Impair",
       "choices": [
         { "text": "Not at all"             ,       "value": 0 },
         { "text": "Several days"           ,       "value": 1 },
         { "text": "More than half the days",       "value": 2 },
         { "text": "Nearly every day"       ,       "value": 3 }
       ]
+    },
+    {
+      "identifier": "PHQ_Self_Harm_Positive",
+      "type": "instruction",
+      "optional": false,
+      "title": "Thank you. Remember, if you ever experience distress or feel that you are going to hurt yourself or others, please contact your physician.\n\nYou can also view the mental health resources on the MindKind website: https://staging.wtgmhdc.synapse.org/contact",
+      "buttonTitle": "Ok"
     },
     {
       "identifier": "PHQ_10_Impair",
