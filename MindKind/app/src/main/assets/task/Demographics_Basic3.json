@@ -72,19 +72,6 @@
       "max": 9
     },
     {
-      "identifier": "DEMOG_HOUSE",
-      "type": "singleChoice.wheel.string",
-      "title": "Do you live in a...",
-      "buttonTitle": "Ok",
-      "choices": [
-        "House (own, rent, other)",
-        "Apartment (own, rent, other)",
-        "Dormitory",
-        "Shelter",
-        "No fixed address"
-      ]
-    },
-    {
       "identifier": "DEMOG_FOOD",
       "type": "singleChoice.integer",
       "title": "Are you or others in your household worried about not having enough food to eat because of a lack of money or other resources?",

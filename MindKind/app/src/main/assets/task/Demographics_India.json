@@ -67,6 +67,19 @@
       ]
     },
     {
+      "identifier": "DEMOG_INDIA_HOUSE",
+      "type": "singleChoice.wheel.string",
+      "title": "Do you live in a...",
+      "buttonTitle": "Ok",
+      "choices": [
+        "House (own, rent, other)",
+        "Apartment (own, rent, other)",
+        "Dormitory",
+        "Shelter",
+        "No fixed address"
+      ]
+    },
+    {
       "identifier": "DEMOG_INDIA_ROOMS",
       "type": "integer",
       "title": "How many rooms in this household are used for sleeping?",
