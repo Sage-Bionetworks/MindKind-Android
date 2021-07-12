@@ -1,0 +1,376 @@
+{
+  "identifier": "Mental_Health_Management",
+  "type": "conversationSurvey",
+  "taskIdentifier": "Mental_Health_Management",
+  "schemaIdentifier": "Mental_Health_Management",
+  "measureType": "Baseline",
+  "steps": [{
+    "identifier": "MHM_Intro",
+    "type": "instruction",
+    "title": "Now let’s talk about how you have tried to manage your mental health.",
+    "buttonTitle": "Ok",
+    "optional": false
+  },
+    {
+      "identifier": "MHM_1_MHCondition",
+      "type": "singleChoice.integer",
+      "title": "Has a doctor or health care provider ever told you that you have a mental health or substance abuse condition?",
+      "ifUserAnswers": "0, skip to IMPACT_1_Psychiatrist_current",
+      "choices": [{
+        "text": "Yes",
+        "value": 1
+      },
+        {
+          "text": "No",
+          "value": 0
+        }
+      ]
+    },
+    {
+      "identifier": "MHM_2_ConditionList",
+      "type": "multiChoice.checkbox.string",
+      "title": "Please select all that apply",
+      "buttonTitle": "Ok",
+      "choices": [{
+        "text": "Alcohol use disorder",
+        "value": "Alcohol use disorder"
+      },
+        {
+          "text": "Anxiety reaction/panic disorder",
+          "value": "Anxiety or panic disorder"
+        },
+        {
+          "text": "Attention-deficit/hyperactivity disorder (ADHD)",
+          "value": "ADHD"
+        },
+        {
+          "text": "Autism spectrum disorder",
+          "value": "Autism spectrum disorder"
+        },
+        {
+          "text": "Bipolar disorder",
+          "value": "Bipolar disorder"
+        },
+        {
+          "text": "Drug use disorder",
+          "value": "Drug use disorder"
+        },
+        {
+          "text": "Eating disorder",
+          "value": "Eating disorder"
+        },
+        {
+          "text": "Personality disorder",
+          "value": "Personality disorder"
+        },
+        {
+          "text": "Post-traumatic stress disorder (PTSD)",
+          "value": "PTSD"
+        },
+        {
+          "text": "Schizophrenia",
+          "value": "Schizophrenia"
+        },
+        {
+          "text": "Social phobia",
+          "value": "Social phobia"
+        },
+        {
+          "text": "Other mental health or substance use condition",
+          "value": "Other"
+        },
+        {
+          "text": "I have no diagnosed mental health or substance use condition",
+          "value": "None"
+        }
+      ]
+    },
+    {
+      "identifier": "IMPACT_1_Psychiatrist_current",
+      "type": "singleChoice.integer",
+      "title": "Do you CURRENTLY see a psychiatrist for mental health or substance misuse?",
+      "choices": [{
+        "text": "Yes",
+        "value": 1
+      },
+        {
+          "text": "No",
+          "value": 0
+        },
+        {
+          "text": "Decline to answer",
+          "value": -1
+        }
+      ]
+    },
+    {
+      "identifier": "IMPACT_2_Counselor_current",
+      "type": "singleChoice.integer",
+      "title": "Do you CURRENTLY see a psychologist, social worker or other counselor for mental health or substance misuse?",
+      "choices": [{
+        "text": "Yes",
+        "value": 1
+      },
+        {
+          "text": "No",
+          "value": 0
+        },
+        {
+          "text": "Decline to answer",
+          "value": -1
+        }
+      ]
+    },
+    {
+      "identifier": "IMPACT_3_SupportGroups_current",
+      "type": "singleChoice.integer",
+      "title": "Are you attending any support groups for mental health or substance misuse?",
+      "choices": [{
+        "text": "Yes",
+        "value": 1
+      },
+        {
+          "text": "No",
+          "value": 0
+        },
+        {
+          "text": "Decline to answer",
+          "value": -1
+        }
+      ]
+    },
+    {
+      "identifier": "IMPACT_4_SelfHelp_current",
+      "type": "singleChoice.integer",
+      "title": "Are you CURRENTLY reading any self-help books or online sources for mental health or substance abuse treatment?",
+      "choices": [{
+        "text": "Yes",
+        "value": 1
+      },
+        {
+          "text": "No",
+          "value": 0
+        },
+        {
+          "text": "Decline to answer",
+          "value": -1
+        }
+      ]
+    },
+    {
+      "identifier": "IMPACT_5_Medications_current",
+      "type": "singleChoice.integer",
+      "title": "Are you CURRENTLY taking medications for mental health problems?",
+      "choices": [{
+        "text": "Yes",
+        "value": 1
+      },
+        {
+          "text": "No",
+          "value": 0
+        },
+        {
+          "text": "Decline to answer",
+          "value": -1
+        }
+      ]
+    },
+    {
+      "identifier": "IMPACT_6_Sleep_current",
+      "type": "singleChoice.integer",
+      "title": "Are you CURRENTLY taking medications for sleep?",
+      "choices": [{
+        "text": "Yes",
+        "value": 1
+      },
+        {
+          "text": "No",
+          "value": 0
+        },
+        {
+          "text": "Decline to answer",
+          "value": -1
+        }
+      ]
+    },
+    {
+      "identifier": "IMPACT_7_Healer_current",
+      "type": "singleChoice.integer",
+      "title": "Are you CURRENTLY seeing a traditional/faith healer for a mental health issue?",
+      "choices": [{
+        "text": "Yes",
+        "value": 1
+      },
+        {
+          "text": "No",
+          "value": 0
+        },
+        {
+          "text": "Decline to answer",
+          "value": -1
+        }
+      ]
+    },
+    {
+      "identifier": "IMPACT_1_Psychiatrist_history",
+      "type": "singleChoice.integer",
+      "title": "Have you EVER SEEN a psychiatrist for mental health or substance use treatment?",
+      "choices": [{
+        "text": "Yes",
+        "value": 1
+      },
+        {
+          "text": "No",
+          "value": 0
+        },
+        {
+          "text": "Decline to answer",
+          "value": -1
+        }
+      ]
+    },
+    {
+      "identifier": "IMPACT_2_Counselor_history",
+      "type": "singleChoice.integer",
+      "title": "Have you EVER SEEN a psychologist, social worker or other counselor for mental health or substance treatment?",
+      "choices": [{
+        "text": "Yes",
+        "value": 1
+      },
+        {
+          "text": "No",
+          "value": 0
+        },
+        {
+          "text": "Decline to answer",
+          "value": -1
+        }
+      ]
+    },
+    {
+      "identifier": "IMPACT_3_SupportGroups_history",
+      "type": "singleChoice.integer",
+      "title": "Have you attended any support groups for mental health or substance abuse treatment?",
+      "choices": [{
+        "text": "Yes",
+        "value": 1
+      },
+        {
+          "text": "No",
+          "value": 0
+        },
+        {
+          "text": "Decline to answer",
+          "value": -1
+        }
+      ]
+    },
+    {
+      "identifier": "IMPACT_4_SelfHelp_history",
+      "type": "singleChoice.integer",
+      "title": "Have you read any self-help books or online sources for mental health or substance abuse treatment?",
+      "choices": [{
+        "text": "Yes",
+        "value": 1
+      },
+        {
+          "text": "No",
+          "value": 0
+        },
+        {
+          "text": "Decline to answer",
+          "value": -1
+        }
+      ]
+    },
+    {
+      "identifier": "IMPACT_5_Medications_history",
+      "type": "singleChoice.integer",
+      "title": "Have you EVER TAKEN medications medications for mental health problems?",
+      "choices": [{
+        "text": "Yes",
+        "value": 1
+      },
+        {
+          "text": "No",
+          "value": 0
+        },
+        {
+          "text": "Decline to answer",
+          "value": -1
+        }
+      ]
+    },
+    {
+      "identifier": "IMPACT_6_Sleep_history",
+      "type": "singleChoice.integer",
+      "title": "Have you EVER TAKEN medications for sleep?",
+      "choices": [{
+        "text": "Yes",
+        "value": 1
+      },
+        {
+          "text": "No",
+          "value": 0
+        },
+        {
+          "text": "Decline to answer",
+          "value": -1
+        }
+      ]
+    },
+    {
+      "identifier": "IMPACT_7_Healer_history",
+      "type": "singleChoice.integer",
+      "title": "Have you EVER SEEN a traditional/faith healer for a mental health issue?",
+      "choices": [{
+        "text": "Yes",
+        "value": 1
+      },
+        {
+          "text": "No",
+          "value": 0
+        },
+        {
+          "text": "Decline to answer",
+          "value": -1
+        }
+      ]
+    },
+    {
+      "identifier": "MHM_5_ConditionList",
+      "type": "multiChoice.checkbox.string",
+      "title": "During the past 30 days have you used any of the following? (Select all that apply)",
+      "buttonTitle": "Ok",
+      "choices": [{
+        "text": "Smoked marijuana / dagga",
+        "value": "marijuana"
+      },
+        {
+          "text": "Smoked cigarettes",
+          "value": "cigarettes"
+        },
+        {
+          "text": "Vaped / smoked electronic cigarettes",
+          "value": "vaped"
+        },
+        {
+          "text": "Drank alcohol",
+          "value": "alcohol"
+        },
+        {
+          "text": "Taken nyaope/wonga/tik",
+          "value": "nyaope"
+        },
+        {
+          "text": "Taken other recreational drugs",
+          "value": "Other"
+        },
+        {
+          "text": "None of the above",
+          "value": "None"
+        }
+      ]
+    }
+  ]
+}
