@@ -264,11 +264,13 @@ open class SettingsActivity: AppCompatActivity() {
     private fun showContactUsDialog() {
         val fm = supportFragmentManager
 
-        val dialog = ConfirmationDialog.newInstance(
+        val dialog = ConfirmationDialog.newContactUsInstance(
                 getString(R.string.settings_delete_your_data),
                 getString(R.string.settings_delete_your_data_desc),
                 getString(R.string.cancel),
-                getString(R.string.settings_contact_us))
+                getString(R.string.settings_contact_us),
+                getString(R.string.settings_delete_your_data_message_desc),
+                getString(R.string.settings_email_contact_us))
 
         dialog.show(fm, ConfirmationDialog.TAG)
 
