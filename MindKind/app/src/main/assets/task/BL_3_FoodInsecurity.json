@@ -15,7 +15,7 @@
       "title": "The food that (I/we) bought just didn’t last, and (I/we) didn’t have money to get more.",
       "choices": [{
         "text": "Often True",
-        "value": 0
+        "value": 2
       },
         {
           "text": "Sometimes True",
@@ -23,7 +23,7 @@
         },
         {
           "text": "Never True",
-          "value": 2
+          "value": 0
         },
         {
           "text": "Don't Know or Refuse to answer",
@@ -37,7 +37,7 @@
       "title": "(I/we) couldn’t afford to eat balanced meals.",
       "choices": [{
         "text": "Often True",
-        "value": 0
+        "value": 2
       },
         {
           "text": "Sometimes True",
@@ -45,7 +45,7 @@
         },
         {
           "text": "Never True",
-          "value": 2
+          "value": 0
         },
         {
           "text": "Don't Know or Refuse to answer",
@@ -78,15 +78,15 @@
       "title": "How often did this happen?",
       "choices": [{
         "text": "Almost every month",
-        "value": 0
+        "value": 3
       },
         {
           "text": "Some months but not every month",
-          "value": 1
+          "value": 2
         },
         {
           "text": "Only 1 or 2 months",
-          "value": 2
+          "value": 1
         },
         {
           "text": "Don't Know",
