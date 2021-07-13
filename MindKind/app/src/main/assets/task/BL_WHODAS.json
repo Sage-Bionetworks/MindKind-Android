@@ -8,9 +8,9 @@
      {
       "identifier": "YourHealth_Intro",
       "type": "instruction",
-      "title": "Ok, now we are going to ask some more personal questions about your physical and mental health. Some of these questions might be uncomfortable, some may not apply to you at all. Just do your best, and feel free to skip if you are having a hard time answering."
+      "title": "Ok, now we are going to ask some more personal questions about your physical and mental health. Some of these questions might be uncomfortable, some may not apply to you at all. Just do your best, and feel free to skip if you are having a hard time answering.",
       "continueAfterDelay": true
-     }
+     },
     {
       "identifier": "WHO_Intro",
       "type": "instruction",
