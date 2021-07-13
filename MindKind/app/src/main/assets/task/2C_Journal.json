@@ -1,0 +1,38 @@
+{
+  "identifier": "2C_Journal",
+  "type": "conversationSurvey",
+  "taskIdentifier": "2C_Journal",
+  "schemaIdentifier": "2C_Journal",
+  "steps": [
+    {
+      "identifier": "2C_Journal_Prompt",
+      "type": "instruction.random",
+      "title": "Will be replaced with one from the titleList",
+       "optional": false,
+      "continueAfterDelay": true,
+      "useWeekNumberAsIndex": true,
+      "titleList": [
+		"Now it's time for your journal! What does being social mean to you? How does being social make you feel? Write your thoughts below. To protect your privacy, please do not include your name or any information that could be used to identify you.",
+		"Thanks again for answering our questions. Now it's time for your journal! To protect your privacy, please do not include your name or any information that could be used to identify you. What kind of activities do you like best?",
+		"Time to tell us a little more about your day. You could also share your ideas about how to make being part of a study like this more interesting! To protect your privacy, please do not include your name or any information.",
+		"Thank you for all your help.  If you have time, please let us know how we can make answering questions every day more useful. To protect your privacy, please do not include your name or any information.",
+		"OK, terrific, thanks for checking in. One more thing, let's complete your journal.  To protect your privacy, please do not include your name or any information that could be used to identify you.",
+		"Time to journal! To protect your privacy, please do not include your name or any information that could be used to identify you.",
+		"One last thing, let's complete your journal. Tell us about one thing that makes you most happy. To protect your privacy, please do not include your name or any information that could be used to identify you.",
+		"Journal topic: Do you socialize  when you feel low. Why? To protect your privacy, please do not include your name or any information that could be used to identify you.",
+		"Journal Time: Here is your topic. When you have a bad day, what things do you do to make it better? To protect your privacy, please do not include your name or any information that could be used to identify you.",
+		"Time to speak your mind! Optional topic: What goals do you have for the future?  To protect your privacy, please do not include your name or any information that could be used to identify you.",
+		"Its journal time. Write a little something here about your day.  To protect your privacy, please do not include your name or any information that could be used to identify you.",
+		"Finally, if there was a way for us to make the experience more engaging, what do you recommend?  To protect your privacy, please do not include your name or any information that could be used to identify you."]
+	},
+    {
+      "identifier": "2C_Journal_Answer",
+      "type": "text",
+      "title": "NOTICE: We are not monitoring your response in real time. If you need help, contact a doctor or mental health care provider. Resources are available on the study website https://staging.wtgmhdc.synapse.org/contact",
+      "buttonTitle": "Submit",
+      "maxCharacters": "750",
+      "placeholderText": "To protect your privacy, please do not include your name or any information that could be used to identify you."
+    }
+  ]
+}
+
