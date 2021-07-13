@@ -77,7 +77,7 @@
     },
     {
       "identifier": "IPAQ_6_WALKTime",
-      "title": "How much time did you usually spend WALKING on one of those days?",
+      "title": "How much time did you usually spend WALKING on one of those days? (in minutes)",
       "buttonTitle": "Ok",
       "ifUserAnswers": "0, skip to IPAQ_SITIntro",
       "type": "text",
@@ -95,7 +95,7 @@
     },
     {
       "identifier": "IPAQ_7_SitTime",
-      "title": "During the last 7 days, how much time did you spend SITTING on a week day",
+      "title": "During the last 7 days, how much time did you spend SITTING on a week day?",
       "buttonTitle": "Ok",
       "ifUserAnswers": "0, skip to Next Activity",
       "type": "text",
