@@ -163,7 +163,7 @@
     <string name="welcome_4_title">We protect your personal data</string>
     <string name="welcome_4_message">Your privacy is important to us. Encryption removes your name and encodes your data. This makes it difficult for people who view your data to be able to identify you.</string>
     <string name="welcome_5_title">We only record phone data with your consent</string>
-    <string name="welcome_5_message">We record data from you phone usage. You can turn this off or on at any time and still be part of the study.</string>
+    <string name="welcome_5_message">We record data from your phone usage. You can turn this off or on at any time and still be part of the study.</string>
     <string name="welcome_6_title">The choice is always up to you</string>
     <string name="welcome_6_message">We are glad you’re here! You can withdraw from the MindKind Study at any time. You can ask us for a copy of your data or to delete your data.</string>
     <string name="welcome_accept">Continue</string>
