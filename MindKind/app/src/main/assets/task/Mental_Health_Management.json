@@ -8,7 +8,7 @@
     "identifier": "MHM_Intro",
     "type": "instruction",
     "title": "Now let’s talk about how you have tried to manage your mental health.",
-    "buttonTitle": "Ok",
+    "continueAfterDelay": true,
     "optional": false
   },
     {
