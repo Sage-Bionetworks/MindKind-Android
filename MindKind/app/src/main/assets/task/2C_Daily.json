@@ -6,12 +6,12 @@
   "steps": [
     {
       "identifier": "2C_Daily_Y",
-      "type": "singleChoice.string",
+      "type": "singleChoice.integer",
       "ifUserAnswers": "No, skip to 2C_Dept",
       "title": "Did you do anything social today?",
       "choices": [
-        { "text": "Yes" ,               "value": "Yes" },
-        { "text": "No"  ,               "value": "No" }
+        { "text": "Yes" ,               "value": 1 },
+        { "text": "No"  ,               "value": 0 }
       ]
     },
     {
