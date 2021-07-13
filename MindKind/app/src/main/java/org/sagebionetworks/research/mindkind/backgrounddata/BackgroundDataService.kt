@@ -88,6 +88,7 @@ import org.threeten.bp.ZonedDateTime
 import org.threeten.bp.temporal.ChronoUnit
 import java.io.File
 import java.io.FileOutputStream
+import java.lang.Exception
 import java.util.*
 import javax.inject.Inject
 
@@ -275,9 +276,11 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
         // Used for local data storage
         sharedPrefs = createSharedPrefs(this)
 
+        startForeground()
+
         // Check if we have already past the end of study
         if (sharedPrefs.getBoolean(hasShownEndOfStudyNotifKey, false)) {
-            stopSelf()
+            return
         }
 
         // Refresh the data that the service should be tracking
@@ -290,7 +293,6 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
 
         createNotificationChannel()
         createEngagementNotificationChannel()
-        startForeground()
 
         database = Room.databaseBuilder(this,
                 MindKindDatabase::class.java,
@@ -308,7 +310,6 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
                 uploadDataReceiver, IntentFilter(ACTIVITY_UPLOAD_DATA_ACTION))
 
         startBackgroundData()
-
         checkForEndOfStudy()
     }
 
@@ -359,9 +360,14 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
     }
 
     private fun stopBackgroundData() {
-        unregisterReceiver(receiver)
+        try {
+            unregisterReceiver(receiver)
+        } catch (e: Exception) {
+            // Catch error if receiver is not registered
+        }
         sensorManager?.unregisterListener(this)
         handler.removeCallbacks(ambientLightRunnable)
+        handler.removeCallbacks(endOfStudyCheckRunnable)
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -463,6 +469,12 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.d(TAG, "onStartCommand: startId = $startId")
+
+        // Check if we have already past the end of study
+        if (sharedPrefs.getBoolean(hasShownEndOfStudyNotifKey, false)) {
+            stopSelf()
+            return START_STICKY
+        }
 
         when (intent?.action) {
             WIFI_CHARGING_UPLOAD_DATA_ACTION -> uploadDataToBridge()
@@ -569,6 +581,7 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
                 "Failed to save BackgroundData to room")
 
         checkLastConversationCompleteDate()
+        checkForEndOfStudy()
     }
 
     /**
@@ -634,6 +647,7 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
         if (isEndOfStudy) {
             endTheStudy()
         } else { // Schedule to check again soon
+            handler.removeCallbacks(endOfStudyCheckRunnable)
             handler.postDelayed(endOfStudyCheckRunnable, endOfStudyCheckFreq)
         }
     }
