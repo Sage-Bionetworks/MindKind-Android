@@ -7,7 +7,7 @@
     {
       "identifier": "JournalIntro",
       "type": "instruction",
-      "title": "It's Journal Time: We are not monitoring your response in real time. If you need help, contact a doctor or mental health care provider. Resources are available on the study website (LINK to resources tab on study website).",
+      "title": "It's Journal Time: We are not monitoring your response in real time. If you need help, contact a doctor or mental health care provider. Resources are available on the study website https://staging.wtgmhdc.synapse.org/contact.",
       "buttonTitle": "Okay",
       "optional": false,
       "continueAfterDelay": true
