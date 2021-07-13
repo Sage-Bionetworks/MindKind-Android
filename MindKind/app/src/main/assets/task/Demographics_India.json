@@ -42,8 +42,8 @@
       "type": "singleChoice.integer",
       "title": "Do you share this toilet facility with other households?",
       "choices": [
-        { "text": "Yes"                     ,         "value": 0 },
-        { "text": "No"                      ,         "value": 1 },
+        { "text": "Yes"                     ,         "value": 1 },
+        { "text": "No"                      ,         "value": 0 },
         { "text": "Prefer not to say"       ,         "value": -1 }
       ]
     },
@@ -92,8 +92,8 @@
       "type": "singleChoice.integer",
       "title": "Is any usual member of this household covered by a health scheme or health insurance?",
       "choices": [
-        { "text": "Yes"                     ,         "value": 0 },
-        { "text": "No"                      ,         "value": 1 },
+        { "text": "Yes"                     ,         "value": 1 },
+        { "text": "No"                      ,         "value": 0 },
         { "text": "Prefer not to say"       ,         "value": -1 }
       ]
     },
