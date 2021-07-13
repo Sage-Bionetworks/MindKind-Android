@@ -7,7 +7,7 @@
     {
       "identifier": "2C_Daily_Y",
       "type": "singleChoice.integer",
-      "ifUserAnswers": "No, skip to 2C_Dept",
+      "ifUserAnswers": "0, skip 3",
       "title": "Did you do anything social today?",
       "choices": [
         { "text": "Yes" ,               "value": 1 },
@@ -17,7 +17,7 @@
     {
       "identifier": "2C_Daily_Locale",
       "type": "singleChoice.integer",
-      "title": "How much of  your social activity was done online?",
+      "title": "How much of your social activity was done online?",
       "choices": [
         { "text": "All Online"      ,          "value": 0 },
         { "text": "Mostly Online"   ,          "value": 1 },  
