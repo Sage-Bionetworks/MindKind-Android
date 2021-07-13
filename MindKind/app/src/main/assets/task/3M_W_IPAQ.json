@@ -97,7 +97,6 @@
       "identifier": "IPAQ_7_SitTime",
       "title": "During the last 7 days, how much time did you spend SITTING on a week day?",
       "buttonTitle": "Ok",
-      "ifUserAnswers": "0, skip to Next Activity",
       "type": "text",
       "maxCharacters": 3,
       "placeholderText": "Time (in minutes)",

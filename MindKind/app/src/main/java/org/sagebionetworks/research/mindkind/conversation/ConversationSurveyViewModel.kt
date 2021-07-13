@@ -141,8 +141,15 @@ open class ConversationSurveyViewModel(
         val ifAnsweredOrSplit = lastStep.ifUserAnswers?.split("|")
 
         ifAnsweredOrSplit?.forEach {
-            // Make sure it has a skip to (is this still necessary?)
-            val ifAnsweredConditionalSplit = it.split(", skip to ")
+            val skipToDelimeter = ", skip to "
+            val skipNumberOfQuestionsDelimeter = ", skip "
+            var delimeter = skipToDelimeter
+
+            var ifAnsweredConditionalSplit = it.split(delimeter)
+            if (ifAnsweredConditionalSplit.size <= 1) {
+                delimeter = skipNumberOfQuestionsDelimeter
+                ifAnsweredConditionalSplit = it.split(delimeter)
+            }
 
             // Must have format [Answer], skip to [Step Identifier]
             if (ifAnsweredConditionalSplit.size < 2) {
@@ -150,6 +157,11 @@ open class ConversationSurveyViewModel(
             }
 
             if (lastAnswer == ifAnsweredConditionalSplit.firstOrNull()) {
+                if (delimeter == skipNumberOfQuestionsDelimeter) {
+                    itemCount += ifAnsweredConditionalSplit.lastOrNull()?.toInt() ?: 0
+                    return@forEach
+                }
+
                 val newNextStep = stepWith(ifAnsweredConditionalSplit.lastOrNull()) ?: run {
                     return@forEach
                 }
