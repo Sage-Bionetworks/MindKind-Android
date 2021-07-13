@@ -6,13 +6,13 @@
   "steps": [{
     "identifier": "NCES_A_Intro",
     "type": "instruction",
-    "title": "For each of these statements, please tell me whether you:",
+    "title": "For each of these statements, please tell me whether:",
     "continueAfterDelay": true
   },
     {
       "identifier": "NCES_1_CloseKnit",
       "type": "singleChoice.integer",
-      "title": "This is a close-knit neighborhood",
+      "title": "This is a close-knit neighborhood.",
       "choices": [{
         "text": "Strongly Agree",
         "value": 3
