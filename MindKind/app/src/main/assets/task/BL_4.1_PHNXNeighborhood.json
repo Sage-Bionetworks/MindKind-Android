@@ -7,7 +7,7 @@
       {
         "identifier": "BL_PHNX_Intro",
         "type": "instruction",
-        "title": "For the next three question please choose an answer that best relates to your situation:",
+        "title": "For the next three questions please choose an answer that best relates to your situation:",
         "continueAfterDelay": true
       },
       {
