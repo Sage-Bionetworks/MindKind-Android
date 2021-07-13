@@ -53,8 +53,8 @@
       "type": "singleChoice.integer",
       "title": "Does your home have electricity?",
       "choices": [
-        { "text": "Yes"                     ,         "value": 0 },
-        { "text": "No"                      ,         "value": 1 }
+        { "text": "Yes"                     ,         "value": 1 },
+        { "text": "No"                      ,         "value": 0 }
       ]
     },
     {
@@ -62,8 +62,8 @@
       "type": "singleChoice.integer",
       "title": "Does your home have running water?",
       "choices": [
-        { "text": "Yes"                     ,         "value": 0 },
-        { "text": "No"                      ,         "value": 1 }
+        { "text": "Yes"                     ,         "value": 1 },
+        { "text": "No"                      ,         "value": 0 }
       ]
     }
   ]
