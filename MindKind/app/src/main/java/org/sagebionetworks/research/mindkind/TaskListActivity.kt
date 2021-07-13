@@ -36,6 +36,7 @@ import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Intent
 import android.content.SharedPreferences
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -54,6 +55,8 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.common.base.Preconditions
 import dagger.android.AndroidInjection
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_task_list.*
 import org.sagebionetworks.research.domain.result.AnswerResultType
 import org.sagebionetworks.research.domain.result.implementations.AnswerResultBase
@@ -62,10 +65,12 @@ import org.sagebionetworks.research.mindkind.MindKindApplication.*
 import org.sagebionetworks.research.mindkind.TaskListViewModel.Companion.studyStartDateKey
 import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService
 import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService.Companion.SHOW_ENGAGEMENT_NOTIFICATION_ACTION
+import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService.Companion.hasShownRecruitmentNotifKey
 import org.sagebionetworks.research.mindkind.backgrounddata.ProgressInStudy
 import org.sagebionetworks.research.mindkind.conversation.*
 import org.sagebionetworks.research.mindkind.research.SageTaskIdentifier
 import org.sagebionetworks.research.mindkind.researchstack.framework.SageResearchStack
+import org.sagebionetworks.research.mindkind.room.BackgroundDataTypeConverters
 import org.sagebionetworks.research.mindkind.settings.SettingsActivity
 import org.sagebionetworks.research.sageresearch.dao.room.AppConfigRepository
 import org.sagebionetworks.research.sageresearch.dao.room.ReportEntity
@@ -99,6 +104,7 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
     private var observersAttachedAt: LocalDateTime? = null
     private var taskLiveData: LiveData<TaskListState>? = null
     private var studyProgressLiveData: LiveData<ProgressInStudy?>? = null
+    private var recruitmentLiveData: LiveData<RecruitmentAppConfig?>? = null
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -155,6 +161,11 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
 
         viewModel = ViewModelProvider(this, TaskListViewModel.Factory(
                 appConfigRepo, reportRepo)).get()
+
+        recruitmentLiveData = viewModel.recruitmentJsonLiveData()
+        recruitmentLiveData?.observe(this, Observer {
+            Log.i(TAG, "Recuitment app config value $it")
+        })
     }
 
     @SuppressLint("ApplySharedPref")
@@ -244,8 +255,68 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
     }
 
     fun startTask(jsonResourceName: String?) {
+        if (didShowRecruitmentAlert()) {
+            return // Check for recruitment alert when a user goes to do a survey
+        }
+
         val fileName = jsonResourceName ?: run { return }
-        ConversationSurveyActivity.start(this, jsonResourceName)
+        ConversationSurveyActivity.start(this, fileName)
+    }
+
+    fun didShowRecruitmentAlert(): Boolean {
+        val recruitment = recruitmentLiveData?.value ?: run { return false }
+        val progress = studyProgressLiveData?.value ?: run { return false }
+
+        if (sharedPrefs.getBoolean(hasShownRecruitmentNotifKey, false)) {
+            return false // Already showed the recruitment notif
+        }
+
+        val now = LocalDateTime.now()
+        if (progress.week >= recruitment.notifyAtStartOfWeek &&
+                now.isAfter(recruitment.startDate) && now.isBefore(recruitment.endDate)) {
+
+            showRecruitmentAlert(recruitment)
+            return true
+        }
+
+        return false
+    }
+
+    fun showRecruitmentAlert(recruitment: RecruitmentAppConfig) {
+        sharedPrefs.edit().putBoolean(hasShownRecruitmentNotifKey, true).apply()
+
+        val dialog = Dialog(this)
+
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setCancelable(true)
+        dialog.setContentView(R.layout.dialog_2_button_message)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.white)
+
+        val title = dialog.findViewById<TextView>(R.id.dialog_title)
+        title?.text = null
+
+        val msg = dialog.findViewById<TextView>(R.id.dialog_message)
+        msg?.text = recruitment.title
+
+        val posButton = dialog.findViewById<MaterialButton>(R.id.confirm_button)
+        posButton?.text = getString(R.string.rsb_BOOL_YES)
+        posButton?.setOnClickListener {
+            dialog.dismiss()
+            goToWebpage(recruitment.url)
+        }
+
+        val negButton = dialog.findViewById<MaterialButton>(R.id.cancel_button)
+        negButton?.text = getString(R.string.rsb_BOOL_NO)
+        negButton?.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
+    }
+
+    fun goToWebpage(uriString: String) {
+        val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(uriString))
+        startActivity(browserIntent)
     }
 
     fun showEngagementMessage() {
@@ -529,10 +600,39 @@ open class TaskListViewModel(
     private var lastCompletedAiReportCount = -1
     private var completedAiTodayLiveData: LiveData<List<ReportEntity>>? = null
 
+    private val recruitmentJsonLiveData: MutableLiveData<RecruitmentAppConfig?> = MutableLiveData()
+
+    private val appConfigDisposable = CompositeDisposable()
+
     fun clearCache() {
         lastAiReportCount = -1
         lastBaselineReportCount = -1
         lastCompletedAiReportCount = -1
+    }
+
+    fun recruitmentJsonLiveData(): LiveData<RecruitmentAppConfig?> {
+        val dataGroups = SageResearchStack.SageDataProvider.getInstance().userDataGroups
+        appConfigDisposable.add(appConfigRepo.appConfig.firstOrError()
+            .subscribeOn(Schedulers.io())
+            .subscribe({ appConfig ->
+                Log.i(TAG, "App config updated successfully")
+                ((appConfig.clientData as? Map<*, *>)
+                        ?.get("recruitment") as? Map<*, *>)?.let { recruitment ->
+
+                    (recruitment[dataGroups.firstOrNull {
+                        return@firstOrNull recruitment[it] != null
+                    }] as? Map<*, *>)?.let {
+                        val gson = BackgroundDataTypeConverters().gson
+                        val json = gson.toJson(it)
+                        val data = gson.fromJson(json, RecruitmentAppConfig::class.java)
+                        recruitmentJsonLiveData.postValue(data)
+                    }
+                }
+            }, {
+                Log.w(TAG, "App config updated failed ${it.localizedMessage}")
+            }))
+
+        return recruitmentJsonLiveData
     }
 
     fun studyProgressLiveData(): LiveData<ProgressInStudy?> {
@@ -641,3 +741,10 @@ data class AiClientData(
         val identifier: String,
         val ai: String?,
         val date: LocalDateTime)
+
+data class RecruitmentAppConfig(
+        val url: String,
+        val notifyAtStartOfWeek: Int,
+        val startDate: LocalDateTime,
+        val endDate: LocalDateTime,
+        val title: String)
