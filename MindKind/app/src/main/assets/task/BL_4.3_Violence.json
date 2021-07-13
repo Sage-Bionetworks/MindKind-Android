@@ -59,7 +59,7 @@
         "choices": [
           { "text": "Once"                           ,               "value": 1 },
           { "text": "More than once"                 ,               "value": 2 },
-          { "text": "Don't know"                     ,               "value": 3 }
+          { "text": "Don't know"                     ,               "value": -1 }
         ]
       },
     {
@@ -71,7 +71,7 @@
         { "text": "Never"                          ,               "value": 0 },
         { "text": "Once"                           ,               "value": 1 },
         { "text": "More than once"                 ,               "value": 2 },
-        { "text": "Don't know"                     ,               "value": 3 }
+        { "text": "Don't know"                     ,               "value": -1 }
       ]
     },
       {
@@ -83,7 +83,7 @@
           { "text": "Never"                          ,               "value": 0 },
           { "text": "Once"                           ,               "value": 1 },
           { "text": "More than once"                 ,               "value": 2 },
-          { "text": "Don't know"                     ,               "value": 3 }
+          { "text": "Don't know"                     ,               "value": -1 }
         ]
       },
     {
