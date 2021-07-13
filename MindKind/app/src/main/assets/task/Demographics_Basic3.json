@@ -58,7 +58,7 @@
     {
       "identifier": "DEMOG_ADULTS",
       "type": "integer",
-      "title": "How many adults besides you live with you?",
+      "title": "How many other adults live with you (not counting yourself)?",
       "buttonTitle": "Ok",
       "min": 0,
       "max": 9
@@ -77,11 +77,11 @@
       "title": "Are you or others in your household worried about not having enough food to eat because of a lack of money or other resources?",
       "choices": [{
         "text": "Yes",
-        "value": 0
+        "value": 1
       },
         {
           "text": "No",
-          "value": 1
+          "value": 0
         },
         {
           "text": "Prefer not to say",
