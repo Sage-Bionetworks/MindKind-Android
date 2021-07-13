@@ -73,6 +73,7 @@ import org.sagebionetworks.research.domain.result.implementations.TaskResultBase
 import org.sagebionetworks.research.mindkind.R.drawable
 import org.sagebionetworks.research.mindkind.R.string
 import org.sagebionetworks.research.mindkind.TaskListActivity
+import org.sagebionetworks.research.mindkind.TaskListViewModel
 import org.sagebionetworks.research.mindkind.conversation.ConversationSurveyActivity
 import org.sagebionetworks.research.mindkind.research.SageTaskIdentifier
 import org.sagebionetworks.research.mindkind.room.BackgroundDataEntity
@@ -103,8 +104,6 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
                 "org.sagebionetworks.research.MindKind.BackgroundData"
         public const val DATA_USAGE_RECEIVER_ACTION =
                 "org.sagebionetworks.research.MindKind.DataUsageReceiver"
-        public const val AMBIENT_LIGHT_WORKER_ACTION =
-                "org.sagebionetworks.research.MindKind.AmbientLightWorker"
 
         public const val SHOW_ENGAGEMENT_NOTIFICATION_ACTION =
                 "org.sagebionetworks.research.MindKind.ShowEngagementNotification"
@@ -153,6 +152,7 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
         }
 
         public const val hasShownWithdrawalNotifKey = "hasShownWithdrawalNotif"
+        public const val hasShownEndOfStudyNotifKey = "hasShownEndOfStudyNotif"
 
         fun createSharedPrefs(context: Context): SharedPreferences {
             return context.getSharedPreferences("Mindkind", MODE_PRIVATE)
@@ -193,6 +193,7 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
         }
 
         fun permanentlyStopSelf(context: Context) {
+            Log.i(TAG, "BackgroundDataService has been permanently stopped")
             WorkUtils.cancelPeriodicWork(context, BridgeUploadWorker.periodicWorkName)
             WorkUtils.cancelPeriodicWork(context, DataUsageWorker.periodicWorkName)
             context.stopService(Intent(context, BackgroundDataService::class.java))
@@ -259,6 +260,12 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
         kickOffAmbientLightUpdates()
     }
 
+    private val msToWaitForUpload = 20000 // Wait 20 sec for upload to complete after study end
+    private val endOfStudyCheckFreq = 1000L * 60L * 30 // Check every half hour
+    private val endOfStudyCheckRunnable = Runnable() {
+        checkForEndOfStudy()
+    }
+
     override fun onCreate() {
         Log.d(TAG, "onCreate")
         super.onCreate()
@@ -267,6 +274,11 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
 
         // Used for local data storage
         sharedPrefs = createSharedPrefs(this)
+
+        // Check if we have already past the end of study
+        if (sharedPrefs.getBoolean(hasShownEndOfStudyNotifKey, false)) {
+            stopSelf()
+        }
 
         // Refresh the data that the service should be tracking
         // It is important that this always stays up to date
@@ -296,6 +308,8 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
                 uploadDataReceiver, IntentFilter(ACTIVITY_UPLOAD_DATA_ACTION))
 
         startBackgroundData()
+
+        checkForEndOfStudy()
     }
 
     private fun startBackgroundData() {
@@ -453,7 +467,6 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
         when (intent?.action) {
             WIFI_CHARGING_UPLOAD_DATA_ACTION -> uploadDataToBridge()
             DATA_USAGE_RECEIVER_ACTION -> writeDataUsageToDatabase()
-            AMBIENT_LIGHT_WORKER_ACTION -> kickOffAmbientLightUpdates()
             SHOW_ENGAGEMENT_NOTIFICATION_ACTION -> checkLastConversationCompleteDate(true)
             SETTINGS_CHANGED_ACTION -> checkAllowedDataTypes()
         }
@@ -608,6 +621,39 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
             sensorManager?.unregisterListener(this) // make sure we don't register twice
             sensorManager?.registerListener(this, it, SENSOR_DELAY_NORMAL)
         }
+    }
+
+    private fun checkForEndOfStudy() {
+
+        val isEndOfStudy = TaskListViewModel.cachedProgressInStudy(sharedPrefs)?.let {
+            it.week > studyDurationInWeeks
+        } ?: false
+
+        Log.i(TAG, "Checking for end of study... value = $isEndOfStudy")
+
+        if (isEndOfStudy) {
+            endTheStudy()
+        } else { // Schedule to check again soon
+            handler.postDelayed(endOfStudyCheckRunnable, endOfStudyCheckFreq)
+        }
+    }
+
+    private fun endTheStudy() {
+        Log.i(TAG, "Ending the study")
+
+        uploadDataToBridge()
+
+        allDataTypes.forEach {
+            setDataAllowedToBeTracked(sharedPrefs, it, false)
+        }
+        dataAllowedToBeTracked = listOf()
+
+        sharedPrefs.edit().putBoolean(hasShownEndOfStudyNotifKey, true).apply()
+
+        // Give 20 seconds for upload to succeed/fail, and then permanently stop the service
+        handler.postDelayed({
+            permanentlyStopSelf(this)
+        }, msToWaitForUpload.toLong())
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
