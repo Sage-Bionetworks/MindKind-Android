@@ -215,7 +215,8 @@
     <string name="settings_withdrawal2_quit"><u>Yes, Take Survey</u></string>
     <string name="settings_contact_us">Contact Us</string>
     <string name="settings_delete_your_data">Delete Your Data</string>
-    <string name="settings_delete_your_data_desc">You can choose to withdraw from the study at any time. You can request a copy of your data and you can request that we delete the data we have already collected.  Contact us to withdraw from the study and request your data to be deleted or request a copy of your data.</string>
+    <string name="settings_delete_your_data_desc">You can choose to withdraw from the study at any time. You can request a copy of your data and you can request that we delete the data we have already collected.</string>
+    <string name="settings_delete_your_data_message_desc">Email us to tell us if you want to withdraw from the study. You can ask us to delete your data or send you a copy of your data.</string>
 
     <string name="settings_withdrawal_waiting_title">Withdrawing you from the MindKind study.</string>
     <string name="settings_withdrawal_waiting_message">Please wait a moment while we remove you from study.</string>

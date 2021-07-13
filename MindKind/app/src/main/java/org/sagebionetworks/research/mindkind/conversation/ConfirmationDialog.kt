@@ -12,6 +12,12 @@ import android.view.ViewGroup
 import android.view.Window
 import androidx.fragment.app.DialogFragment
 import kotlinx.android.synthetic.main.dialog_confirmation.view.*
+import kotlinx.android.synthetic.main.dialog_confirmation.view.close_button
+import kotlinx.android.synthetic.main.dialog_confirmation.view.confirmation_continue
+import kotlinx.android.synthetic.main.dialog_confirmation.view.confirmation_message
+import kotlinx.android.synthetic.main.dialog_confirmation.view.confirmation_quit
+import kotlinx.android.synthetic.main.dialog_confirmation.view.confirmation_title
+import kotlinx.android.synthetic.main.dialog_contact_us.view.*
 import org.sagebionetworks.research.mindkind.R
 
 class ConfirmationDialog : DialogFragment() {
@@ -27,6 +33,8 @@ class ConfirmationDialog : DialogFragment() {
 
         private const val KEY_TITLE = "KEY_TITLE"
         private const val KEY_MESSAGE = "KEY_MESSAGE"
+        private const val KEY_CONTACT_US_EMAIL = "CONTACT_US_EMAIL"
+        private const val KEY_CONTACT_US_MSG = "CONTACT_US_MSG"
         private const val KEY_CONTINUE_BUTTON_TEXT = "KEY_CONTINUE_BUTTON_TEXT"
         private const val KEY_QUIT_BUTTON_TEXT = "KEY_QUIT_BUTTON_TEXT"
 
@@ -42,6 +50,21 @@ class ConfirmationDialog : DialogFragment() {
             return fragment
         }
 
+        fun newContactUsInstance(title: String, message: String,
+                                 continueText: String, quitText: String,
+                                 contactUsMsg: String, contactUsEmail: String): ConfirmationDialog {
+            Log.d(LOG_TAG, "newInstance()")
+            val args = Bundle()
+            args.putString(KEY_TITLE, title)
+            args.putString(KEY_MESSAGE, message)
+            args.putString(KEY_CONTINUE_BUTTON_TEXT, continueText)
+            args.putString(KEY_QUIT_BUTTON_TEXT, quitText)
+            args.putString(KEY_CONTACT_US_EMAIL, contactUsEmail)
+            args.putString(KEY_CONTACT_US_MSG, contactUsMsg)
+            val fragment = ConfirmationDialog()
+            fragment.arguments = args
+            return fragment
+        }
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -51,7 +74,14 @@ class ConfirmationDialog : DialogFragment() {
         val dialog = Dialog(requireActivity())
 
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setContentView(R.layout.dialog_confirmation)
+
+        val layoutId = if (arguments?.getString(KEY_CONTACT_US_EMAIL) != null) {
+            R.layout.dialog_contact_us
+        } else {
+            R.layout.dialog_confirmation
+        }
+        dialog.setContentView(layoutId)
+
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
         dialog.setCancelable(false)
@@ -84,6 +114,11 @@ class ConfirmationDialog : DialogFragment() {
         view.confirmation_continue.text = arguments?.getString(KEY_CONTINUE_BUTTON_TEXT)
         view.confirmation_continue.paintFlags = view.confirmation_continue.paintFlags or Paint.UNDERLINE_TEXT_FLAG
         view.confirmation_quit.text = arguments?.getString(KEY_QUIT_BUTTON_TEXT)
+
+        arguments?.getString(KEY_CONTACT_US_EMAIL)?.let {
+            view.confirmation_message_email?.text = it
+            view.confirmation_message_detail?.text = arguments?.getString(KEY_CONTACT_US_MSG)
+        }
     }
 
     private fun setupClickListeners(view: View) {

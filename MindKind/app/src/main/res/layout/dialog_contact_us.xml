@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ BSD 3-Clause License
+  ~
+  ~ Copyright 2021  Sage Bionetworks. All rights reserved.
+  ~
+  ~ Redistribution and use in source and binary forms, with or without modification,
+  ~ are permitted provided that the following conditions are met:
+  ~
+  ~ 1.  Redistributions of source code must retain the above copyright notice, this
+  ~ list of conditions and the following disclaimer.
+  ~
+  ~ 2.  Redistributions in binary form must reproduce the above copyright notice,
+  ~ this list of conditions and the following disclaimer in the documentation and/or
+  ~ other materials provided with the distribution.
+  ~
+  ~ 3.  Neither the name of the copyright holder(s) nor the names of any contributors
+  ~ may be used to endorse or promote products derived from this software without
+  ~ specific prior written permission. No license is granted to the trademarks of
+  ~ the copyright holders even if such marks are included in this software.
+  ~
+  ~ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  ~ AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  ~ IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+  ~ ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+  ~ FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+  ~ DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+  ~ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+  ~ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+  ~ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+  ~ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  -->
+
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/confirmation_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:layout_margin="0dp"
+    android:padding="0dp"
+    android:background="@color/ocean300">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingTop="30dp"
+                android:paddingLeft="10dp">
+
+                <FrameLayout
+                    android:id="@+id/close_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:foreground="?attr/selectableItemBackgroundBorderless"
+                    android:background="@color/transparent"
+                    android:padding="0dp"
+                    android:layout_marginTop="0dp">
+
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/ic_close"
+                        app:tint="@color/white"
+                        android:contentDescription="@string/rsb_AX_BUTTON_BACK"/>
+
+                </FrameLayout>
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/confirmation_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:layout_gravity="center_horizontal"
+                android:gravity="center_horizontal"
+                style="@style/TextAppearance.Sage.Settings.Header"
+                android:layout_marginHorizontal="36dp"
+                android:layout_marginVertical="16dp"
+                android:paddingTop="16dp"
+                android:textColor="@color/dark_text"
+                android:textSize="24sp"
+                android:textStyle="bold"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/confirmation_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_horizontal"
+            style="@style/TextAppearance.Sage.Settings.Header"
+            android:layout_marginHorizontal="40dp"
+            android:layout_marginBottom="@dimen/margin_medium"
+            android:textColor="@color/dark_text"
+            android:textSize="18sp"
+            android:textStyle="bold"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/confirmation_message_detail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:layout_gravity="center_horizontal"
+                android:gravity="center_horizontal"
+                style="@style/TextAppearance.Sage.Settings.Header"
+                android:layout_marginHorizontal="40dp"
+                android:layout_marginVertical="16dp"
+                android:paddingTop="@dimen/margin_large"
+                android:textColor="@color/dark_text"
+                android:textSize="18sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/confirmation_message_email"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:layout_gravity="center_horizontal"
+                android:gravity="center_horizontal"
+                style="@style/TextAppearance.Sage.Settings.Header"
+                android:layout_marginHorizontal="@dimen/margin_small"
+                android:layout_marginVertical="16dp"
+                android:paddingTop="@dimen/margin_large"
+                android:textColor="@color/dark_text"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textIsSelectable="true"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@color/white"
+            android:orientation="vertical"
+            android:gravity="bottom"
+            android:padding="32dp">
+            <com.google.android.material.button.MaterialButton
+                style="@style/Sage.MaterialButton.Rounded"
+                android:id="@+id/confirmation_quit"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:text=""
+                android:visibility="gone"/>
+
+            <com.google.android.material.button.MaterialButton
+                style="@style/Sage.MaterialButton.UnderlinedBorderless"
+                android:id="@+id/confirmation_continue"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:textSize="16sp"
+                android:text=""/>
+        </LinearLayout>
+
+    </LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
