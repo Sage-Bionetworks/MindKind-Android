@@ -9,7 +9,7 @@
       "identifier": "BADS_Intro",
       "type": "instruction",
       "buttonTitle": "Ok",
-      "title": "Please read each statement carefully and then circle the number which best describes how much the statement was true for you DURING THE PAST WEEK, INCLUDING TODAY."
+      "title": "Please read each statement carefully and then select the number which best describes how much the statement was true for you DURING THE PAST WEEK, INCLUDING TODAY."
     },
     {
       "identifier": "BADS_1_BED",
