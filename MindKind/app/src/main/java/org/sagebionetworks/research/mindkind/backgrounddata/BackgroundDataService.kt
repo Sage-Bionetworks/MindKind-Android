@@ -154,6 +154,7 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
 
         public const val hasShownWithdrawalNotifKey = "hasShownWithdrawalNotif"
         public const val hasShownEndOfStudyNotifKey = "hasShownEndOfStudyNotif"
+        public const val hasShownRecruitmentNotifKey = "hasShownRecruitmentStudyNotif"
 
         fun createSharedPrefs(context: Context): SharedPreferences {
             return context.getSharedPreferences("Mindkind", MODE_PRIVATE)

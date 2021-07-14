@@ -173,7 +173,7 @@ open class RegistrationActivity: AppCompatActivity() {
 
     fun joinStudy() {
         val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(
-                "https://staging.wtgmhdc.synapse.org/eligibility "))
+                "https://staging.wtgmhdc.synapse.org/eligibility"))
         startActivity(browserIntent)
     }
 
