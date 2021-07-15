@@ -14,7 +14,7 @@
     {
       "identifier": "IPAQ_1_VigorousDays",
       "type": "integer",
-      "title": "During the last 7 days, on how many days did you do vigorous physical activities like heavy lifting, digging, aerobics, or fast bicycling?",
+      "title": "During the last 7 days, on how many days did you do VIGOROUS physical activities like heavy lifting, digging, aerobics, or fast bicycling?",
       "buttonTitle": "Ok",
       "min": 0,
       "max": 7,
@@ -23,7 +23,7 @@
      {
       "identifier": "IPAQ_2_VigorousTime",
       "type": "integer",
-      "title": "How much time did you usually spend doing vigorous physical activities on one of those days? (in minutes)",
+      "title": "How much time did you usually spend doing VIGOROUS physical activities on one of those days? (in minutes)",
       "buttonTitle": "Ok",
       "min": 0,
       "max": 500,
@@ -86,7 +86,7 @@
      {
       "identifier": "IPAQ_7_SitTime",
       "type": "integer",
-      "title": "During the last 7 days, how much time did you spend SITTING on a week day?",
+      "title": "During the last 7 days, how much time did you spend SITTING on a week day? (in minutes)",
       "buttonTitle": "Ok",
       "min": 0,
       "max": 1440,
