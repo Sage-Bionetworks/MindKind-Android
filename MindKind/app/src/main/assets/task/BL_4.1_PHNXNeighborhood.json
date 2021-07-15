@@ -15,12 +15,11 @@
         "type": "singleChoice.integer",
         "title": "I feel safe walking in my neighborhood, day or night.",
         "choices": [
-          { "text": "Strongly Agree"                           ,               "value": 5 },
-          { "text": "Agree"                                   ,               "value": 4 },
+          { "text": "Strongly Agree"                           ,               "value": 1 },
+          { "text": "Agree"                                   ,               "value": 2 },
           { "text": "Neutral (neither agree, nor disagree)"   ,               "value": 3 },
-          { "text": "Strongly Disagree"                        ,               "value": 2 },
-          { "text": "Disagree"                                ,               "value": 1 },
-          { "text": "Strongly Disagree"                       ,               "value": 0 }
+          { "text": "Disagree"                                ,               "value": 4 },
+          { "text": "Strongly Disagree"                       ,               "value": 5 }
         ]
       },
         {
@@ -28,12 +27,11 @@
         "type": "singleChoice.integer",
         "title": "Violence is not a problem in my neighborhood.",
         "choices": [
-          { "text": "Strongly Agree"                           ,               "value": 5 },
-          { "text": "Agree"                                   ,               "value": 4 },
+          { "text": "Strongly Agree"                           ,               "value": 1 },
+          { "text": "Agree"                                   ,               "value": 2 },
           { "text": "Neutral (neither agree, nor disagree)"   ,               "value": 3 },
-          { "text": "Strongly Disagree"                        ,               "value": 2 },
-          { "text": "Disagree"                                ,               "value": 1 },
-          { "text": "Strongly Disagree"                       ,               "value": 0 }
+          { "text": "Disagree"                                ,               "value": 4 },
+          { "text": "Strongly Disagree"                       ,               "value": 5 }
         ]
       },
         {
@@ -41,12 +39,11 @@
         "type": "singleChoice.integer",
         "title": "My neighborhood is safe from crime.",
         "choices": [
-          { "text": "Strongly Agree"                           ,               "value": 5 },
-          { "text": "Agree"                                   ,               "value": 4 },
+          { "text": "Strongly Agree"                           ,               "value": 1 },
+          { "text": "Agree"                                   ,               "value": 2 },
           { "text": "Neutral (neither agree, nor disagree)"   ,               "value": 3 },
-          { "text": "Strongly Disagree"                        ,               "value": 2 },
-          { "text": "Disagree"                                ,               "value": 1 },
-          { "text": "Strongly Disagree"                       ,               "value": 0 }
+          { "text": "Disagree"                                ,               "value": 4 },
+          { "text": "Strongly Disagree"                       ,               "value": 5 }
         ]
 
       }
