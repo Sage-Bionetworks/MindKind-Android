@@ -123,6 +123,10 @@
     <string name="conversation_confirmation_continue"><u>Continue</u></string>
     <string name="conversation_confirmation_quit">Exit Survey</string>
 
+    <string name="home_baseline_intro_title">Welcome to MindKind!</string>
+    <string name="home_baseline_intro_message">Before we can get going on your daily experience, we need to know a bit about you. Once you complete these questions, we can get started on your daily MindKind journey. Click on a section to begin.</string>
+    <string name="home_baseline_intro_continue">Continue</string>
+
     <!-- SMS code screen -->
     <string name="enter_code">Enter Code</string>
     <string name="sms_message">SMS Message</string>

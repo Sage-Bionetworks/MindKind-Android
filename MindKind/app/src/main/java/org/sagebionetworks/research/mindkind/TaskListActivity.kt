@@ -88,6 +88,7 @@ import javax.inject.Inject
 class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback {
     companion object {
         private val TAG = TaskListActivity::class.simpleName
+        private const val prefsIntroAlertKey = "BaselineIntroAlertKey"
     }
 
     @Inject
@@ -195,6 +196,7 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
             // Progress in study is null until the day after they completed their baseline
             val progressInStudy = it ?: run {
                 task_progress_container.visibility = View.GONE
+                showBaselineIntroAlertIfNecessary()
                 return@Observer
             }
             task_progress_container.visibility = View.VISIBLE
@@ -294,21 +296,22 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
 
         val title = dialog.findViewById<TextView>(R.id.dialog_title)
         title?.text = null
+        title.visibility = View.GONE
 
         val msg = dialog.findViewById<TextView>(R.id.dialog_message)
         msg?.text = recruitment.title
 
-        val posButton = dialog.findViewById<MaterialButton>(R.id.confirm_button)
+        val negButton = dialog.findViewById<MaterialButton>(R.id.confirm_button)
+        negButton?.text = getString(R.string.rsb_BOOL_NO)
+        negButton?.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        val posButton = dialog.findViewById<MaterialButton>(R.id.cancel_button)
         posButton?.text = getString(R.string.rsb_BOOL_YES)
         posButton?.setOnClickListener {
             dialog.dismiss()
             goToWebpage(recruitment.url)
-        }
-
-        val negButton = dialog.findViewById<MaterialButton>(R.id.cancel_button)
-        negButton?.text = getString(R.string.rsb_BOOL_NO)
-        negButton?.setOnClickListener {
-            dialog.dismiss()
         }
 
         dialog.show()
@@ -408,6 +411,34 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
     private fun aiSelected(index: Int) {
         val ai = MindKindApplication.aiForIndex(index)
         viewModel.saveAiAnswer(ai)
+    }
+
+    private fun showBaselineIntroAlertIfNecessary() {
+        if (sharedPrefs.getBoolean(prefsIntroAlertKey, false)) {
+            return
+        }
+        sharedPrefs.edit().putBoolean(prefsIntroAlertKey, true).apply()
+
+        val dialog = Dialog(this)
+
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setCancelable(true)
+        dialog.setContentView(R.layout.dialog_basic_message)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.white)
+
+        val title = dialog.findViewById<TextView>(R.id.dialog_title)
+        title?.text = getString(R.string.home_baseline_intro_title)
+
+        val msg = dialog.findViewById<TextView>(R.id.dialog_message)
+        msg?.text = getString(R.string.home_baseline_intro_message)
+
+        val closeButton = dialog.findViewById<MaterialButton>(R.id.close_button)
+        closeButton?.text = getString(R.string.home_baseline_intro_continue)
+        closeButton?.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 }
 
