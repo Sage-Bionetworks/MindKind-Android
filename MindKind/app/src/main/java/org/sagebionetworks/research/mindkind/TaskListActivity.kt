@@ -296,21 +296,22 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
 
         val title = dialog.findViewById<TextView>(R.id.dialog_title)
         title?.text = null
+        title.visibility = View.GONE
 
         val msg = dialog.findViewById<TextView>(R.id.dialog_message)
         msg?.text = recruitment.title
 
-        val posButton = dialog.findViewById<MaterialButton>(R.id.confirm_button)
+        val negButton = dialog.findViewById<MaterialButton>(R.id.confirm_button)
+        negButton?.text = getString(R.string.rsb_BOOL_NO)
+        negButton?.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        val posButton = dialog.findViewById<MaterialButton>(R.id.cancel_button)
         posButton?.text = getString(R.string.rsb_BOOL_YES)
         posButton?.setOnClickListener {
             dialog.dismiss()
             goToWebpage(recruitment.url)
-        }
-
-        val negButton = dialog.findViewById<MaterialButton>(R.id.cancel_button)
-        negButton?.text = getString(R.string.rsb_BOOL_NO)
-        negButton?.setOnClickListener {
-            dialog.dismiss()
         }
 
         dialog.show()
