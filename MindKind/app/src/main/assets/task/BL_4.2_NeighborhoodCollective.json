@@ -15,19 +15,23 @@
       "title": "This is a close-knit neighborhood.",
       "choices": [{
         "text": "Strongly Agree",
-        "value": 3
+        "value": 1
       },
         {
           "text": "Agree",
           "value": 2
         },
         {
+          "text": "Neither Agree nor Disagree",
+          "value": 3
+        },
+        {
           "text": "Disagree",
-          "value": 1
+          "value": 4
         },
         {
           "text": "Strongly Disagree",
-          "value": 0
+          "value": 5
         }
       ]
     },
@@ -37,19 +41,23 @@
       "title": "People around here are willing to help their neighbors.",
       "choices": [{
         "text": "Strongly Agree",
-        "value": 3
+        "value": 1
       },
         {
           "text": "Agree",
           "value": 2
         },
         {
+          "text": "Neither Agree nor Disagree",
+          "value": 3
+        },
+        {
           "text": "Disagree",
-          "value": 1
+          "value": 4
         },
         {
           "text": "Strongly Disagree",
-          "value": 0
+          "value": 5
         }
       ]
     },
@@ -59,19 +67,23 @@
       "title": "People in this neighborhood generally don’t get along with each other.",
       "choices": [{
         "text": "Strongly Agree",
-        "value": 3
+        "value": 1
       },
         {
           "text": "Agree",
           "value": 2
         },
         {
+          "text": "Neither agree nor disagree",
+          "value": 3
+        },
+        {
           "text": "Disagree",
-          "value": 1
+          "value": 4
         },
         {
           "text": "Strongly Disagree",
-          "value": 0
+          "value": 5
         }
       ]
     },
@@ -81,19 +93,23 @@
       "title": "People in this neighborhood do not share the same values.",
       "choices": [{
         "text": "Strongly Agree",
-        "value": 3
+        "value": "value": 1
       },
         {
           "text": "Agree",
           "value": 2
         },
         {
+          "text": "Neither agree nor disagree",
+          "value": 3
+        },
+        {
           "text": "Disagree",
-          "value": 1
+          "value": 4
         },
         {
           "text": "Strongly Disagree",
-          "value": 0
+          "value": 5
         }
       ]
     },
@@ -103,19 +119,23 @@
       "title": "People in this neighborhood can be trusted.",
       "choices": [{
         "text": "Strongly Agree",
-        "value": 3
-      },
-        {
+        "value": 1
+       },
+       {
           "text": "Agree",
           "value": 2
         },
         {
+          "text": "Neither agree nor disagree",
+          "value": 3
+        },
+        {
           "text": "Disagree",
-          "value": 1
+          "value": 4
         },
         {
           "text": "Strongly Disagree",
-          "value": 0
+          "value": 5
         }
       ]
     },
@@ -131,19 +151,23 @@
       "title": "If a group of neighborhood children were skipping school and hanging out on a street corner, how likely is that your neighbors would do something about it?",
       "choices": [{
         "text": "Very Likely",
-        "value": 3
-      },
-        {
-          "text": "Likely",
+        "value": 1
+       },
+       {
+          "text": "Agree",
           "value": 2
         },
         {
-          "text": "Unlikely",
-          "value": 1
+          "text": "Neither agree nor disagree",
+          "value": 3
         },
         {
-          "text": "Very Unlikely",
-          "value": 0
+          "text": "Disagree",
+          "value": 4
+        },
+        {
+          "text": "Strongly Disagree",
+          "value": 5
         }
       ]
     },
@@ -153,19 +177,23 @@
       "title": "If some children were spray-painting graffiti on a local building, how likely is it that your neighbors would do something about it?",
       "choices": [{
         "text": "Very Likely",
-        "value": 3
-      },
-        {
+        "value": 1
+       },
+       {
           "text": "Likely",
           "value": 2
         },
         {
+          "text": "Neither Likely nor Unlikely;",
+          "value": 3
+        },
+        {
           "text": "Unlikely",
-          "value": 1
+          "value": 4
         },
         {
           "text": "Very Unlikely",
-          "value": 0
+          "value": 5
         }
       ]
     },
@@ -175,19 +203,23 @@
       "title": "If a child was showing disrespect to an adult, how likely is it that people in your neighborhood would scold that child?",
       "choices": [{
         "text": "Very Likely",
-        "value": 3
-      },
-        {
+        "value": 1
+       },
+       {
           "text": "Likely",
           "value": 2
         },
         {
+          "text": "Neither Likely nor Unlikely;",
+          "value": 3
+        },
+        {
           "text": "Unlikely",
-          "value": 1
+          "value": 4
         },
         {
           "text": "Very Unlikely",
-          "value": 0
+          "value": 5
         }
       ]
     },
@@ -197,19 +229,23 @@
       "title": "If there was a fight in front of your house and someone was being beaten or threatened, how likely is it that your neighbors would break it up?",
       "choices": [{
         "text": "Very Likely",
-        "value": 3
-      },
-        {
+        "value": 1
+       },
+       {
           "text": "Likely",
           "value": 2
         },
         {
+          "text": "Neither Likely nor Unlikely;",
+          "value": 3
+        },
+        {
           "text": "Unlikely",
-          "value": 1
+          "value": 4
         },
         {
           "text": "Very Unlikely",
-          "value": 0
+          "value": 5
         }
       ]
     },
@@ -219,19 +255,23 @@
       "title": "Suppose that because of budget cuts the fire station closest to your home was going to be closed down by the city. How likely is it that neighborhood residents would organize to try to do something to keep the fire station open?",
       "choices": [{
         "text": "Very Likely",
-        "value": 3
-      },
-        {
+        "value": 1
+       },
+       {
           "text": "Likely",
           "value": 2
         },
         {
+          "text": "Neither Likely nor Unlikely;",
+          "value": 3
+        },
+        {
           "text": "Unlikely",
-          "value": 1
+          "value": 4
         },
         {
           "text": "Very Unlikely",
-          "value": 0
+          "value": 5
         },
         {
           "text": "There is not a fire station close to my home",
