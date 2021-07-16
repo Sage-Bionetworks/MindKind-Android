@@ -13,6 +13,7 @@
       "startDay": 1,
       "filenames": [
           "4P_Greet",
+          "Mood_Daily",
           "4P_Daily",
           "All_Depart"
       ]
@@ -25,6 +26,7 @@
       "startDay": 1,
       "filenames": [
           "4P_Greet",
+          "Mood_Daily",
           "4P_Daily",
           "4P_Journal",
           "All_Depart"
