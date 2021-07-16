@@ -18,7 +18,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="#000"
-            android:text=""/>
+            android:text=""
+            android:autoLink="web"
+            android:textColorLink="@color/ocean300"/>
     </LinearLayout>
 
 </RelativeLayout>
