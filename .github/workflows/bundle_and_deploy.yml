@@ -18,8 +18,8 @@ jobs:
         env:
           STUDY_PUBLIC_KEY_BASE64: ${{ secrets.STUDY_PUBLIC_KEY_BASE64 }}
         run: |
-          mkdir -p ${HOME}/MindKind/app/src/main/assets/
-          echo "$STUDY_PUBLIC_KEY_BASE64" | base64 --decode > ${HOME}/MindKind/app/src/main/assets/study_public_key.pem
+          mkdir -p ${GITHUB_WORKSPACE}/MindKind/app/src/main/assets/
+          echo "$STUDY_PUBLIC_KEY_BASE64" | base64 --decode > ${GITHUB_WORKSPACE}/MindKind/app/src/main/assets/study_public_key.pem
       - uses: actions/cache@v1
         with:
           path: ~/.gradle/caches/modules-2
