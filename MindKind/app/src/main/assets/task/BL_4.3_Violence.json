@@ -66,7 +66,7 @@
       "identifier": "Violence_6_OutsideHome_Positive",
       "type": "singleChoice.integer",
       "title": "Outside of your home or living situation, how many times did you see anyone get attacked?",
-      "skipTo": "BL_4_Violence_Outtro_Positive",
+      "ifUserAnswers": "0, skip to BL_4_Violence_Outtro_Positive|1, skip to BL_4_Violence_Outtro_Positive|2, skip to BL_4_Violence_Outtro_Positive|-1, skip to BL_4_Violence_Outtro_Positive|",
       "choices": [
         { "text": "Never"                          ,               "value": 0 },
         { "text": "Once"                           ,               "value": 1 },
