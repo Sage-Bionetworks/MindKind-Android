@@ -9,7 +9,8 @@
       "identifier": "UCLA_Loneliness",
       "type": "instruction",
       "title": "The next questions are about how you feel about different aspects of your life. For each one, tell me how often you feel that way.",
-      "buttonTitle": "Ok"
+      "buttonTitle": "Ok",
+      "optional": false
     },
     {
       "identifier": "UCLA_1_Company",
