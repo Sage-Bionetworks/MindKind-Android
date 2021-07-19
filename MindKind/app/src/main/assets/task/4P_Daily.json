@@ -17,7 +17,7 @@
     {
       "identifier": "4P_Daily_Enjoy",
       "type": "singleChoice.integer",
-      "title": "Pick the number that describes how rested you felt today?",
+      "title": "How much did you enjoy yourself?",
       "choices": [
         { "text": "Not At All"  ,               "value": 0 },
         { "text": "Not Very"    ,               "value": 1 },
