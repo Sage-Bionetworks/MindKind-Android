@@ -102,8 +102,6 @@ open class SettingsActivity: AppCompatActivity() {
                         null, false, false),
                 SettingsItem(LayoutType.ITEM, getString(R.string.settings_contact_us_title),
                         null, false, false),
-                SettingsItem(LayoutType.ITEM, getString(R.string.settings_licenses),
-                        null, false, false),
                 SettingsItem(LayoutType.HEADER, getString(R.string.settings_options_title),
                         null, false, true),
                 SettingsItem(LayoutType.ITEM, getString(R.string.settings_withdraw_title),
