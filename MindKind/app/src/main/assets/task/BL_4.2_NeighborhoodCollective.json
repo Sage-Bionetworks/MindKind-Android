@@ -6,7 +6,7 @@
   "steps": [{
     "identifier": "NCES_A_Intro",
     "type": "instruction",
-    "title": "For each of these statements, please tell me whether:",
+    "title": "For each of these statements, please tell me whether you Strongly Agree, Agree, Disagree or Strongly Disagree.",
     "continueAfterDelay": true
   },
     {
