@@ -14,6 +14,7 @@ import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.TranslateAnimation
+import android.view.inputmethod.InputMethodManager
 import android.widget.CheckBox
 import android.widget.LinearLayout
 import android.widget.ScrollView
@@ -35,13 +36,11 @@ import kotlinx.android.synthetic.main.number_picker.view.*
 import kotlinx.android.synthetic.main.text_input.view.*
 import org.sagebionetworks.research.mindkind.MindKindApplication
 import org.sagebionetworks.research.mindkind.R
-import org.sagebionetworks.research.mindkind.TaskListActivity
 import org.sagebionetworks.research.mindkind.TaskListViewModel
 import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService
 import org.sagebionetworks.research.sageresearch.dao.room.AppConfigRepository
 import org.sagebionetworks.research.sageresearch.dao.room.ReportRepository
 import org.sagebionetworks.research.sageresearch_app_sdk.TaskResultUploader
-import java.lang.Math.max
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -394,7 +393,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
             it.text = step.buttonTitle
 
             it.setOnClickListener { _ ->
-                disableAllButtons()
+                disableAllButtonsAndHideKeyboard()
                 handler?.postDelayed({
                     addQuestion(scroll)
                 }, DELAY)
@@ -426,7 +425,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
 
                 it.setOnClickListener {
                     addAnswer(step, c.text, c.value, scroll)
-                    disableAllButtons()
+                    disableAllButtonsAndHideKeyboard()
                 }
 
                 val llp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
@@ -454,7 +453,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
 
                 it.setOnClickListener {
                     addAnswer(step, c.text, c.value, scroll)
-                    disableAllButtons()
+                    disableAllButtonsAndHideKeyboard()
                 }
 
                 val llp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
@@ -496,7 +495,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
                 var numberPicker = button_container.number_picker
                 var select = numberPicker.value
                 addAnswer(step, choices[select], choices[select], scroll)
-                disableAllButtons()
+                disableAllButtonsAndHideKeyboard()
             }
             val llp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT)
@@ -559,7 +558,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
 
                 val values = newSelected.joinToString()
                 addAnswer(step, values, values, scroll)
-                disableAllButtons()
+                disableAllButtonsAndHideKeyboard()
             }
             button_container.addView(it,
                     LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
@@ -576,7 +575,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
                 button_container, false) as? MaterialButton)?.let {
 
             it.setOnClickListener {
-                disableAllButtons()
+                disableAllButtonsAndHideKeyboard()
                 addAnswer(step, null, null, scroll)
             }
             val llp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
@@ -586,11 +585,12 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         }
     }
 
-    private fun disableAllButtons() {
+    private fun disableAllButtonsAndHideKeyboard() {
         button_container.children.forEach {
             it.isEnabled = false
             it.alpha = 0.33f
         }
+        hideKeyboard()
     }
 
     private fun handleIntegerInput(intStep: ConversationIntegerFormStep?, answer: String?, scroll: Boolean) {
@@ -631,7 +631,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
                 it.text = step.buttonTitle
 
                 it.setOnClickListener { _ ->
-                    disableAllButtons()
+                    disableAllButtonsAndHideKeyboard()
                     val text = curView.text?.toString() ?: run { return@setOnClickListener }
                     val intAnswer = text.toInt()
                     addAnswer(step, text, intAnswer, scroll)
@@ -699,7 +699,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
                 }
 
                 it.setOnClickListener {
-                    disableAllButtons()
+                    disableAllButtonsAndHideKeyboard()
                     val text = inputView?.text?.toString() ?: run { return@setOnClickListener }
                     addAnswer(step, text, text, scroll)
                 }
@@ -712,6 +712,15 @@ open class ConversationSurveyActivity: AppCompatActivity() {
 
         if(step.optional != false) {
             addSkipButton(step, scroll)
+        }
+    }
+
+    open fun hideKeyboard() {
+        (getSystemService(INPUT_METHOD_SERVICE) as? InputMethodManager)?.let { imm ->
+            // Find the currently focused view, so we can grab the correct window token from it.
+            // If no view currently has focus, create a new one, just so we can grab a window token from it
+            val view = currentFocus ?: View(this)
+            imm.hideSoftInputFromWindow(view.windowToken, 0)
         }
     }
 
@@ -743,7 +752,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
                 val dialog = ConversationTimeOfDayDialog(input)
                 val callback = object: ConversationTimeOfDayDialog.Callback {
                     override fun onDateSelected(d: Date) {
-                        disableAllButtons()
+                        disableAllButtonsAndHideKeyboard()
                         logInfo("Received date callback: $d")
 
                         // Answer format should always be the same length and format for researchers
