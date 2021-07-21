@@ -18,10 +18,10 @@ import org.sagebionetworks.research.domain.result.implementations.TaskResultBase
 import org.sagebionetworks.research.domain.result.interfaces.Result
 import org.sagebionetworks.research.mindkind.MindKindApplication.REPORT_LOCAL_DATE_TIME
 import org.sagebionetworks.research.mindkind.MindKindApplication.RESULT_DATA_TYPE
-import org.sagebionetworks.research.mindkind.TaskListViewModel
 import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService
 import org.sagebionetworks.research.mindkind.research.SageTaskIdentifier
 import org.sagebionetworks.research.mindkind.room.BackgroundDataTypeConverters
+import org.sagebionetworks.research.mindkind.viewmodel.TaskListViewModel
 import org.sagebionetworks.research.sageresearch.dao.room.AppConfigRepository
 import org.sagebionetworks.research.sageresearch.dao.room.ReportEntity
 import org.sagebionetworks.research.sageresearch.dao.room.ReportRepository

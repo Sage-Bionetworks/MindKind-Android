@@ -66,7 +66,9 @@ open class TaskListViewModel(
                     LocalDateTime.now().toString()).apply()
         }
 
-        private fun roiDailyId(aiIdentifier: String?): String {
+        public const val moodDailyAnswerKey = "Mood_Daily"
+
+        public fun roiDailyId(aiIdentifier: String?): String {
             return when (aiIdentifier) {
                 MindKindApplication.SLEEP_AI -> "1S_Daily_Rested"
                 MindKindApplication.SOCIAL_AI -> "2C_Daily_Y"
@@ -106,6 +108,14 @@ open class TaskListViewModel(
             }
         }
 
+        private fun localDate(report: ReportEntity?): LocalDateTime? {
+            val dateStr = ((report?.data?.data as? Map<*, *>)?.get(
+                    MindKindApplication.REPORT_LOCAL_DATE_TIME) as? String) ?: run {
+                return null
+            }
+            return LocalDateTime.parse(dateStr)
+        }
+
         public fun consolidateAiValues(now: LocalDateTime,
                                        baselineEntities: List<ReportEntity>,
                                        aiReports: List<ReportEntity>): AiSelectionState {
@@ -133,9 +143,7 @@ open class TaskListViewModel(
             // Populate the AI selections base on report dateTime's
             aiReports.sortedBy { it.dateTime }.map {
                 val ai = ((it.data?.data as? Map<*, *>)?.get(MindKindApplication.CURRENT_AI_RESULT_ID) as? String)
-                val aiLocalTimeStr = ((it.data?.data as? Map<*, *>)?.get(
-                        MindKindApplication.REPORT_LOCAL_DATE_TIME) as? String) ?: LocalDateTime.now().toString()
-                val aiLocalTime = LocalDateTime.parse(aiLocalTimeStr)
+                val aiLocalTime = localDate(it) ?: now
                 AiClientData(it.identifier ?: "", ai, aiLocalTime)
             }.forEach {
                 val aiWeek = aiStartDate.until(it.date, ChronoUnit.WEEKS) + 1
@@ -173,19 +181,17 @@ open class TaskListViewModel(
             }
         }
 
-        fun consolidateReturnOfInformation(roiAlertStatus: List<Boolean>, aiState: AiSelectionState,
+        public fun consolidateReturnOfInformation(now: LocalDateTime,
+                                           roiAlertStatus: List<Boolean>, aiState: AiSelectionState,
                                            completeAiPast2Weeks: List<ReportEntity>): RoiDialogState? {
 
             val progress = aiState.progressInStudy ?: run {
                 return null
             }
 
-            val lastDayOfRoiWeek = LocalDateTime.now().minusDays(progress.dayOfWeek.toLong())
+            val lastDayOfRoiWeek = now.minusDays(progress.dayOfWeek.toLong())
             val startOfRoiWeekInstant = lastDayOfRoiWeek.minusDays(7).startOfDay()
             val endOfRoiWeekInstant = lastDayOfRoiWeek.endOfDay()
-
-            val state = createRoiState(aiState.currentAi)
-            val aiDailyId = roiDailyId(aiState.currentAi)
 
             // Only show summaries in week 2 or later
             val weekIdx = progress.week - 2
@@ -193,14 +199,22 @@ open class TaskListViewModel(
                 return null
             }
 
+            val lastWeekAi = when(weekIdx) {
+                in 0..5 -> aiState.week1Ai
+                in 6..9 -> aiState.week5Ai
+                else -> aiState.week9Ai
+            }
+            val state = createRoiState(lastWeekAi)
+            val aiDailyId = roiDailyId(lastWeekAi)
+
             val alreadyShowedAlertThisWeek = roiAlertStatus[weekIdx]
             if (alreadyShowedAlertThisWeek) {
                 return state?.copy(shouldShowAlert = false) // already showed the alert
             }
 
             val roiDailies = completeAiPast2Weeks.filter {
-                return@filter it.dateTime?.isBetweenInclusive(startOfRoiWeekInstant,
-                        endOfRoiWeekInstant, ZoneId.systemDefault()) ?: false
+                val local = localDate(it) ?: now
+                return@filter local.isBetweenInclusive(startOfRoiWeekInstant, endOfRoiWeekInstant)
             }
 
             var moodDailyCount = 0
@@ -208,20 +222,20 @@ open class TaskListViewModel(
 
             roiDailies.forEach { report ->
                 val answerMap = report.data?.data as? Map<*, *> ?: run { return@forEach }
-                (answerMap["Mood_Daily"] as? Int)?.let {
+                (answerMap[moodDailyAnswerKey] as? Int)?.let {
                     if (listOf(3, 4, 5).contains(it)) {
                         moodDailyCount += 1
                     }
                 }
                 (answerMap[aiDailyId] as? Int)?.let {
-                    if (shouldCountRoi(it, aiState.currentAi)) {
+                    if (shouldCountRoi(it, lastWeekAi)) {
                         aiSpecificCount += 1
                     }
                 }
             }
 
-            return return state?.copy(countMoodDaily = moodDailyCount, countAiDaily = aiSpecificCount,
-                    shouldShowAlert = (moodDailyCount < 3 && aiSpecificCount < 3) && !alreadyShowedAlertThisWeek)
+            return state?.copy(countMoodDaily = moodDailyCount, countAiDaily = aiSpecificCount,
+                    shouldShowAlert = (moodDailyCount >= 3 && aiSpecificCount >= 3) && !alreadyShowedAlertThisWeek)
         }
 
         fun startDateTime(baselineReports: List<ReportEntity>): LocalDateTime? {
@@ -234,15 +248,11 @@ open class TaskListViewModel(
                 return@filter dataTypeFromReport(it) == SageTaskIdentifier.Baseline
             }.sortedBy { it.dateTime }.firstOrNull()
 
-            val baselineClientData = oldestBaselineReport?.data?.data as? Map<*, *> ?: run {
-                return null // Invalid baseline data
-            }
-
-            val localDateTimeStr = baselineClientData[MindKindApplication.REPORT_LOCAL_DATE_TIME] as? String ?: run {
+            val localDateTime = localDate(oldestBaselineReport) ?: run {
                 return null // invalid client data
             }
 
-            return LocalDateTime.parse(localDateTimeStr)?.startOfNextDay()
+            return localDateTime.startOfNextDay()
         }
 
         fun dataTypeFromReport(report: ReportEntity): String? {
@@ -421,7 +431,8 @@ open class TaskListViewModel(
 
                 val aiState = consolidateAiValues(LocalDateTime.now(), baselines, aiReports)
                 val taskItems = consolidateTaskItems(aiState, baselines, completedAi)
-                val returnOfInfo = consolidateReturnOfInformation(roiAlertStatus, aiState, completedAiLastWeek)
+                val returnOfInfo = consolidateReturnOfInformation(LocalDateTime.now(),
+                        roiAlertStatus, aiState, completedAiLastWeek)
                 val state = TaskListState(aiState, taskItems, returnOfInfo)
 
                 mediator.postValue(state)

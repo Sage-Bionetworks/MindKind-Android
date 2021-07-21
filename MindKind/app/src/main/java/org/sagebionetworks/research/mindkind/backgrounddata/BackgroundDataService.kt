@@ -73,7 +73,6 @@ import org.sagebionetworks.research.domain.result.implementations.TaskResultBase
 import org.sagebionetworks.research.mindkind.R.drawable
 import org.sagebionetworks.research.mindkind.R.string
 import org.sagebionetworks.research.mindkind.TaskListActivity
-import org.sagebionetworks.research.mindkind.TaskListViewModel
 import org.sagebionetworks.research.mindkind.conversation.ConversationSurveyActivity
 import org.sagebionetworks.research.mindkind.research.SageTaskIdentifier
 import org.sagebionetworks.research.mindkind.room.BackgroundDataEntity
@@ -81,6 +80,7 @@ import org.sagebionetworks.research.mindkind.room.BackgroundDataTypeConverters
 import org.sagebionetworks.research.mindkind.room.MindKindDatabase
 import org.sagebionetworks.research.mindkind.util.NoLimitRateLimiter
 import org.sagebionetworks.research.mindkind.util.RateLimiter
+import org.sagebionetworks.research.mindkind.viewmodel.TaskListViewModel
 import org.sagebionetworks.research.sageresearch_app_sdk.TaskResultUploader
 import org.threeten.bp.Instant
 import org.threeten.bp.LocalDateTime

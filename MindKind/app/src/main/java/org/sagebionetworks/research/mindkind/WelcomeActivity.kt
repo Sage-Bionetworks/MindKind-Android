@@ -23,6 +23,7 @@ import kotlinx.android.synthetic.main.activity_welcome.*
 import kotlinx.android.synthetic.main.welcome_6.view.*
 import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService
 import org.sagebionetworks.research.mindkind.settings.SettingsActivity
+import org.sagebionetworks.research.mindkind.viewmodel.TaskListViewModel
 import org.sagebionetworks.research.sageresearch.dao.room.AppConfigRepository
 import org.sagebionetworks.research.sageresearch.dao.room.ReportRepository
 import org.threeten.bp.LocalDateTime
@@ -103,7 +104,7 @@ open class WelcomeActivity: AppCompatActivity() {
         // View Model logic is empty, but set them up to pre-load all the data
         initializeAppViewModel = ViewModelProvider(this, TaskListViewModel.Factory(
                 appConfigRepo, reportRepo)).get()
-        initializeAppViewModel.taskListLiveData().observe(this, Observer {
+        initializeAppViewModel.taskListLiveData(sharedPrefs).observe(this, Observer {
             Log.i(TAG, "At ${LocalDateTime.now()} AI state is ${it.aiState}")
         })
         initializeAppViewModel.studyProgressLiveData().observe(this, Observer {
