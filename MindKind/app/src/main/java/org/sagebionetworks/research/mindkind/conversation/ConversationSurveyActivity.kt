@@ -154,7 +154,8 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         intent.extras?.getString(extraConversationId)?.let {
             val progress = TaskListViewModel.cachedProgressInStudy(sharedPrefs)
             weekInStudy = progress?.week ?: 1
-            val conversation = ConversationGsonHelper.createSurvey(this, it, progress) ?: run {
+            val conversation = ConversationGsonHelper.createSurvey(
+                    this, sharedPrefs, it, progress) ?: run {
                 AlertDialog.Builder(this)
                         .setMessage(R.string.conversation_error_msg)
                         .setNeutralButton(R.string.rsb_ok) { dialog, which ->

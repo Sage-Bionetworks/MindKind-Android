@@ -34,19 +34,18 @@ package org.sagebionetworks.research.mindkind;
 
 import android.app.Activity;
 import android.app.Service;
-import androidx.annotation.VisibleForTesting;
-import androidx.fragment.app.Fragment;
 
+import org.sagebionetworks.bridge.android.di.BridgeStudyComponent;
 import org.sagebionetworks.research.mindkind.inject.DaggerSageApplicationComponent;
 import org.sagebionetworks.research.mindkind.inject.DaggerSageUserScopeComponent;
 import org.sagebionetworks.research.mindkind.inject.SageUserScopeComponent;
-import org.sagebionetworks.researchstack.backbone.ResearchStack;
-import org.sagebionetworks.bridge.android.di.BridgeStudyComponent;
-
 import org.sagebionetworks.research.sageresearch.BridgeSageResearchApp;
+import org.sagebionetworks.researchstack.backbone.ResearchStack;
 
 import javax.inject.Inject;
 
+import androidx.annotation.VisibleForTesting;
+import androidx.fragment.app.Fragment;
 import androidx.work.Configuration;
 import dagger.android.AndroidInjector;
 import dagger.android.DispatchingAndroidInjector;
