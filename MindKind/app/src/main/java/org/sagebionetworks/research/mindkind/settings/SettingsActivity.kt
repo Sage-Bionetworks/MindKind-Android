@@ -18,6 +18,7 @@ import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.activity_conversation_survey.*
 import kotlinx.android.synthetic.main.activity_settings.*
 import org.sagebionetworks.research.mindkind.BuildConfig
+import org.sagebionetworks.research.mindkind.EntryActivity
 import org.sagebionetworks.research.mindkind.R
 import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService
 import org.sagebionetworks.research.mindkind.conversation.ConfirmationDialog
@@ -187,7 +188,10 @@ open class SettingsActivity: AppCompatActivity() {
                 }
             }
 
+            // Needs to be done immediately for entry activity navigation
+            @SuppressLint("ApplySharedPref")
             override fun onFooterClicked(item: SettingsItem?) {
+                sharedPrefs.edit().putBoolean(EntryActivity.prefsOnboardingKey, true).commit()
                 // Currently this is only used after welcome screen, so now go to the home screen
                 returnToEntryActivity()
             }
