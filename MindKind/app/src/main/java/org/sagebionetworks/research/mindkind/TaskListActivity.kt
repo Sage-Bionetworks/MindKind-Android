@@ -88,7 +88,7 @@ import javax.inject.Inject
 class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback {
     companion object {
         private val TAG = TaskListActivity::class.simpleName
-        private const val prefsIntroAlertKey = "BaselineIntroAlertKey"
+        public const val prefsIntroAlertKey = "BaselineIntroAlertKey"
     }
 
     @Inject
