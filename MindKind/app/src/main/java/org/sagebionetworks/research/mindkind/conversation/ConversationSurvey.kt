@@ -21,6 +21,8 @@ class ConversationGsonHelper {
 
         private val TAG = ConversationGsonHelper::class.java.simpleName
 
+        public const val weeklyRandomKey = "weeklyRandomKey"
+
         fun createGson(): Gson {
             return GsonBuilder()
                     .registerTypeAdapterFactory(getStepTypeAdapterFactory())
@@ -44,7 +46,8 @@ class ConversationGsonHelper {
          * @param jsonFilename json filename without the ".json" file extension
          * @return a parsed ConversationSurvey that has all it's nested steps expanded
          */
-        fun createSurvey(context: Context, jsonFilename: String, progress: ProgressInStudy?): ConversationSurvey? {
+        fun createSurvey(context: Context, sharedPrefs: SharedPreferences,
+                         jsonFilename: String, progress: ProgressInStudy?): ConversationSurvey? {
             val gson = createGson()
             val json = stringFromJsonAsset(context, jsonFilename)
             val dataGroups = SageResearchStack.SageDataProvider.getInstance().userDataGroups
@@ -64,6 +67,7 @@ class ConversationGsonHelper {
             // If this conversation is a schedule, there are multiple nestedGroup steps
             // that first need filtered based on the rules and priority
             if (conversation.isSchedule == true) {
+                val randomDayIdx = isRandomWeeklyDay(sharedPrefs, progress)
                 conversation.steps.filter {
                     val ngStep = (it as? NestedGroupStep) ?: run { return@filter false }
                     ngStep.userHasDataGroup?.let { dataGroup ->
@@ -71,7 +75,7 @@ class ConversationGsonHelper {
                             return@filter false
                         }
                     }
-                    return@filter shouldInclude(ngStep, progress)
+                    return@filter shouldInclude(ngStep, progress, randomDayIdx)
                 }.sortedBy {
                     return@sortedBy (it as? NestedGroupStep)?.frequency?.ordinal
                 }.firstOrNull()?.let {
@@ -121,7 +125,8 @@ class ConversationGsonHelper {
                     steps = newSteps)
         }
 
-        fun shouldInclude(step: NestedGroupStep, progress: ProgressInStudy?): Boolean {
+        fun shouldInclude(step: NestedGroupStep,
+                          progress: ProgressInStudy?, randomDayIdx: Int): Boolean {
             if (progress == null) {
                 Log.w(TAG, "Study progress is null, we shouldn't be here")
                 return step.frequency == NestedGroupFrequency.once ||
@@ -129,10 +134,23 @@ class ConversationGsonHelper {
             }
             return when(step.frequency) {
                 NestedGroupFrequency.weekly -> progress.dayOfWeek == step.startDay
-                NestedGroupFrequency.weeklyRandom -> progress.dayOfWeek == (1..7).shuffled().first()
+                NestedGroupFrequency.weeklyRandom -> progress.dayOfWeek == randomDayIdx
                 NestedGroupFrequency.once -> true
                 else /* .daily */ -> (progress.daysFromStart + 1) >= step.startDay
             }
+        }
+
+        fun isRandomWeeklyDay(sharedPrefs: SharedPreferences, progress: ProgressInStudy?): Int {
+            val weekVal = progress?.week ?: run { return 0 }
+            // Should be in range 1-6
+            val weeklyKey = "$weeklyRandomKey$weekVal"
+            var randomDayIdx = sharedPrefs.getInt(weeklyKey, 0)
+            if (randomDayIdx <= 0) {
+                randomDayIdx = (1 until 6).shuffled().first()
+                sharedPrefs.edit().putInt(weeklyKey, randomDayIdx).apply()
+                Log.i(TAG, "Random day $randomDayIdx assigned to $weeklyKey")
+            }
+            return randomDayIdx
         }
 
         private fun getStepTypeAdapterFactory(): RuntimeTypeAdapterFactory<ConversationStep> {
