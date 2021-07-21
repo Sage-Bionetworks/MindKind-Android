@@ -600,7 +600,7 @@ open class TaskListViewModel(
                             "PositiveExperiences"),
                     TaskListItem(MindKindApplication.BODY_MOVEMENT_AI,
                             R.string.movements_title,
-                            R.string.three_to_seven_minutes,
+                            R.string.one_to_five_minutes,
                             R.string.movements_detail,
                             "BodyMovement"),
                     TaskListItem(MindKindApplication.SOCIAL_AI,
