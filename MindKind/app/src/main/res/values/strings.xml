@@ -268,4 +268,21 @@
     <string name="settings_url_terms_of_service">https://staging.wtgmhdc.synapse.org/terms</string>
     <string name="settings_email_contact_us">MindKindSupport@sagebionetworks.org</string>
     <string name="settings_email_contact_us_subject">Contacting Support</string>
+
+    <!-- Return of information -->
+    <string name="roi_sleep_ai_text1">sleep</string>
+    <string name="roi_sleep_ai_text2">felt rested</string>
+    <string name="roi_sleep_ai_text3">good rest</string>
+    <string name="roi_social_ai_text1">social activity</string>
+    <string name="roi_social_ai_text2">did something social</string>
+    <string name="roi_social_ai_text3">your social activities</string>
+    <string name="roi_movements_ai_text1">exercise activity</string>
+    <string name="roi_movements_ai_text2">exercised</string>
+    <string name="roi_movements_ai_text3">exercise</string>
+    <string name="roi_experiences_ai_text1">positive experiences</string>
+    <string name="roi_experiences_ai_text2">did something to make yourself feel good</string>
+    <string name="roi_experiences_ai_text3">your positive experiences</string>
+
+
+
 </resources>
