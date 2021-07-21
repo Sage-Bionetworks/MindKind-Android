@@ -350,7 +350,7 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
 
         val randomAiIndex = (Math.random() * 4).toInt()
         if (isUserInARM2) {
-            aiText = MindKindApplication.aiForIndex(randomAiIndex)
+            aiText = titleForAIIdentifier(MindKindApplication.aiForIndex(randomAiIndex))
         }
 
         if (isUserInARM2) {
@@ -406,6 +406,16 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
         dialog.show()
 
         aiDialog = dialog
+    }
+
+    private fun titleForAIIdentifier(title: String): String {
+        when (title) {
+            SOCIAL_AI -> return getString(R.string.social)
+            SLEEP_AI -> return getString(R.string.sleep)
+            BODY_MOVEMENT_AI -> return getString(R.string.movement)
+            POSITIVE_EXPERIENCES_AI -> return getString(R.string.positive_experiences)
+            else -> return getString(R.string.health) // Shouldn't ever hit the default
+        }
     }
 
     private fun aiSelected(index: Int) {

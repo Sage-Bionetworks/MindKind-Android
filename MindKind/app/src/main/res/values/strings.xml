@@ -186,6 +186,12 @@
     <string name="arm2_other_weeks_ai_title">Great job completing the first section!</string>
     <string name="arm2_other_weeks_ai_text">For the next section, your new topic is %s.</string>
 
+    <string name="positive_experiences">Positive Experiences</string>
+    <string name="social">Social</string>
+    <string name="sleep">Sleep</string>
+    <string name="movement">Movement</string>
+    <string name="health">Health</string>
+
     <string name="three_minutes">3 minutes</string>
     <string name="six_minutes">6 minutes</string>
     <string name="three_to_seven_minutes">3–7 minutes</string>

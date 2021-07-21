@@ -63,7 +63,7 @@ public class MindKindApplication extends BridgeSageResearchApp implements HasSup
     public static final String SOCIAL_AI = "Social";
     public static final String SLEEP_AI = "Sleep";
     public static final String BODY_MOVEMENT_AI = "Movement";
-    public static final String POSITIVE_EXPERIENCES_AI = "Positive Experiences";
+    public static final String POSITIVE_EXPERIENCES_AI = "Experiences";
 
     public static final String[] AI = new String[] {
         SOCIAL_AI, SLEEP_AI, BODY_MOVEMENT_AI, POSITIVE_EXPERIENCES_AI
