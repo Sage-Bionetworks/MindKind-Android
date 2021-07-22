@@ -333,7 +333,8 @@ class TaskListViewModelTests: RoomTestHelper() {
         assertNotNull(roi)
         assertEquals(roi!!.countAiDaily, 2)
         assertEquals(roi!!.countMoodDaily, 2)
-        assertFalse(roi!!.shouldShowAlert)
+        assertFalse(roi!!.enoughDataToShow)
+        assertTrue(roi!!.shouldShowAlert)
     }
 
     @Test
@@ -360,7 +361,8 @@ class TaskListViewModelTests: RoomTestHelper() {
         assertNotNull(roi)
         assertEquals(roi!!.countAiDaily, 3)
         assertEquals(roi!!.countMoodDaily, 2)
-        assertFalse(roi!!.shouldShowAlert)
+        assertFalse(roi!!.enoughDataToShow)
+        assertTrue(roi!!.shouldShowAlert)
     }
 
     @Test
@@ -385,6 +387,33 @@ class TaskListViewModelTests: RoomTestHelper() {
         assertNotNull(roi)
         assertEquals(roi!!.countAiDaily, 3)
         assertEquals(roi!!.countMoodDaily, 3)
+        assertTrue(roi!!.enoughDataToShow)
         assertTrue(roi!!.shouldShowAlert)
+    }
+
+    @Test
+    fun test_roi_week2_alert_already_showed() {
+        val ai = SOCIAL_AI
+        val key = roiDailyId(ai)
+        val alerts = createRoiAlertStatus(2)
+        val progress = ProgressInStudy(2, 1, 1, week9Day1Noon)
+        val aiSurveys = listOf(
+                createMoodDaily(week9Day1Noon, 1, 3),
+                createMoodDaily(week9Day1Noon, 1, 3),
+                createMoodDaily(week9Day1Noon, 1, 3),
+                createSurveyDaily(week9Day1Noon, 1, key, 1),
+                createSurveyDaily(week9Day1Noon, 1, key, 1),
+                createSurveyDaily(week9Day1Noon, 1, key, 1))
+        val aiState = AiSelectionState(ai, null, null,
+                ai, false, progress)
+
+        val roi = TaskListViewModel.consolidateReturnOfInformation(
+                week9Day1Noon, alerts, aiState, aiSurveys)
+
+        assertNotNull(roi)
+        assertEquals(roi!!.countAiDaily, 3)
+        assertEquals(roi!!.countMoodDaily, 3)
+        assertTrue(roi!!.enoughDataToShow)
+        assertFalse(roi!!.shouldShowAlert)
     }
 }

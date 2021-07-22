@@ -106,6 +106,7 @@ open class WelcomeActivity: AppCompatActivity() {
                 appConfigRepo, reportRepo)).get()
         initializeAppViewModel.taskListLiveData(sharedPrefs).observe(this, Observer {
             Log.i(TAG, "At ${LocalDateTime.now()} AI state is ${it.aiState}")
+            initializeAppViewModel.saveAiState(sharedPrefs, it.aiState)
         })
         initializeAppViewModel.studyProgressLiveData().observe(this, Observer {
             // Progress in study is null until the day after they completed their baseline

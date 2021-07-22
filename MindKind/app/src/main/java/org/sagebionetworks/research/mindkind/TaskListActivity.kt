@@ -79,6 +79,19 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
     companion object {
         private val TAG = TaskListActivity::class.simpleName
         public const val prefsIntroAlertKey = "BaselineIntroAlertKey"
+
+        public const val prefsWeek1AlertKey =  "AiAlertKeyWeek1"
+        public const val prefsWeek5AlertKey =  "AiAlertKeyWeek5"
+        public const val prefsWeek9AlertKey =  "AiAlertKeyWeek9"
+
+        public fun prefsHasShownAiAlert(sharedPrefs: SharedPreferences, weekInStudy: Int): Boolean {
+            return sharedPrefs.contains(
+                when (weekInStudy) {
+                    in 5..8 -> prefsWeek5AlertKey
+                    in 9..12 -> prefsWeek9AlertKey
+                    else -> prefsWeek1AlertKey
+                })
+        }
     }
 
     @Inject
@@ -172,9 +185,21 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
         taskLiveData?.observe(this, Observer {
             Log.i(TAG, "At ${LocalDateTime.now()} AI state is ${it.aiState}")
             loading_progress.visibility = View.GONE
-            if (it.aiState.shouldPromptUserForAi) {
+
+            viewModel.saveAiState(sharedPrefs, it.aiState)
+
+            // Process if we should show alerts to the user
+            val shouldShowRoiAlert = (it.returnOfInfo?.shouldShowAlert == true)
+            val shouldShowAiAlert = it.aiState.shouldPromptUserForAi
+            if (shouldShowRoiAlert) {
+                val weekIdx = it.aiState.progressInStudy?.week ?: 1
+                val ai = if (shouldShowAiAlert) it.aiState else null
+                showRoiAlert(it.returnOfInfo, ai, weekIdx)
+            } else if (shouldShowAiAlert) {
                 showAiDialog(it.aiState)
             }
+
+            // Update the task items
             adapter.dataSet.clear()
             adapter.dataSet.addAll(it.taskListItems)
             adapter.notifyDataSetChanged()
@@ -330,6 +355,11 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
         }
         Log.d(TAG, "Showing dialog with AI state $aiSelection")
 
+        if (prefsHasShownAiAlert(sharedPrefs, aiSelection.progressInStudy?.week ?: 1)) {
+            Log.d(TAG, "Dialog already shown in the past, skip it")
+            return // already showed the dialog
+        }
+
         // Check if we should assign a random ai instead
         val dataGroups = SageResearchStack.SageDataProvider.getInstance().userDataGroups
         val isUserInARM2 = dataGroups.contains(DATAGROUP_ARM2)
@@ -396,6 +426,42 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
         dialog.show()
 
         aiDialog = dialog
+    }
+
+    private fun showRoiAlert(roiState: RoiDialogState?, shouldMoveTo: AiSelectionState?, weekIdx: Int) {
+        val roi = roiState ?: run { return }
+        val dialog = Dialog(this)
+
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setCancelable(false)
+        dialog.setContentView(R.layout.dialog_basic_message)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.white)
+
+        val title = dialog.findViewById<TextView>(R.id.dialog_title)
+        title?.text = getString(R.string.home_return_title)
+
+        val msg = dialog.findViewById<TextView>(R.id.dialog_message)
+        if (roi.enoughDataToShow) {
+            val preFormattedStr = getString(R.string.home_return_message_5strings)
+            val text1 = getString(roi.AI_text1)
+            val text2 = getString(roi.AI_text2)
+            val text3 = getString(roi.AI_text3)
+            val text4 = roi.countMoodDaily.toString()
+            val text5 = roi.countAiDaily.toString()
+            msg?.text = preFormattedStr.format(text1, text2, text3, text4, text5)
+        } else {
+            msg?.text = getString(R.string.home_return_message_not_enough)
+        }
+
+        val closeButton = dialog.findViewById<MaterialButton>(R.id.close_button)
+        closeButton?.text = getString(R.string.home_okay)
+        closeButton?.setOnClickListener { view ->
+            dialog.dismiss()
+            shouldMoveTo?.let { showAiDialog(it) }
+        }
+
+        dialog.show()
+        viewModel.saveDidShowRoiAlert(sharedPrefs, weekIdx)
     }
 
     private fun titleForAIIdentifier(title: String): String {
@@ -473,4 +539,5 @@ data class RoiDialogState(
         val AI_text3: Int,
         val countMoodDaily: Int = 0,
         val countAiDaily: Int = 0,
+        val enoughDataToShow: Boolean = false,
         val shouldShowAlert: Boolean = false)

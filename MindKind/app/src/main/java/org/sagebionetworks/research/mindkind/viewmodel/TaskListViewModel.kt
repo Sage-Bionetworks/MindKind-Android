@@ -1,5 +1,6 @@
 package org.sagebionetworks.research.mindkind.viewmodel
 
+import android.annotation.SuppressLint
 import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.*
@@ -207,11 +208,6 @@ open class TaskListViewModel(
             val state = createRoiState(lastWeekAi)
             val aiDailyId = roiDailyId(lastWeekAi)
 
-            val alreadyShowedAlertThisWeek = roiAlertStatus[weekIdx]
-            if (alreadyShowedAlertThisWeek) {
-                return state?.copy(shouldShowAlert = false) // already showed the alert
-            }
-
             val roiDailies = completeAiPast2Weeks.filter {
                 val local = localDate(it) ?: now
                 return@filter local.isBetweenInclusive(startOfRoiWeekInstant, endOfRoiWeekInstant)
@@ -234,8 +230,12 @@ open class TaskListViewModel(
                 }
             }
 
-            return state?.copy(countMoodDaily = moodDailyCount, countAiDaily = aiSpecificCount,
-                    shouldShowAlert = (moodDailyCount >= 3 && aiSpecificCount >= 3) && !alreadyShowedAlertThisWeek)
+            val enoughDataToShow = (moodDailyCount >= 3 && aiSpecificCount >= 3)
+
+            return state?.copy(
+                    countMoodDaily = moodDailyCount, countAiDaily = aiSpecificCount,
+                    enoughDataToShow = enoughDataToShow,
+                    shouldShowAlert = !roiAlertStatus[weekIdx])
         }
 
         fun startDateTime(baselineReports: List<ReportEntity>): LocalDateTime? {
@@ -317,6 +317,7 @@ open class TaskListViewModel(
         }
     }
 
+    private var roiAlertStatus: List<Boolean> = listOf()
     private var lastAiReportCount = -1
     private var aiReportsLiveData: LiveData<List<ReportEntity>>? = null
     private var lastBaselineReportCount = -1
@@ -391,12 +392,40 @@ open class TaskListViewModel(
         return reportsLiveData(identifier, startDate, endDate)
     }
 
-    fun taskListLiveData(sharedPrefs: SharedPreferences): LiveData<TaskListState> {
-        val mediator = MediatorLiveData<TaskListState>()
+    @SuppressLint("ApplySharedPref")
+    fun saveDidShowRoiAlert(sharedPrefs: SharedPreferences, weekIdx: Int) {
+        sharedPrefs.edit().putBoolean("$roiAlertBaseKey$weekIdx", true).commit()
+        refreshRoiAlertStatus(sharedPrefs)
+    }
 
-        val roiAlertStatus = (2 until studyDurationInWeeks).map {
+    private fun refreshRoiAlertStatus(sharedPrefs: SharedPreferences) {
+        roiAlertStatus = (2 until studyDurationInWeeks).map {
             return@map sharedPrefs.getBoolean("$roiAlertBaseKey$it", false)
         }
+    }
+
+    @SuppressLint("ApplySharedPref")
+    public fun saveAiState(sharedPrefs: SharedPreferences, aiSelection: AiSelectionState?) {
+        aiSelection?.week1Ai?.let {
+            if (!sharedPrefs.contains(TaskListActivity.prefsWeek1AlertKey)) {
+                sharedPrefs.edit().putString(TaskListActivity.prefsWeek1AlertKey, it).commit()
+            }
+        }
+        aiSelection?.week5Ai?.let {
+            if (!sharedPrefs.contains(TaskListActivity.prefsWeek5AlertKey)) {
+                sharedPrefs.edit().putString(TaskListActivity.prefsWeek5AlertKey, it).commit()
+            }
+        }
+        aiSelection?.week9Ai?.let {
+            if (!sharedPrefs.contains(TaskListActivity.prefsWeek9AlertKey)) {
+                sharedPrefs.edit().putString(TaskListActivity.prefsWeek9AlertKey, it).commit()
+            }
+        }
+    }
+
+    fun taskListLiveData(sharedPrefs: SharedPreferences): LiveData<TaskListState> {
+        val mediator = MediatorLiveData<TaskListState>()
+        refreshRoiAlertStatus(sharedPrefs)
 
         // Consolidation first-class fun to be invoked below
         val consolidationFun: (() -> Unit) = {
