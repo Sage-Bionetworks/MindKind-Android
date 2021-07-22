@@ -114,8 +114,8 @@ class ConversationGsonHelper {
 
             // Filter on data group
             newSteps = newSteps.filter { step ->
-                (step as? StepNeedsDataGroup)?.let {
-                    return@filter dataGroups.contains(step.needsDataGroup)
+                (step as? StepNeedsDataGroup)?.needsDataGroup?.let {
+                    return@filter dataGroups.contains(it)
                 }
                 return@filter true
             }.toMutableList()
