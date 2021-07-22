@@ -171,7 +171,6 @@ open class TaskListViewModel(
         fun consolidateTaskItems(aiState: AiSelectionState,
                                  baselineEntities: List<ReportEntity>,
                                  completedAiToday: List<ReportEntity>): List<TaskListItem> {
-            return orderedTaskItemList()
             return orderedTaskItemList().filter { item ->
                 if (item.identifier.startsWith(SageTaskIdentifier.Baseline)) {
                     return@filter baselineEntities.firstOrNull {
