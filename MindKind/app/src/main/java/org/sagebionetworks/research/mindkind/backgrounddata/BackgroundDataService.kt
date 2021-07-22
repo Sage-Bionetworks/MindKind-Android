@@ -155,11 +155,14 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
         public const val hasShownWithdrawalNotifKey = "hasShownWithdrawalNotif"
         public const val hasShownEndOfStudyNotifKey = "hasShownEndOfStudyNotif"
         public const val hasShownRecruitmentNotifKey = "hasShownRecruitmentStudyNotif"
+        public const val lastBackgroundUploadDateKey = "lastBackgroundUploadDateKey"
 
         fun createSharedPrefs(context: Context): SharedPreferences {
             return context.getSharedPreferences("Mindkind", MODE_PRIVATE)
         }
 
+        // No quicker than every 12 hours we should upload
+        public const val uploadFrequencyInHours = 12.toLong()
         public const val studyDurationInWeeks = 12
 
         // List of data types to track
@@ -386,6 +389,21 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
      * Packages all existing un-uploaded data and attempts to upload it to bridge
      */
     private fun uploadDataToBridge() {
+
+        val now = LocalDateTime.now()
+
+        // First, check last upload time, as we don't want to upload too frequently
+        sharedPrefs.getString(lastBackgroundUploadDateKey, null)?.let {
+            val lastUpload = LocalDateTime.parse(it)
+            if (lastUpload.plusHours(uploadFrequencyInHours).isAfter(now)) {
+                Log.i(TAG, "Ignoring too frequent upload request")
+                return // The user uploaded less than X hours ago
+            }
+        }
+
+        // Save that we attempted an upload
+        sharedPrefs.edit().putString(lastBackgroundUploadDateKey, now.toString()).apply()
+
         // Always try to upload all past failed uploads if any exist
         subscribeCompletableAsync(
                 RxJavaInterop.toV2Completable(uploadManager.processUploadFiles()),
