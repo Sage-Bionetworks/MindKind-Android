@@ -171,7 +171,7 @@ open class TaskListViewModel(
         fun consolidateTaskItems(aiState: AiSelectionState,
                                  baselineEntities: List<ReportEntity>,
                                  completedAiToday: List<ReportEntity>): List<TaskListItem> {
-
+            return orderedTaskItemList()
             return orderedTaskItemList().filter { item ->
                 if (item.identifier.startsWith(SageTaskIdentifier.Baseline)) {
                     return@filter baselineEntities.firstOrNull {
@@ -217,24 +217,29 @@ open class TaskListViewModel(
             var moodDailyCount = 0
             var aiSpecificCount = 0
 
+            var moodTargetCount = 0
+            var aiTargetCount = 0
+
             roiDailies.forEach { report ->
                 val answerMap = report.data?.data as? Map<*, *> ?: run { return@forEach }
-                (answerMap[moodDailyAnswerKey] as? Double)?.toInt().let {
+                (answerMap[moodDailyAnswerKey] as? Double)?.toInt()?.let {
+                    moodDailyCount += 1
                     if (listOf(3, 4, 5).contains(it)) {
-                        moodDailyCount += 1
+                        moodTargetCount += 1
                     }
                 }
                 (answerMap[aiDailyId] as? Double)?.toInt()?.let {
+                    aiSpecificCount += 1
                     if (shouldCountRoi(it, lastWeekAi)) {
-                        aiSpecificCount += 1
+                        aiTargetCount += 1
                     }
                 }
             }
 
-            val enoughDataToShow = (moodDailyCount >= 3 && aiSpecificCount >= 3)
+            val enoughDataToShow = (moodDailyCount >= 3 || aiSpecificCount >= 3)
 
             return state?.copy(
-                    countMoodDaily = moodDailyCount, countAiDaily = aiSpecificCount,
+                    countMoodDaily = moodTargetCount, countAiDaily = aiTargetCount,
                     enoughDataToShow = enoughDataToShow,
                     shouldShowAlert = !roiAlertStatus[weekIdx])
         }

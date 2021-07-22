@@ -110,7 +110,7 @@ class TaskListViewModelTests: RoomTestHelper() {
             return ReportEntity(identifier = SageTaskIdentifier.Surveys,
                     dateTime = dateTime.toInstant(ZoneOffset.UTC),
                     data = ClientData(mapOf(
-                            Pair(moodDailyAnswerKey, answer),
+                            Pair(moodDailyAnswerKey, answer.toDouble()),
                             Pair(REPORT_LOCAL_DATE_TIME, dateTime.toString()))))
         }
 
@@ -120,7 +120,7 @@ class TaskListViewModelTests: RoomTestHelper() {
             return ReportEntity(identifier = SageTaskIdentifier.Surveys,
                     dateTime = dateTime.toInstant(ZoneOffset.UTC),
                     data = ClientData(mapOf(
-                            Pair(key, answer),
+                            Pair(key, answer.toDouble()),
                             Pair(REPORT_LOCAL_DATE_TIME, dateTime.toString()))))
         }
 
@@ -361,7 +361,7 @@ class TaskListViewModelTests: RoomTestHelper() {
         assertNotNull(roi)
         assertEquals(roi!!.countAiDaily, 3)
         assertEquals(roi!!.countMoodDaily, 2)
-        assertFalse(roi!!.enoughDataToShow)
+        assertTrue(roi!!.enoughDataToShow)
         assertTrue(roi!!.shouldShowAlert)
     }
 
