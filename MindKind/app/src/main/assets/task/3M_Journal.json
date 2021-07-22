@@ -29,7 +29,7 @@
     {
       "identifier": "3M_Journal_Answer",
       "type": "text",
-      "title": "NOTICE: We are not monitoring your response in real time. If you need help, contact a doctor or mental health care provider. Resources are available on the study website https://staging.wtgmhdc.synapse.org/contact",
+      "title": "NOTICE: We are not monitoring your response in real time. If you need help, contact a doctor or mental health care provider. Resources are available on the study website https://mindkindstudy.org/contact",
       "buttonTitle": "Submit",
       "maxCharacters": "750",
       "placeholderText": "To protect your privacy, please do not include your name or any information that could be used to identify you."
