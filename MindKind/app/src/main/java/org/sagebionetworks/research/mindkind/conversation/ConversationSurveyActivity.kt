@@ -25,6 +25,7 @@ import androidx.core.view.children
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.get
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
@@ -217,8 +218,15 @@ open class ConversationSurveyActivity: AppCompatActivity() {
 
     private fun completeConversation() {
         viewModel.completeConversation(sharedPrefs)
+        uploadBackgroundData()
         setResult(RESULT_OK)
         finish()
+    }
+
+    private fun uploadBackgroundData() {
+        // Notifies the server that it should upload the background data to bridge
+        LocalBroadcastManager.getInstance(this)
+                .sendBroadcast(Intent(BackgroundDataService.ACTIVITY_UPLOAD_DATA_ACTION))
     }
 
     fun View.slideDown(duration: Int = 500) {
