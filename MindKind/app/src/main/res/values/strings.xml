@@ -165,7 +165,7 @@
     <string name="welcome_1_title">Welcome to the MindKind Study!</string>
     <string name="welcome_1_message">Your experience will help researchers better understand the emotional health of young people.</string>
     <string name="welcome_2_title">Interacting with the MindKind Study</string>
-    <string name="welcome_2_message">Although MindKind Study surveys may look like a text chat - MindKind is a computer, not a person.\n\nIf you experience distress or thoughts of harming yourself, contact your physician or \<a href='https://staging.wtgmhdc.synapse.org/contact'>find local mental health resources\</a> for ways to find help.</string>
+    <string name="welcome_2_message">Although MindKind Study surveys may look like a text chat - MindKind is a computer, not a person.\n\nIf you experience distress or thoughts of harming yourself, contact your physician or \<a href='https://mindkindstudy.org/contact'>find local mental health resources\</a> for ways to find help.</string>
     <string name="welcome_3_title">Your responses\nare important</string>
     <string name="welcome_3_message">Keeping up with your daily surveys and weekly check-ins gives the MindKind Study a better picture of your emotional health. You can skip any question you don\'t want to answer.</string>
     <string name="welcome_4_title">We protect your personal data</string>
@@ -270,12 +270,12 @@
     <string name="settings_continue">Continue</string>
 
     <!-- Settings Links -->
-    <string name="settings_url_mental_health">https://staging.wtgmhdc.synapse.org/contact</string>
-    <string name="settings_url_about_study">https://staging.wtgmhdc.synapse.org/about</string>
-    <string name="settings_url_about_team">https://staging.wtgmhdc.synapse.org/research</string>
-    <string name="settings_url_informed_consent">https://staging.wtgmhdc.synapse.org/consent-info</string>
-    <string name="settings_url_privacy_policy">https://staging.wtgmhdc.synapse.org/privacy-policy</string>
-    <string name="settings_url_terms_of_service">https://staging.wtgmhdc.synapse.org/terms</string>
+    <string name="settings_url_mental_health">https://mindkindstudy.org/contact</string>
+    <string name="settings_url_about_study">https://mindkindstudy.org/about</string>
+    <string name="settings_url_about_team">https://mindkindstudy.org/research</string>
+    <string name="settings_url_informed_consent">https://mindkindstudy.org/consent-info</string>
+    <string name="settings_url_privacy_policy">https://mindkindstudy.org/privacy-policy</string>
+    <string name="settings_url_terms_of_service">https://mindkindstudy.org/terms</string>
     <string name="settings_email_contact_us">MindKindSupport@sagebionetworks.org</string>
     <string name="settings_email_contact_us_subject">Contacting Support</string>
 
