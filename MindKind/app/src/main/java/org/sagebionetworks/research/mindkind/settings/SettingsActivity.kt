@@ -24,6 +24,7 @@ import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataServic
 import org.sagebionetworks.research.mindkind.conversation.ConfirmationDialog
 import org.sagebionetworks.research.mindkind.research.SageTaskIdentifier
 import org.sagebionetworks.research.mindkind.returnToEntryActivity
+import org.sagebionetworks.researchstack.backbone.ui.ViewWebDocumentActivity
 
 
 open class SettingsActivity: AppCompatActivity() {
@@ -182,6 +183,7 @@ open class SettingsActivity: AppCompatActivity() {
                     getString(R.string.settings_informed_consent_title) -> goToWebpage(getString(R.string.settings_url_informed_consent))
                     getString(R.string.settings_privacy_policy_title) -> goToWebpage(getString(R.string.settings_url_privacy_policy))
                     getString(R.string.settings_terms_of_service_title) -> goToWebpage(getString(R.string.settings_url_terms_of_service))
+                    getString(R.string.settings_licenses) -> goToLicense()
                     getString(R.string.settings_contact_us_title) -> sendEmail(getString(R.string.settings_email_contact_us),
                                                                         getString(R.string.settings_email_contact_us_subject))
                     else -> processDataTracking(item)
@@ -227,6 +229,12 @@ open class SettingsActivity: AppCompatActivity() {
 
     fun showDeleteMyDataContactUs() {
         showContactUsDialog()
+    }
+
+    fun goToLicense() {
+        val title = getString(R.string.settings_licenses)
+        startActivity(ViewWebDocumentActivity.newIntentForPath(this,
+                title, "file:///android_asset/html/Licenses.html"))
     }
 
     fun goToWebpage(uriString: String) {
