@@ -184,6 +184,7 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
         taskLiveData = viewModel.taskListLiveData(sharedPrefs)
         taskLiveData?.observe(this, Observer {
             Log.i(TAG, "At ${LocalDateTime.now()} AI state is ${it.aiState}")
+            Log.i(TAG, "At ${LocalDateTime.now()} ROI state is ${it.returnOfInfo}")
             loading_progress.visibility = View.GONE
 
             viewModel.saveAiState(sharedPrefs, it.aiState)

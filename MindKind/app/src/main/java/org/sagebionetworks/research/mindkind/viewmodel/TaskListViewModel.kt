@@ -195,13 +195,14 @@ open class TaskListViewModel(
             val endOfRoiWeekInstant = lastDayOfRoiWeek.endOfDay()
 
             // Only show summaries in week 2 or later
+            val weekOfStudy = progress.week
             val weekIdx = progress.week - 2
             if (weekIdx < 0 || weekIdx >= roiAlertStatus.size) {
                 return null
             }
 
-            val lastWeekAi = when(weekIdx) {
-                in 0..5 -> aiState.week1Ai
+            val lastWeekAi = when(weekOfStudy) {
+                in 1..5 -> aiState.week1Ai
                 in 6..9 -> aiState.week5Ai
                 else -> aiState.week9Ai
             }
@@ -218,12 +219,12 @@ open class TaskListViewModel(
 
             roiDailies.forEach { report ->
                 val answerMap = report.data?.data as? Map<*, *> ?: run { return@forEach }
-                (answerMap[moodDailyAnswerKey] as? Int)?.let {
+                (answerMap[moodDailyAnswerKey] as? Double)?.toInt().let {
                     if (listOf(3, 4, 5).contains(it)) {
                         moodDailyCount += 1
                     }
                 }
-                (answerMap[aiDailyId] as? Int)?.let {
+                (answerMap[aiDailyId] as? Double)?.toInt()?.let {
                     if (shouldCountRoi(it, lastWeekAi)) {
                         aiSpecificCount += 1
                     }
