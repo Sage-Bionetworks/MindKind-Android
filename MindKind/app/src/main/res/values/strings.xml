@@ -126,6 +126,10 @@
     <string name="home_baseline_intro_title">Welcome to MindKind!</string>
     <string name="home_baseline_intro_message">Before we can get going on your daily experience, we need to know a bit about you. Once you complete these questions, we can get started on your daily MindKind journey. Click on a section to begin.</string>
     <string name="home_baseline_intro_continue">Continue</string>
+    <string name="home_return_title">Weekly Summary</string>
+    <string name="home_return_message_5strings">Here is what your %1$s and mood looked like last week. You said your mood was average or better %4$s days in the last week. You also said you %2$s %5$s days. Have you noticed a pattern between %3$s and your mood?</string>
+    <string name="home_return_message_not_enough">We would like to share a summary of your mood and activity with you, but we didn\'t hear from you enough last week. Try participating in more daily surveys so we can show you some results.</string>
+    <string name="home_okay">Okay</string>
 
     <!-- SMS code screen -->
     <string name="enter_code">Enter Code</string>
@@ -274,4 +278,21 @@
     <string name="settings_url_terms_of_service">https://staging.wtgmhdc.synapse.org/terms</string>
     <string name="settings_email_contact_us">MindKindSupport@sagebionetworks.org</string>
     <string name="settings_email_contact_us_subject">Contacting Support</string>
+
+    <!-- Return of information -->
+    <string name="roi_sleep_ai_text1">sleep</string>
+    <string name="roi_sleep_ai_text2">felt rested</string>
+    <string name="roi_sleep_ai_text3">good rest</string>
+    <string name="roi_social_ai_text1">social activity</string>
+    <string name="roi_social_ai_text2">did something social</string>
+    <string name="roi_social_ai_text3">your social activities</string>
+    <string name="roi_movements_ai_text1">exercise activity</string>
+    <string name="roi_movements_ai_text2">exercised</string>
+    <string name="roi_movements_ai_text3">exercise</string>
+    <string name="roi_experiences_ai_text1">positive experiences</string>
+    <string name="roi_experiences_ai_text2">did something to make yourself feel good</string>
+    <string name="roi_experiences_ai_text3">your positive experiences</string>
+
+
+
 </resources>
