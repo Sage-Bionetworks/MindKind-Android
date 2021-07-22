@@ -12,6 +12,13 @@
       "optional": false
   },
     {
+      "identifier": "DEMOG_Edit_Answer_Info",
+      "type": "instruction",
+      "title": "If you change your mind about any of your answers, you can scroll back to the answer or skipped question you want to change. Press and hold on it to see the options and select a new one. When you get to the end, press Done to submit your answers.",
+      "buttonTitle": "Ok",
+      "optional": false
+    },
+    {
       "identifier": "DEMOG_BIRTH_SEX",
       "type": "singleChoice.integer",
       "title": "What sex were you assigned at birth?",
