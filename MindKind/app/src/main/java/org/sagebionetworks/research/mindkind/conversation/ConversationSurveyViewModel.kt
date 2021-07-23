@@ -18,10 +18,10 @@ import org.sagebionetworks.research.domain.result.implementations.TaskResultBase
 import org.sagebionetworks.research.domain.result.interfaces.Result
 import org.sagebionetworks.research.mindkind.MindKindApplication.REPORT_LOCAL_DATE_TIME
 import org.sagebionetworks.research.mindkind.MindKindApplication.RESULT_DATA_TYPE
-import org.sagebionetworks.research.mindkind.TaskListViewModel
 import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService
 import org.sagebionetworks.research.mindkind.research.SageTaskIdentifier
 import org.sagebionetworks.research.mindkind.room.BackgroundDataTypeConverters
+import org.sagebionetworks.research.mindkind.viewmodel.TaskListViewModel
 import org.sagebionetworks.research.sageresearch.dao.room.AppConfigRepository
 import org.sagebionetworks.research.sageresearch.dao.room.ReportEntity
 import org.sagebionetworks.research.sageresearch.dao.room.ReportRepository
@@ -141,8 +141,15 @@ open class ConversationSurveyViewModel(
         val ifAnsweredOrSplit = lastStep.ifUserAnswers?.split("|")
 
         ifAnsweredOrSplit?.forEach {
-            // Make sure it has a skip to (is this still necessary?)
-            val ifAnsweredConditionalSplit = it.split(", skip to ")
+            val skipToDelimeter = ", skip to "
+            val skipNumberOfQuestionsDelimeter = ", skip "
+            var delimeter = skipToDelimeter
+
+            var ifAnsweredConditionalSplit = it.split(delimeter)
+            if (ifAnsweredConditionalSplit.size <= 1) {
+                delimeter = skipNumberOfQuestionsDelimeter
+                ifAnsweredConditionalSplit = it.split(delimeter)
+            }
 
             // Must have format [Answer], skip to [Step Identifier]
             if (ifAnsweredConditionalSplit.size < 2) {
@@ -150,6 +157,11 @@ open class ConversationSurveyViewModel(
             }
 
             if (lastAnswer == ifAnsweredConditionalSplit.firstOrNull()) {
+                if (delimeter == skipNumberOfQuestionsDelimeter) {
+                    itemCount += ifAnsweredConditionalSplit.lastOrNull()?.toInt() ?: 0
+                    return@forEach
+                }
+
                 val newNextStep = stepWith(ifAnsweredConditionalSplit.lastOrNull()) ?: run {
                     return@forEach
                 }

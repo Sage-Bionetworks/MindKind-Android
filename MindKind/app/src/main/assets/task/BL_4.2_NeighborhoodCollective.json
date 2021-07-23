@@ -6,7 +6,7 @@
   "steps": [{
     "identifier": "NCES_A_Intro",
     "type": "instruction",
-    "title": "For each of these statements, please tell me whether:",
+    "title": "For each of these statements, please tell me whether you Strongly Agree, Agree, Disagree or Strongly Disagree.",
     "continueAfterDelay": true
   },
     {
@@ -92,9 +92,9 @@
       "type": "singleChoice.integer",
       "title": "People in this neighborhood do not share the same values.",
       "choices": [{
-        "text": "Strongly Agree",
-        "value": "value": 1
-      },
+          "text": "Strongly Agree",
+          "value": 1
+        },
         {
           "text": "Agree",
           "value": 2

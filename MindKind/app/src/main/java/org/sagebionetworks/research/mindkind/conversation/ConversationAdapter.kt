@@ -96,7 +96,10 @@ class ConversationAdapter(
                 (item.linkWithNext && (position >= (dataSet.size - 2)))
 
         (viewHolder as? ChatViewHolder)?.let {
-            it.textView.text = dataSet[position].text
+            val text = dataSet[position].text
+            val hasLink = text?.contains("https:") ?: false
+            it.textView.setTextIsSelectable(hasLink)
+            it.textView.text = text
             it.container.alpha = if (isFullAlpha) { 1.0f } else { 0.45f }
         }
 

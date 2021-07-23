@@ -36,6 +36,7 @@ import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Intent
 import android.content.SharedPreferences
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -52,28 +53,22 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.common.base.Preconditions
 import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.activity_task_list.*
-import org.sagebionetworks.research.domain.result.AnswerResultType
-import org.sagebionetworks.research.domain.result.implementations.AnswerResultBase
-import org.sagebionetworks.research.domain.result.implementations.TaskResultBase
 import org.sagebionetworks.research.mindkind.MindKindApplication.*
-import org.sagebionetworks.research.mindkind.TaskListViewModel.Companion.studyStartDateKey
 import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService
 import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService.Companion.SHOW_ENGAGEMENT_NOTIFICATION_ACTION
+import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService.Companion.hasShownRecruitmentNotifKey
 import org.sagebionetworks.research.mindkind.backgrounddata.ProgressInStudy
 import org.sagebionetworks.research.mindkind.conversation.*
-import org.sagebionetworks.research.mindkind.research.SageTaskIdentifier
 import org.sagebionetworks.research.mindkind.researchstack.framework.SageResearchStack
 import org.sagebionetworks.research.mindkind.settings.SettingsActivity
+import org.sagebionetworks.research.mindkind.viewmodel.TaskListViewModel
+import org.sagebionetworks.research.mindkind.viewmodel.TaskListViewModel.Companion.studyStartDateKey
 import org.sagebionetworks.research.sageresearch.dao.room.AppConfigRepository
-import org.sagebionetworks.research.sageresearch.dao.room.ReportEntity
 import org.sagebionetworks.research.sageresearch.dao.room.ReportRepository
 import org.sagebionetworks.research.sageresearch.extensions.*
-import org.sagebionetworks.research.sageresearch.viewmodel.ReportViewModel
 import org.threeten.bp.*
-import org.threeten.bp.temporal.ChronoUnit
 import java.util.*
 import javax.inject.Inject
 
@@ -83,6 +78,20 @@ import javax.inject.Inject
 class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback {
     companion object {
         private val TAG = TaskListActivity::class.simpleName
+        public const val prefsIntroAlertKey = "BaselineIntroAlertKey"
+
+        public const val prefsWeek1AlertKey =  "AiAlertKeyWeek1"
+        public const val prefsWeek5AlertKey =  "AiAlertKeyWeek5"
+        public const val prefsWeek9AlertKey =  "AiAlertKeyWeek9"
+
+        public fun prefsHasShownAiAlert(sharedPrefs: SharedPreferences, weekInStudy: Int): Boolean {
+            return sharedPrefs.contains(
+                when (weekInStudy) {
+                    in 5..8 -> prefsWeek5AlertKey
+                    in 9..12 -> prefsWeek9AlertKey
+                    else -> prefsWeek1AlertKey
+                })
+        }
     }
 
     @Inject
@@ -99,6 +108,7 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
     private var observersAttachedAt: LocalDateTime? = null
     private var taskLiveData: LiveData<TaskListState>? = null
     private var studyProgressLiveData: LiveData<ProgressInStudy?>? = null
+    private var recruitmentLiveData: LiveData<RecruitmentAppConfig?>? = null
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -155,6 +165,11 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
 
         viewModel = ViewModelProvider(this, TaskListViewModel.Factory(
                 appConfigRepo, reportRepo)).get()
+
+        recruitmentLiveData = viewModel.recruitmentJsonLiveData()
+        recruitmentLiveData?.observe(this, Observer {
+            Log.i(TAG, "Recuitment app config value $it")
+        })
     }
 
     @SuppressLint("ApplySharedPref")
@@ -166,13 +181,26 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
         viewModel.clearCache()
 
         loading_progress.visibility = View.VISIBLE
-        taskLiveData = viewModel.taskListLiveData()
+        taskLiveData = viewModel.taskListLiveData(sharedPrefs)
         taskLiveData?.observe(this, Observer {
             Log.i(TAG, "At ${LocalDateTime.now()} AI state is ${it.aiState}")
+            Log.i(TAG, "At ${LocalDateTime.now()} ROI state is ${it.returnOfInfo}")
             loading_progress.visibility = View.GONE
-            if (it.aiState.shouldPromptUserForAi) {
+
+            viewModel.saveAiState(sharedPrefs, it.aiState)
+
+            // Process if we should show alerts to the user
+            val shouldShowRoiAlert = (it.returnOfInfo?.shouldShowAlert == true)
+            val shouldShowAiAlert = it.aiState.shouldPromptUserForAi
+            if (shouldShowRoiAlert) {
+                val weekIdx = it.aiState.progressInStudy?.week ?: 1
+                val ai = if (shouldShowAiAlert) it.aiState else null
+                showRoiAlert(it.returnOfInfo, ai, weekIdx)
+            } else if (shouldShowAiAlert) {
                 showAiDialog(it.aiState)
             }
+
+            // Update the task items
             adapter.dataSet.clear()
             adapter.dataSet.addAll(it.taskListItems)
             adapter.notifyDataSetChanged()
@@ -184,6 +212,7 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
             // Progress in study is null until the day after they completed their baseline
             val progressInStudy = it ?: run {
                 task_progress_container.visibility = View.GONE
+                showBaselineIntroAlertIfNecessary()
                 return@Observer
             }
             task_progress_container.visibility = View.VISIBLE
@@ -244,8 +273,69 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
     }
 
     fun startTask(jsonResourceName: String?) {
+        if (didShowRecruitmentAlert()) {
+            return // Check for recruitment alert when a user goes to do a survey
+        }
+
         val fileName = jsonResourceName ?: run { return }
-        ConversationSurveyActivity.start(this, jsonResourceName)
+        ConversationSurveyActivity.start(this, fileName)
+    }
+
+    fun didShowRecruitmentAlert(): Boolean {
+        val recruitment = recruitmentLiveData?.value ?: run { return false }
+        val progress = studyProgressLiveData?.value ?: run { return false }
+
+        if (sharedPrefs.getBoolean(hasShownRecruitmentNotifKey, false)) {
+            return false // Already showed the recruitment notif
+        }
+
+        val now = LocalDateTime.now()
+        if (progress.week >= recruitment.notifyAtStartOfWeek &&
+                now.isAfter(recruitment.startDate) && now.isBefore(recruitment.endDate)) {
+
+            showRecruitmentAlert(recruitment)
+            return true
+        }
+
+        return false
+    }
+
+    fun showRecruitmentAlert(recruitment: RecruitmentAppConfig) {
+        sharedPrefs.edit().putBoolean(hasShownRecruitmentNotifKey, true).apply()
+
+        val dialog = Dialog(this)
+
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setCancelable(true)
+        dialog.setContentView(R.layout.dialog_2_button_message)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.white)
+
+        val title = dialog.findViewById<TextView>(R.id.dialog_title)
+        title?.text = null
+        title.visibility = View.GONE
+
+        val msg = dialog.findViewById<TextView>(R.id.dialog_message)
+        msg?.text = recruitment.title
+
+        val negButton = dialog.findViewById<MaterialButton>(R.id.confirm_button)
+        negButton?.text = getString(R.string.rsb_BOOL_NO)
+        negButton?.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        val posButton = dialog.findViewById<MaterialButton>(R.id.cancel_button)
+        posButton?.text = getString(R.string.rsb_BOOL_YES)
+        posButton?.setOnClickListener {
+            dialog.dismiss()
+            goToWebpage(recruitment.url)
+        }
+
+        dialog.show()
+    }
+
+    fun goToWebpage(uriString: String) {
+        val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(uriString))
+        startActivity(browserIntent)
     }
 
     fun showEngagementMessage() {
@@ -266,6 +356,11 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
         }
         Log.d(TAG, "Showing dialog with AI state $aiSelection")
 
+        if (prefsHasShownAiAlert(sharedPrefs, aiSelection.progressInStudy?.week ?: 1)) {
+            Log.d(TAG, "Dialog already shown in the past, skip it")
+            return // already showed the dialog
+        }
+
         // Check if we should assign a random ai instead
         val dataGroups = SageResearchStack.SageDataProvider.getInstance().userDataGroups
         val isUserInARM2 = dataGroups.contains(DATAGROUP_ARM2)
@@ -276,7 +371,7 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
 
         val randomAiIndex = (Math.random() * 4).toInt()
         if (isUserInARM2) {
-            aiText = MindKindApplication.aiForIndex(randomAiIndex)
+            aiText = titleForAIIdentifier(MindKindApplication.aiForIndex(randomAiIndex))
         }
 
         if (isUserInARM2) {
@@ -334,310 +429,116 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
         aiDialog = dialog
     }
 
+    private fun showRoiAlert(roiState: RoiDialogState?, shouldMoveTo: AiSelectionState?, weekIdx: Int) {
+        val roi = roiState ?: run { return }
+        val dialog = Dialog(this)
+
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setCancelable(false)
+        dialog.setContentView(R.layout.dialog_basic_message)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.white)
+
+        val title = dialog.findViewById<TextView>(R.id.dialog_title)
+        title?.text = getString(R.string.home_return_title)
+
+        val msg = dialog.findViewById<TextView>(R.id.dialog_message)
+        if (roi.enoughDataToShow) {
+            val preFormattedStr = getString(R.string.home_return_message_5strings)
+            val text1 = getString(roi.AI_text1)
+            val text2 = getString(roi.AI_text2)
+            val text3 = getString(roi.AI_text3)
+            val text4 = roi.countMoodDaily.toString()
+            val text5 = roi.countAiDaily.toString()
+            msg?.text = preFormattedStr.format(text1, text2, text3, text4, text5)
+        } else {
+            msg?.text = getString(R.string.home_return_message_not_enough)
+        }
+
+        val closeButton = dialog.findViewById<MaterialButton>(R.id.close_button)
+        closeButton?.text = getString(R.string.home_okay)
+        closeButton?.setOnClickListener { view ->
+            dialog.dismiss()
+            shouldMoveTo?.let { showAiDialog(it) }
+        }
+
+        dialog.show()
+        viewModel.saveDidShowRoiAlert(sharedPrefs, weekIdx)
+    }
+
+    private fun titleForAIIdentifier(title: String): String {
+        when (title) {
+            SOCIAL_AI -> return getString(R.string.social)
+            SLEEP_AI -> return getString(R.string.sleep)
+            BODY_MOVEMENT_AI -> return getString(R.string.movement)
+            POSITIVE_EXPERIENCES_AI -> return getString(R.string.positive_experiences)
+            else -> return getString(R.string.health) // Shouldn't ever hit the default
+        }
+    }
+
     private fun aiSelected(index: Int) {
         val ai = MindKindApplication.aiForIndex(index)
         viewModel.saveAiAnswer(ai)
     }
-}
 
-open class TaskListViewModel(
-        private val appConfigRepo: AppConfigRepository,
-        reportRepo: ReportRepository) : ReportViewModel(reportRepo = reportRepo) {
+    private fun showBaselineIntroAlertIfNecessary() {
+        if (sharedPrefs.getBoolean(prefsIntroAlertKey, false)) {
+            return
+        }
+        sharedPrefs.edit().putBoolean(prefsIntroAlertKey, true).apply()
 
-    companion object {
-        private val TAG = TaskListViewModel::class.java.simpleName
+        val dialog = Dialog(this)
 
-        public const val studyStartDateKey = "LocalStudyStartDate"
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setCancelable(true)
+        dialog.setContentView(R.layout.dialog_basic_message)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.white)
 
-        fun cachedProgressInStudy(sharedPreferences: SharedPreferences): ProgressInStudy? {
-            sharedPreferences.getString(studyStartDateKey, null)?.let {
-                val studyStartDate = LocalDateTime.parse(it)
-                val now = LocalDateTime.now()
-                return calculateStudyProgress(studyStartDate, now)
-            }
-            return null
+        val title = dialog.findViewById<TextView>(R.id.dialog_title)
+        title?.text = getString(R.string.home_baseline_intro_title)
+
+        val msg = dialog.findViewById<TextView>(R.id.dialog_message)
+        msg?.text = getString(R.string.home_baseline_intro_message)
+
+        val closeButton = dialog.findViewById<MaterialButton>(R.id.close_button)
+        closeButton?.text = getString(R.string.home_baseline_intro_continue)
+        closeButton?.setOnClickListener {
+            dialog.dismiss()
         }
 
-        fun calculateStudyProgress(start: LocalDateTime, now: LocalDateTime): ProgressInStudy? {
-            if (now.isBefore(start)) {  // Study starts day after the date
-                return null
-            }
-            val daysFromStart = start.until(now, ChronoUnit.DAYS).toInt()
-            val dayOfWeek = (daysFromStart % 7) + 1
-            val weekInStudy = (daysFromStart / 7) + 1
-            return ProgressInStudy(weekInStudy, dayOfWeek, daysFromStart, start)
-        }
-
-        // We need the changes to be reflected immediately
-        fun markConversationComplete(sharedPreferences: SharedPreferences) {
-            sharedPreferences.edit().putString(
-                    ConversationSurveyActivity.completedDateKey,
-                    LocalDateTime.now().toString()).apply()
-        }
-
-        public fun consolidateAiValues(now: LocalDateTime,
-                                       baselineEntities: List<ReportEntity>,
-                                       aiReports: List<ReportEntity>): AiSelectionState {
-
-            // Default ai selection is all nulls and false to prompt user
-            var aiSelection = AiSelectionState(null, null, null, null, false)
-
-            val aiStartDate = startDateTime(baselineEntities) ?: run {
-                return aiSelection // Cannot find start date time, they haven't completed baseline yet
-            }
-
-            // This checks for week 1 needing to be collected
-            if (aiReports.isEmpty()) {
-                aiSelection = aiSelection.copy(shouldPromptUserForAi =
-                    now.inSameDayAs(aiStartDate) || now.isAfter(aiStartDate))
-                return aiSelection // User has done their baseline and might need to assign their week 1 AI
-            }
-
-            // Time helper vars
-            val weekInStudy = aiStartDate.until(now, ChronoUnit.WEEKS) + 1
-
-            // Populate the AI selections base on report dateTime's
-            aiReports.sortedBy { it.dateTime }.map {
-                val ai = ((it.data?.data as? Map<*, *>)?.get(CURRENT_AI_RESULT_ID) as? String)
-                val aiLocalTimeStr = ((it.data?.data as? Map<*, *>)?.get(
-                        REPORT_LOCAL_DATE_TIME) as? String) ?: LocalDateTime.now().toString()
-                val aiLocalTime = LocalDateTime.parse(aiLocalTimeStr)
-                AiClientData(it.identifier ?: "", ai, aiLocalTime)
-            }.forEach {
-                val aiWeek = aiStartDate.until(it.date, ChronoUnit.WEEKS) + 1
-                aiSelection = when {
-                    aiWeek <= 4 -> aiSelection.copy(week1Ai = it.ai)
-                    aiWeek <= 8 -> aiSelection.copy(week5Ai = it.ai)
-                    else /* >= 12 */ -> aiSelection.copy(week9Ai = it.ai)
-                }
-            }
-
-            return when {
-                weekInStudy <= 4 -> aiSelection.copy(
-                        currentAi = aiSelection.week1Ai,
-                        shouldPromptUserForAi = aiSelection.week1Ai == null)
-                weekInStudy <= 8 -> aiSelection.copy(
-                        currentAi = aiSelection.week5Ai,
-                        shouldPromptUserForAi = aiSelection.week5Ai == null)
-                else /* >= 12 */ -> aiSelection.copy(
-                        currentAi = aiSelection.week9Ai,
-                        shouldPromptUserForAi = aiSelection.week9Ai == null)
-            }
-        }
-
-        fun consolidateTaskItems(aiState: AiSelectionState,
-                                 baselineEntities: List<ReportEntity>,
-                                 completedAiToday: List<ReportEntity>): List<TaskListItem> {
-
-            return orderedTaskItemList().filter { item ->
-                if (item.identifier.startsWith(SageTaskIdentifier.Baseline)) {
-                    return@filter baselineEntities.firstOrNull {
-                        dataTypeFromReport(it) == item.identifier
-                    } == null
-                }
-                return@filter completedAiToday.isEmpty() && aiState.currentAi == item.identifier
-            }
-        }
-
-        fun startDateTime(baselineReports: List<ReportEntity>): LocalDateTime? {
-            if (baselineReports.isEmpty()) {
-                // User needs to have done their baseline to set their AI
-                return null
-            }
-
-            val oldestBaselineReport = baselineReports.filter {
-                return@filter dataTypeFromReport(it) == SageTaskIdentifier.Baseline
-            }.sortedBy { it.dateTime }.firstOrNull()
-
-            val baselineClientData = oldestBaselineReport?.data?.data as? Map<*, *> ?: run {
-                return null // Invalid baseline data
-            }
-
-            val localDateTimeStr = baselineClientData[REPORT_LOCAL_DATE_TIME] as? String ?: run {
-                return null // invalid client data
-            }
-
-            return LocalDateTime.parse(localDateTimeStr)?.startOfNextDay()
-        }
-
-        fun dataTypeFromReport(report: ReportEntity): String? {
-            return ((report.data?.data as? Map<*, *>)?.get(RESULT_DATA_TYPE) as? String)
-        }
-
-        fun orderedTaskItemList(): List<TaskListItem> {
-            return listOf(
-                    TaskListItem(SageTaskIdentifier.Baseline,
-                            R.string.about_you_title,
-                            R.string.three_minutes,
-                            R.string.about_you_detail,
-                            "Baseline"),
-                    TaskListItem("Baseline_EnvironmentAll",
-                            R.string.env_title,
-                            R.string.three_minutes,
-                            R.string.env_detail,
-                            "Baseline_Environment"),
-                    TaskListItem("Baseline_HabitsAll",
-                            R.string.habits_title,
-                            R.string.three_minutes,
-                            R.string.habits_detail,
-                            "Baseline_Habits"),
-                    TaskListItem("Baseline_HealthAll",
-                            R.string.health_title,
-                            R.string.six_minutes,
-                            R.string.health_detail,
-                            "Baseline_Health"),
-                    TaskListItem(MindKindApplication.SLEEP_AI,
-                            R.string.sleep_title,
-                            R.string.three_to_seven_minutes,
-                            R.string.sleep_detail,
-                            "Sleep"),
-                    TaskListItem(MindKindApplication.POSITIVE_EXPERIENCES_AI,
-                            R.string.exp_title,
-                            R.string.three_to_seven_minutes,
-                            R.string.exp_detail,
-                            "PositiveExperiences"),
-                    TaskListItem(MindKindApplication.BODY_MOVEMENT_AI,
-                            R.string.movements_title,
-                            R.string.three_to_seven_minutes,
-                            R.string.movements_detail,
-                            "BodyMovement"),
-                    TaskListItem(MindKindApplication.SOCIAL_AI,
-                            R.string.social_title,
-                            R.string.three_to_seven_minutes,
-                            R.string.social_detail,
-                            "Social"))
-        }
-    }
-
-    class Factory @Inject constructor(
-            private val appConfigRepo: AppConfigRepository,
-            private val reportRepo: ReportRepository) :
-            ViewModelProvider.Factory {
-
-        // Suppress unchecked cast, pre-condition would catch it first anyways
-        @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            Preconditions.checkArgument(modelClass.isAssignableFrom(TaskListViewModel::class.java))
-            return TaskListViewModel(appConfigRepo, reportRepo) as T
-        }
-    }
-
-    private var lastAiReportCount = -1
-    private var aiReportsLiveData: LiveData<List<ReportEntity>>? = null
-    private var lastBaselineReportCount = -1
-    private var baselineReportsLiveData: LiveData<List<ReportEntity>>? = null
-    private var lastCompletedAiReportCount = -1
-    private var completedAiTodayLiveData: LiveData<List<ReportEntity>>? = null
-
-    fun clearCache() {
-        lastAiReportCount = -1
-        lastBaselineReportCount = -1
-        lastCompletedAiReportCount = -1
-    }
-
-    fun studyProgressLiveData(): LiveData<ProgressInStudy?> {
-        val now = LocalDateTime.now()
-        return Transformations.map(fullStudyReportsLiveData(SageTaskIdentifier.Baseline)) { baseline ->
-            startDateTime(baseline)?.let {
-                return@map calculateStudyProgress(it, now)
-            }
-            return@map null
-        }
-    }
-
-    private fun fullStudyReportsLiveData(identifier: String): LiveData<List<ReportEntity>> {
-        val endDate = LocalDateTime.now().startOfNextDay()
-        val studyStartDate = endDate.minusDays(
-                (BackgroundDataService.studyDurationInWeeks + 1) * 7.toLong())
-        return reportsLiveData(identifier, studyStartDate, endDate)
-    }
-
-    private fun todayStudyReportsLiveData(identifier: String): LiveData<List<ReportEntity>> {
-        val startDate = LocalDateTime.now().startOfDay()
-        val endDate = LocalDateTime.now().endOfDay()
-        return reportsLiveData(identifier, startDate, endDate)
-    }
-
-    fun taskListLiveData(): LiveData<TaskListState> {
-        val mediator = MediatorLiveData<TaskListState>()
-
-        // Consolidation first-class fun to be invoked below
-        val consolidationFun: (() -> Unit) = {
-            val baselines = baselineReportsLiveData?.value
-            val aiReports = aiReportsLiveData?.value
-            val completedAi = completedAiTodayLiveData?.value
-
-            // Edge case bug fix for when the ReportRepo clears out the db
-            // To Re-write reports that come down from the web
-            // The live data gets a call back that there are now zero ai reports
-            // which temporarily causes issues, so check to see if the ai state is stale
-            val newBaselineCount = baselines?.size ?: -1
-            val newAiReportsCount = aiReports?.size ?: -1
-            val newCompletedAiCount = completedAi?.size ?: -1
-
-            // Check if the mediator live data is ready, and that it is not
-            // a transition state where it has less reports than we saw previously
-            if (baselines != null && aiReports != null && completedAi != null &&
-                    (newBaselineCount > lastBaselineReportCount ||
-                     newAiReportsCount > lastAiReportCount ||
-                     newCompletedAiCount > lastCompletedAiReportCount)) {
-
-                Log.d(TAG, "baselines ${baselines.size} aireports ${aiReports.size} completedAi ${completedAi.size}")
-                lastBaselineReportCount = newBaselineCount
-                lastAiReportCount = newAiReportsCount
-                lastCompletedAiReportCount = newCompletedAiCount
-
-                val aiState = consolidateAiValues(LocalDateTime.now(), baselines, aiReports)
-                val taskItems = consolidateTaskItems(aiState, baselines, completedAi)
-                val state = TaskListState(aiState, taskItems)
-                mediator.postValue(state)
-            }
-        }
-
-        val aiSelectionReports = fullStudyReportsLiveData(SageTaskIdentifier.AI)
-        aiReportsLiveData = aiSelectionReports
-        mediator.addSource(aiSelectionReports) { consolidationFun.invoke() }
-
-        val baselineSelectionReports = fullStudyReportsLiveData(SageTaskIdentifier.Baseline)
-        baselineReportsLiveData = baselineSelectionReports
-        mediator.addSource(baselineSelectionReports) { consolidationFun.invoke() }
-
-        val aiCompletedReports = todayStudyReportsLiveData(SageTaskIdentifier.Surveys)
-        completedAiTodayLiveData = aiCompletedReports
-        mediator.addSource(aiCompletedReports) { consolidationFun.invoke() }
-
-        return mediator
-    }
-
-    fun saveAiAnswer(answer: String) {
-        var aiTaskResult = TaskResultBase(SageTaskIdentifier.AI, UUID.randomUUID())
-
-        val aiResult = AnswerResultBase<String>(
-                CURRENT_AI_RESULT_ID, Instant.now(), Instant.now(),
-                answer, AnswerResultType.STRING)
-        aiTaskResult = aiTaskResult.addStepHistory(aiResult)
-
-        val aiTimeResult = AnswerResultBase<String>(
-                REPORT_LOCAL_DATE_TIME, Instant.now(), Instant.now(),
-                LocalDateTime.now().toString(), AnswerResultType.STRING)
-        aiTaskResult = aiTaskResult.addStepHistory(aiTimeResult)
-
-        reportRepo.saveReports(aiTaskResult)
+        dialog.show()
     }
 }
 
 data class TaskListState(
         val aiState: AiSelectionState,
-        val taskListItems: List<TaskListItem>)
+        val taskListItems: List<TaskListItem>,
+        val returnOfInfo: RoiDialogState? = null)
 
 data class AiSelectionState(
         val week1Ai: String?,
         val week5Ai: String?,
         val week9Ai: String?,
         val currentAi: String?,
-        val shouldPromptUserForAi: Boolean = false)
+        val shouldPromptUserForAi: Boolean = false,
+        val progressInStudy: ProgressInStudy? = null)
 
 data class AiClientData(
         val identifier: String,
         val ai: String?,
         val date: LocalDateTime)
+
+data class RecruitmentAppConfig(
+        val url: String,
+        val notifyAtStartOfWeek: Int,
+        val startDate: LocalDateTime,
+        val endDate: LocalDateTime,
+        val title: String)
+
+data class RoiDialogState(
+        val AI_text1: Int,
+        val AI_text2: Int,
+        val AI_text3: Int,
+        val countMoodDaily: Int = 0,
+        val countAiDaily: Int = 0,
+        val enoughDataToShow: Boolean = false,
+        val shouldShowAlert: Boolean = false)

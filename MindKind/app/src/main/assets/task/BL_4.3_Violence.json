@@ -66,7 +66,7 @@
       "identifier": "Violence_6_OutsideHome_Positive",
       "type": "singleChoice.integer",
       "title": "Outside of your home or living situation, how many times did you see anyone get attacked?",
-      "skipTo": "BL_4_Violence_Outtro_Positive",
+      "ifUserAnswers": "0, skip to BL_4_Violence_Outtro_Positive|1, skip to BL_4_Violence_Outtro_Positive|2, skip to BL_4_Violence_Outtro_Positive|-1, skip to BL_4_Violence_Outtro_Positive|",
       "choices": [
         { "text": "Never"                          ,               "value": 0 },
         { "text": "Once"                           ,               "value": 1 },
@@ -90,7 +90,7 @@
       "identifier": "BL_4_Violence_Outtro_Positive",
       "type": "instruction",
       "optional": false,
-      "title": "Thank you. Remember, if you ever experience distress or feel that you are going to hurt yourself or others, please contact your physician.\n\nYou can also find mental health resources in your region at https://befrienders.org or view the resources on the MindKind website: https://staging.wtgmhdc.synapse.org/contact",
+      "title": "Thank you. Remember, if you ever experience distress or feel that you are going to hurt yourself or others, please contact your physician.\n\nYou can also find mental health resources in your region at https://befrienders.org or view the resources on the MindKind website: https://mindkindstudy.org/contact",
       "buttonTitle": "Ok"
     },
     {

@@ -73,7 +73,6 @@ import org.sagebionetworks.research.domain.result.implementations.TaskResultBase
 import org.sagebionetworks.research.mindkind.R.drawable
 import org.sagebionetworks.research.mindkind.R.string
 import org.sagebionetworks.research.mindkind.TaskListActivity
-import org.sagebionetworks.research.mindkind.TaskListViewModel
 import org.sagebionetworks.research.mindkind.conversation.ConversationSurveyActivity
 import org.sagebionetworks.research.mindkind.research.SageTaskIdentifier
 import org.sagebionetworks.research.mindkind.room.BackgroundDataEntity
@@ -81,6 +80,7 @@ import org.sagebionetworks.research.mindkind.room.BackgroundDataTypeConverters
 import org.sagebionetworks.research.mindkind.room.MindKindDatabase
 import org.sagebionetworks.research.mindkind.util.NoLimitRateLimiter
 import org.sagebionetworks.research.mindkind.util.RateLimiter
+import org.sagebionetworks.research.mindkind.viewmodel.TaskListViewModel
 import org.sagebionetworks.research.sageresearch_app_sdk.TaskResultUploader
 import org.threeten.bp.Instant
 import org.threeten.bp.LocalDateTime
@@ -154,11 +154,15 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
 
         public const val hasShownWithdrawalNotifKey = "hasShownWithdrawalNotif"
         public const val hasShownEndOfStudyNotifKey = "hasShownEndOfStudyNotif"
+        public const val hasShownRecruitmentNotifKey = "hasShownRecruitmentStudyNotif"
+        public const val lastBackgroundUploadDateKey = "lastBackgroundUploadDateKey"
 
         fun createSharedPrefs(context: Context): SharedPreferences {
             return context.getSharedPreferences("Mindkind", MODE_PRIVATE)
         }
 
+        // No quicker than every 12 hours we should upload
+        public const val uploadFrequencyInHours = 12.toLong()
         public const val studyDurationInWeeks = 12
 
         // List of data types to track
@@ -385,6 +389,21 @@ class BackgroundDataService : DaggerService(), SensorEventListener {
      * Packages all existing un-uploaded data and attempts to upload it to bridge
      */
     private fun uploadDataToBridge() {
+
+        val now = LocalDateTime.now()
+
+        // First, check last upload time, as we don't want to upload too frequently
+        sharedPrefs.getString(lastBackgroundUploadDateKey, null)?.let {
+            val lastUpload = LocalDateTime.parse(it)
+            if (lastUpload.plusHours(uploadFrequencyInHours).isAfter(now)) {
+                Log.i(TAG, "Ignoring too frequent upload request")
+                return // The user uploaded less than X hours ago
+            }
+        }
+
+        // Save that we attempted an upload
+        sharedPrefs.edit().putString(lastBackgroundUploadDateKey, now.toString()).apply()
+
         // Always try to upload all past failed uploads if any exist
         subscribeCompletableAsync(
                 RxJavaInterop.toV2Completable(uploadManager.processUploadFiles()),

@@ -115,7 +115,7 @@
       "identifier": "PHQ_Self_Harm_Positive",
       "type": "instruction",
       "optional": false,
-      "title": "Thank you. Remember, if you ever experience distress or feel that you are going to hurt yourself or others, please contact your physician.\n\nYou can also view the mental health resources on the MindKind website: https://staging.wtgmhdc.synapse.org/contact",
+      "title": "Thank you. Remember, if you ever experience distress or feel that you are going to hurt yourself or others, please contact your physician.\n\nYou can also view the mental health resources on the MindKind website: https://mindkindstudy.org/contact",
       "buttonTitle": "Ok"
     },
     {

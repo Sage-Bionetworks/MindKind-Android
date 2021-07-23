@@ -123,6 +123,14 @@
     <string name="conversation_confirmation_continue"><u>Continue</u></string>
     <string name="conversation_confirmation_quit">Exit Survey</string>
 
+    <string name="home_baseline_intro_title">Welcome to MindKind!</string>
+    <string name="home_baseline_intro_message">Before we can get going on your daily experience, we need to know a bit about you. Once you complete these questions, we can get started on your daily MindKind journey. Click on a section to begin.</string>
+    <string name="home_baseline_intro_continue">Continue</string>
+    <string name="home_return_title">Weekly Summary</string>
+    <string name="home_return_message_5strings">Here is what your %1$s and mood looked like last week. You said your mood was average or better %4$s days in the last week. You also said you %2$s %5$s days. Have you noticed a pattern between %3$s and your mood?</string>
+    <string name="home_return_message_not_enough">We would like to share a summary of your mood and activity with you, but we didn\'t hear from you enough last week. Try participating in more daily surveys so we can show you some results.</string>
+    <string name="home_okay">Okay</string>
+
     <!-- SMS code screen -->
     <string name="enter_code">Enter Code</string>
     <string name="sms_message">SMS Message</string>
@@ -157,13 +165,13 @@
     <string name="welcome_1_title">Welcome to the MindKind Study!</string>
     <string name="welcome_1_message">Your experience will help researchers better understand the emotional health of young people.</string>
     <string name="welcome_2_title">Interacting with the MindKind Study</string>
-    <string name="welcome_2_message">Although MindKind Study surveys may look like a text chat - MindKind is a computer, not a person.\n\nIf you experience distress or thoughts of harming yourself, contact your physician or \<a href='https://staging.wtgmhdc.synapse.org/contact'>find local mental health resources\</a> for ways to find help.</string>
+    <string name="welcome_2_message">Although MindKind Study surveys may look like a text chat - MindKind is a computer, not a person.\n\nIf you experience distress or thoughts of harming yourself, contact your physician or \<a href='https://mindkindstudy.org/contact'>find local mental health resources\</a> for ways to find help.</string>
     <string name="welcome_3_title">Your responses\nare important</string>
     <string name="welcome_3_message">Keeping up with your daily surveys and weekly check-ins gives the MindKind Study a better picture of your emotional health. You can skip any question you don\'t want to answer.</string>
     <string name="welcome_4_title">We protect your personal data</string>
     <string name="welcome_4_message">Your privacy is important to us. Encryption removes your name and encodes your data. This makes it difficult for people who view your data to be able to identify you.</string>
     <string name="welcome_5_title">We only record phone data with your consent</string>
-    <string name="welcome_5_message">We record data from you phone usage. You can turn this off or on at any time and still be part of the study.</string>
+    <string name="welcome_5_message">We record data from your phone usage. You can turn this off or on at any time and still be part of the study.</string>
     <string name="welcome_6_title">The choice is always up to you</string>
     <string name="welcome_6_message">We are glad you’re here! You can withdraw from the MindKind Study at any time. You can ask us for a copy of your data or to delete your data.</string>
     <string name="welcome_accept">Continue</string>
@@ -182,8 +190,15 @@
     <string name="arm2_other_weeks_ai_title">Great job completing the first section!</string>
     <string name="arm2_other_weeks_ai_text">For the next section, your new topic is %s.</string>
 
+    <string name="positive_experiences">Positive Experiences</string>
+    <string name="social">Social</string>
+    <string name="sleep">Sleep</string>
+    <string name="movement">Movement</string>
+    <string name="health">Health</string>
+
     <string name="three_minutes">3 minutes</string>
     <string name="six_minutes">6 minutes</string>
+    <string name="one_to_five_minutes">1-5 minutes</string>
     <string name="three_to_seven_minutes">3–7 minutes</string>
 
     <string name="about_you_title">About you</string>
@@ -255,12 +270,29 @@
     <string name="settings_continue">Continue</string>
 
     <!-- Settings Links -->
-    <string name="settings_url_mental_health">https://staging.wtgmhdc.synapse.org/contact</string>
-    <string name="settings_url_about_study">https://staging.wtgmhdc.synapse.org/about</string>
-    <string name="settings_url_about_team">https://staging.wtgmhdc.synapse.org/research</string>
-    <string name="settings_url_informed_consent">https://staging.wtgmhdc.synapse.org/consent-info</string>
-    <string name="settings_url_privacy_policy">https://staging.wtgmhdc.synapse.org/privacy-policy</string>
-    <string name="settings_url_terms_of_service">https://staging.wtgmhdc.synapse.org/terms</string>
+    <string name="settings_url_mental_health">https://mindkindstudy.org/contact</string>
+    <string name="settings_url_about_study">https://mindkindstudy.org/about</string>
+    <string name="settings_url_about_team">https://mindkindstudy.org/research</string>
+    <string name="settings_url_informed_consent">https://mindkindstudy.org/consent-info</string>
+    <string name="settings_url_privacy_policy">https://mindkindstudy.org/privacy-policy</string>
+    <string name="settings_url_terms_of_service">https://mindkindstudy.org/terms</string>
     <string name="settings_email_contact_us">MindKindSupport@sagebionetworks.org</string>
     <string name="settings_email_contact_us_subject">Contacting Support</string>
+
+    <!-- Return of information -->
+    <string name="roi_sleep_ai_text1">sleep</string>
+    <string name="roi_sleep_ai_text2">felt rested</string>
+    <string name="roi_sleep_ai_text3">good rest</string>
+    <string name="roi_social_ai_text1">social activity</string>
+    <string name="roi_social_ai_text2">did something social</string>
+    <string name="roi_social_ai_text3">your social activities</string>
+    <string name="roi_movements_ai_text1">exercise activity</string>
+    <string name="roi_movements_ai_text2">exercised</string>
+    <string name="roi_movements_ai_text3">exercise</string>
+    <string name="roi_experiences_ai_text1">positive experiences</string>
+    <string name="roi_experiences_ai_text2">did something to make yourself feel good</string>
+    <string name="roi_experiences_ai_text3">your positive experiences</string>
+
+
+
 </resources>

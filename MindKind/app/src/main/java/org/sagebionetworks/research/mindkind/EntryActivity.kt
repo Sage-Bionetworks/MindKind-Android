@@ -33,22 +33,33 @@
 package org.sagebionetworks.research.mindkind
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import dagger.android.AndroidInjection
 import org.sagebionetworks.bridge.android.manager.AuthenticationManager
 import org.sagebionetworks.research.mindkind.authentication.ExternalIdSignInActivity
+import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService
 import javax.inject.Inject
 
 class EntryActivity : AppCompatActivity() {
 
+    companion object {
+        private val TAG = TaskListActivity::class.simpleName
+        public const val prefsOnboardingKey = "OnboardingCompleteKey"
+    }
+
     @Inject
     lateinit var authManager: AuthenticationManager
+
+    private lateinit var sharedPrefs: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.entry_activity)
+
+        sharedPrefs = BackgroundDataService.createSharedPrefs(this)
     }
 
     override fun onResume() {
@@ -56,8 +67,11 @@ class EntryActivity : AppCompatActivity() {
 
         if (authManager.userSessionInfo?.isAuthenticated != true) {
             startActivity(Intent(this, RegistrationActivity::class.java))
-        } else {
+        } else if (sharedPrefs.getBoolean(prefsOnboardingKey, false) ||
+                sharedPrefs.getBoolean(TaskListActivity.prefsIntroAlertKey, false)) {
             startActivity(Intent(this, TaskListActivity::class.java))
+        } else {
+            startActivity(Intent(this, WelcomeActivity::class.java))
         }
         finish()
     }
