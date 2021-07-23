@@ -142,7 +142,7 @@
     {
       "identifier": "NCES_B_Intro",
       "type": "instruction",
-      "title": "For each of the following, please tell if it is very likely, likely, unlikely or very unlikely that people in your neighborhood would act in the following manner:",
+      "title": "For each of the following, please tell if it is very likely, likely, neither likely or unlikely, unlikely, or very unlikely that people in your neighborhood would act in the following manner:",
       "continueAfterDelay": true
     },
     {
@@ -154,19 +154,19 @@
         "value": 1
        },
        {
-          "text": "Agree",
+          "text": "Likely",
           "value": 2
         },
         {
-          "text": "Neither agree nor disagree",
+          "text": "Neither Likely nor Unlikely",
           "value": 3
         },
         {
-          "text": "Disagree",
+          "text": "Unlikely",
           "value": 4
         },
         {
-          "text": "Strongly Disagree",
+          "text": "Very Unlikely",
           "value": 5
         }
       ]
@@ -184,7 +184,7 @@
           "value": 2
         },
         {
-          "text": "Neither Likely nor Unlikely;",
+          "text": "Neither Likely nor Unlikely",
           "value": 3
         },
         {
@@ -210,7 +210,7 @@
           "value": 2
         },
         {
-          "text": "Neither Likely nor Unlikely;",
+          "text": "Neither Likely nor Unlikely",
           "value": 3
         },
         {
@@ -236,7 +236,7 @@
           "value": 2
         },
         {
-          "text": "Neither Likely nor Unlikely;",
+          "text": "Neither Likely nor Unlikely",
           "value": 3
         },
         {
@@ -262,7 +262,7 @@
           "value": 2
         },
         {
-          "text": "Neither Likely nor Unlikely;",
+          "text": "Neither Likely nor Unlikely",
           "value": 3
         },
         {
