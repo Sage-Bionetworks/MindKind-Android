@@ -23,11 +23,8 @@
     "title": "Do you exercise?",
       "ifUserAnswers": "0, skip to BL_5_PhysicalActivity_outtro",
       "choices": [
-        { "text": "No Days", "value": "0" },
-        { "text": "1 Day", "value": "1" },
-        { "text": "2-3 Days", "value": "2.5" },
-        { "text": "4-5 Days", "value": "4.5" },
-        { "text": "6-7 Days", "value": "6.5" }
+        { "text": "No", "value": "0" },
+        { "text": "Yes", "value": "1" }
 
      ]
     },
