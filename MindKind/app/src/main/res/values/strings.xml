@@ -197,6 +197,9 @@
     <string name="movement">Movement</string>
     <string name="health">Health</string>
 
+    <string name="two_minutes">2 minutes</string>
+    <string name="four_to_six_minutes">4-6 minutes</string>
+    <string name="six_to_eight_minutes">6-8 minutes</string>
     <string name="three_minutes">3 minutes</string>
     <string name="six_minutes">6 minutes</string>
     <string name="one_to_five_minutes">1-5 minutes</string>
