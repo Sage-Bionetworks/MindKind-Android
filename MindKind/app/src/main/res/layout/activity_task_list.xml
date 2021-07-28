@@ -157,7 +157,9 @@
         android:textSize="22sp"
         android:padding="@dimen/margin_medium"
         android:textColor="@color/white"
-        android:visibility="gone"/>
+        android:visibility="gone"
+        android:layout_centerHorizontal="true"
+        android:gravity="center_horizontal"/>
 
     <ProgressBar
         android:id="@+id/loading_progress"
