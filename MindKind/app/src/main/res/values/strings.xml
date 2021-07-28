@@ -189,6 +189,7 @@
     <string name="arm2_week_1_ai_text">For the first section, we’ll ask you about your %s. Be sure to come back daily to tell us how things are going.</string>
     <string name="arm2_other_weeks_ai_title">Great job completing the first section!</string>
     <string name="arm2_other_weeks_ai_text">For the next section, your new topic is %s.</string>
+    <string name="task_list_no_items_msg">Great job finishing all your surveys! Come back tomorrow for more!</string>
 
     <string name="positive_experiences">Positive Experiences</string>
     <string name="social">Social</string>

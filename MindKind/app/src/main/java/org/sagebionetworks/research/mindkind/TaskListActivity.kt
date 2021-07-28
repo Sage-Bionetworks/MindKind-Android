@@ -204,6 +204,12 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
             adapter.dataSet.clear()
             adapter.dataSet.addAll(it.taskListItems)
             adapter.notifyDataSetChanged()
+
+            task_list_no_items_todo.visibility = if (it.taskListItems.isEmpty()) {
+                View.VISIBLE
+            } else {
+                View.GONE
+            }
         })
 
         studyProgressLiveData = viewModel.studyProgressLiveData()
