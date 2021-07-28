@@ -177,6 +177,9 @@ class ConversationGsonHelper {
                     .registerSubtype(
                             GifStep::class.java,
                             ConversationStepType.gif.type)
+                    .registerSubtype(
+                            RandomGifStep::class.java,
+                            ConversationStepType.randomGif.type)
                     .registerSubtype(NestedStep::class.java,
                             ConversationStepType.nested.type)
                     .registerSubtype(NestedGroupStep::class.java,
@@ -308,6 +311,17 @@ data class StringConversationInputFieldChoice(
         val text: String,
         val value: String)
 
+data class RandomGifStep(
+        override val identifier: String,
+        override val type: String,
+        override val title: String,
+        override val buttonTitle: String,
+        override val optional: Boolean? = true,
+        override val ifUserAnswers: String? = null,
+        val gifUrls: List<String>,
+        val useWeekNumberAsIndex: Boolean? = false,
+        val continueAfterDelay: Boolean? = false): ConversationStep()
+
 data class GifStep(
         override val identifier: String,
         override val type: String,
@@ -315,7 +329,8 @@ data class GifStep(
         override val buttonTitle: String,
         override val optional: Boolean? = true,
         override val ifUserAnswers: String? = null,
-        val gifUrl: String): ConversationStep()
+        val gifUrl: String,
+        val continueAfterDelay: Boolean? = false): ConversationStep()
 
 data class NestedStep(
         override val identifier: String,
@@ -369,6 +384,7 @@ public enum class ConversationStepType(val type: String) {
     text("text"),
     integer("integer"),
     gif("gif"),
+    randomGif("gif.random"),
     nested("nested"),
     nestedGroup("nestedGroup"),
     randomTitle("instruction.random"),

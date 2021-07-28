@@ -17,6 +17,7 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import org.sagebionetworks.research.mindkind.R
+import org.sagebionetworks.research.mindkind.backgrounddata.ProgressInStudy
 import java.util.*
 
 
@@ -178,6 +179,20 @@ class ConversationAdapter(
             currentIdentifier = dataSet.last().stepIdentifier
         }
 
+    }
+
+    open fun preloadRandomGifSteps(randomGifSteps: List<RandomGifStep>, weekInStudy: Int) {
+        randomGifSteps.forEach {
+            if (it.useWeekNumberAsIndex == true) {
+                val weekInStudyIdx = kotlin.math.max(weekInStudy - 1, 0)
+                val gifUrl = if (weekInStudyIdx < it.gifUrls.size) {
+                    it.gifUrls[weekInStudyIdx]
+                } else {
+                    it.gifUrls.firstOrNull()
+                }
+                glide.load(gifUrl).preload()
+            }
+        }
     }
 
     open fun preloadGifs(gifSteps: List<GifStep>) {
