@@ -15,6 +15,8 @@ import org.sagebionetworks.research.mindkind.R
 import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService
 import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService.Companion.studyDurationInWeeks
 import org.sagebionetworks.research.mindkind.backgrounddata.ProgressInStudy
+import org.sagebionetworks.research.mindkind.conversation.ConversationGsonHelper
+import org.sagebionetworks.research.mindkind.conversation.ConversationSurvey
 import org.sagebionetworks.research.mindkind.conversation.ConversationSurveyActivity
 import org.sagebionetworks.research.mindkind.research.SageTaskIdentifier
 import org.sagebionetworks.research.mindkind.researchstack.framework.SageResearchStack
@@ -168,10 +170,12 @@ open class TaskListViewModel(
             }
         }
 
-        fun consolidateTaskItems(aiState: AiSelectionState,
+        fun consolidateTaskItems(sharedPrefs: SharedPreferences,
+                                 aiState: AiSelectionState,
                                  baselineEntities: List<ReportEntity>,
                                  completedAiToday: List<ReportEntity>): List<TaskListItem> {
-            return orderedTaskItemList().filter { item ->
+
+            return orderedTaskItemList(sharedPrefs, aiState.progressInStudy).filter { item ->
                 if (item.identifier.startsWith(SageTaskIdentifier.Baseline)) {
                     return@filter baselineEntities.firstOrNull {
                         dataTypeFromReport(it) == item.identifier
@@ -264,7 +268,19 @@ open class TaskListViewModel(
             return ((report.data?.data as? Map<*, *>)?.get(MindKindApplication.RESULT_DATA_TYPE) as? String)
         }
 
-        fun orderedTaskItemList(): List<TaskListItem> {
+        fun orderedTaskItemList(sharedPrefs: SharedPreferences,
+                                progress: ProgressInStudy?): List<TaskListItem> {
+
+            var aiSubText = R.string.two_minutes  // Dailies
+            progress?.let {
+                val journalDayIdx = ConversationGsonHelper.isRandomWeeklyDay(sharedPrefs, progress)
+                if (it.dayOfWeek == 7) {
+                    aiSubText = R.string.six_to_eight_minutes // weeklies
+                } else if (it.dayOfWeek == journalDayIdx) {
+                    aiSubText = R.string.four_to_six_minutes // journal day
+                }
+            }
+
             return listOf(
                     TaskListItem(SageTaskIdentifier.Baseline,
                             R.string.about_you_title,
@@ -288,22 +304,22 @@ open class TaskListViewModel(
                             "Baseline_Health"),
                     TaskListItem(MindKindApplication.SLEEP_AI,
                             R.string.sleep_title,
-                            R.string.three_to_seven_minutes,
+                            aiSubText,
                             R.string.sleep_detail,
                             "Sleep"),
                     TaskListItem(MindKindApplication.POSITIVE_EXPERIENCES_AI,
                             R.string.exp_title,
-                            R.string.three_to_seven_minutes,
+                            aiSubText,
                             R.string.exp_detail,
                             "PositiveExperiences"),
                     TaskListItem(MindKindApplication.BODY_MOVEMENT_AI,
                             R.string.movements_title,
-                            R.string.one_to_five_minutes,
+                            aiSubText,
                             R.string.movements_detail,
                             "BodyMovement"),
                     TaskListItem(MindKindApplication.SOCIAL_AI,
                             R.string.social_title,
-                            R.string.three_to_seven_minutes,
+                            aiSubText,
                             R.string.social_detail,
                             "Social"))
         }
@@ -464,7 +480,7 @@ open class TaskListViewModel(
                 lastCompletedAiLastWeekReportCount = newCompletedAiLastWeekCount
 
                 val aiState = consolidateAiValues(LocalDateTime.now(), baselines, aiReports)
-                val taskItems = consolidateTaskItems(aiState, baselines, completedAi)
+                val taskItems = consolidateTaskItems(sharedPrefs, aiState, baselines, completedAi)
                 val returnOfInfo = consolidateReturnOfInformation(LocalDateTime.now(),
                         roiAlertStatus, aiState, completedAiLastWeek)
                 val state = TaskListState(aiState, taskItems, returnOfInfo)
