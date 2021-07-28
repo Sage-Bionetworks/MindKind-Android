@@ -52,7 +52,7 @@
 
     <color name="sageResearchPrimaryLight">@color/denim88</color>
     <color name="sageResearchPrimary">@color/denim</color>
-    <color name="sageResearchPrimaryDark">@color/royal800</color>
+    <color name="sageResearchPrimaryDark">@color/denim</color>
     <color name="sageResearchSecondary">@color/butterscotch500</color>
     <color name="sageResearchSecondaryLight">@color/butterscotch300</color>
     <color name="secondaryTint">@color/sageResearchSecondary</color>
