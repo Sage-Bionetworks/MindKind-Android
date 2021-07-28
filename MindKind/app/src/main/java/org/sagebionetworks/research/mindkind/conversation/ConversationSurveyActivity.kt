@@ -289,7 +289,9 @@ open class ConversationSurveyActivity: AppCompatActivity() {
                 (true == (currentStep as? ConversationInstructionStep)?.continueAfterDelay) ||
                 (true == (currentStep as? RandomTitleStep)?.continueAfterDelay)
 
-        val cannotEdit = currentStep is ConversationInstructionStep || currentStep is GifStep
+        val cannotEdit = currentStep is ConversationInstructionStep ||
+                currentStep is GifStep || currentStep is RandomGifStep
+
         when (currentStep.type) {
             ConversationStepType.randomTitle.type -> {
                 val randomTitleStep = (currentStep as? RandomTitleStep)
@@ -304,6 +306,7 @@ open class ConversationSurveyActivity: AppCompatActivity() {
                     randomTitleStep?.titleList?.shuffled()?.firstOrNull()
                 }
             }
+            ConversationStepType.randomGif.type -> null
             ConversationStepType.gif.type -> null
             else -> currentStep.title
         }?.let {
@@ -343,9 +346,10 @@ open class ConversationSurveyActivity: AppCompatActivity() {
                 handleTimeOfDayInput(step as? ConversationTimeOfDayStep, answer, scroll)
             ConversationStepType.multiChoiceCheckboxString.type ->
                 handleMultiChoiceCheckboxStringInput(step as? ConversationMultiChoiceCheckboxStringStep, answer, scroll)
-            ConversationStepType.gif.type -> {
-                handleGifInput(step as? GifStep)
-            }
+            ConversationStepType.gif.type ->
+                hasQuestions = !handleGifInput(step as? GifStep, null, scroll)
+            ConversationStepType.randomGif.type ->
+                hasQuestions = !handleGifInput(null, step as? RandomGifStep, scroll)
             else -> {
                 hasQuestions = false
             }
@@ -784,12 +788,62 @@ open class ConversationSurveyActivity: AppCompatActivity() {
         }
     }
 
-    private fun handleGifInput(gifStep: GifStep?) {
-        val step = gifStep ?: run { return }
+    private fun handleGifInput(gifStep: GifStep?, randomGifStep: RandomGifStep?, scroll: Boolean): Boolean {
+        if (gifStep == null && randomGifStep == null) {
+            return false
+        }
+
         button_container.removeAllViews()
         val adapter = recycler_view_conversation.adapter as ConversationAdapter
-        val gifTitle: String? = gifStep.title
-        adapter.addGif(gifStep.identifier, gifTitle ?: "", step.gifUrl)
+
+        val gifTitle = gifStep?.title ?: randomGifStep?.title
+        val buttonTitle = gifStep?.buttonTitle ?: randomGifStep?.buttonTitle ?: ""
+
+        gifStep?.let {
+            adapter.addGif(it.identifier, gifTitle ?: "", it.gifUrl)
+        }
+        randomGifStep?.let {
+            val gifUrl = if (it.useWeekNumberAsIndex == true) {
+                val weekInStudyIdx = kotlin.math.max(weekInStudy - 1, 0)
+                if (weekInStudyIdx < it.gifUrls.size) {
+                    it.gifUrls[weekInStudyIdx]
+                } else {
+                    it.gifUrls.firstOrNull()
+                }
+            } else {
+                it.gifUrls.shuffled().firstOrNull()
+            }
+            adapter.addGif(it.identifier, gifTitle ?: "", gifUrl ?: "")
+        }
+
+        val continueAfterDelay = (gifStep?.continueAfterDelay ?: false) ||
+                (randomGifStep?.continueAfterDelay ?: false)
+
+        // If continuing after delay, we don't add the bottom button layout
+        if (continueAfterDelay) {
+            return continueAfterDelay
+        }
+
+        (this.layoutInflater.inflate(R.layout.conversation_material_button,
+                button_container, false) as? MaterialButton)?.let {
+
+            it.text = buttonTitle
+
+            it.setOnClickListener { _ ->
+                disableAllButtonsAndHideKeyboard()
+                handler?.postDelayed({
+                    addQuestion(scroll)
+                }, DELAY)
+            }
+
+            val llp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT)
+            llp.bottomMargin = resources.getDimensionPixelSize(R.dimen.conversation_button_margin)
+            button_container.addView(it, llp)
+        }
+
+        // You can't skip gif steps, so never add skip button to view
+        return continueAfterDelay
     }
 
     private fun handleRandomAi(randomAiStep: AssignRandomAiStep?) {

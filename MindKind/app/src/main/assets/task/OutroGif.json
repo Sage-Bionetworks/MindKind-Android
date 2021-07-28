@@ -1,0 +1,31 @@
+{
+  "identifier": "Gif_Outro",
+  "type": "conversationSurvey",
+  "taskIdentifier": "Gif_Outro",
+  "schemaIdentifier": "Gif_Outro",
+  "steps": [
+    {
+      "identifier": "Gif_Outro_Random",
+      "type": "gif.random",
+      "title": "Thank you!",
+      "continueAfterDelay": true,
+      "optional": false,
+      "gifUrls": [
+          "https://media.giphy.com/media/HmWdvnwNNc6wo/giphy.gif",
+          "https://media.giphy.com/media/NEvPzZ8bd1V4Y/giphy.gif",
+          "https://media.giphy.com/media/DKqH1q9gN5AKA/giphy.gif",
+          "https://media.giphy.com/media/3oEdva9BUHPIs2SkGk/giphy.gif",
+          "https://media.giphy.com/media/W2RM0g9IC8QeK6B4Rw/giphy.gif",
+          "https://media.giphy.com/media/ely3apij36BJhoZ234/giphy.gif",
+          "https://media.giphy.com/media/3o7abGQa0aRJUurpII/giphy.gif",
+          "https://media.giphy.com/media/yyZRSvISN1vvW/giphy.gif",
+          "https://media.giphy.com/media/9x8TO6qKVBBQMzsMUk/giphy.gif",
+          "https://media.giphy.com/media/13vWYXWR1yQeFW/giphy.gif",
+          "https://media.giphy.com/media/xUOxfh6ZM75efM3Bqo/giphy.gif",
+          "https://media.giphy.com/media/VelWewgR6CpNK/giphy.gif"
+      ]
+    }
+  ]
+}
+
+

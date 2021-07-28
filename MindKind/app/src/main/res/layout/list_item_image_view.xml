@@ -1,13 +1,20 @@
-<RelativeLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/container"
     android:layout_width="220dp"
     android:layout_height="220dp"
-    android:background="@drawable/question_background">
+    android:padding="@dimen/margin_medium">
 
-    <ImageView
-        android:id="@+id/conversation_image_view"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:background="@drawable/question_background">
 
-</RelativeLayout>
+        <ImageView
+            android:id="@+id/conversation_image_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </FrameLayout>
+
+</FrameLayout>
