@@ -10,6 +10,7 @@
       "title": "Thank you!",
       "continueAfterDelay": true,
       "optional": false,
+      "useWeekNumberAsIndex": true,
       "gifUrls": [
           "https://media.giphy.com/media/HmWdvnwNNc6wo/giphy.gif",
           "https://media.giphy.com/media/NEvPzZ8bd1V4Y/giphy.gif",

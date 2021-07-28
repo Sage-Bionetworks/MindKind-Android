@@ -183,12 +183,16 @@ open class ConversationSurveyActivity: AppCompatActivity() {
             recycler_view_conversation.adapter = adapter
             addQuestion(true)
 
-            // Pre-load GIFs for quicker access when they come upMD
+            // Pre-load GIFs for quicker access when they come up
             val gifSteps = conversation.steps.filter {
                 it.type == ConversationStepType.gif.type && (it as? GifStep) != null
             }.map { it as GifStep }
             adapter.preloadGifs(gifSteps)
 
+            val randomGifSteps = conversation.steps.filter {
+                it.type == ConversationStepType.randomGif.type && (it as? RandomGifStep) != null
+            }.map { it as RandomGifStep }
+            adapter.preloadRandomGifSteps(randomGifSteps, weekInStudy)
         }
     }
 
