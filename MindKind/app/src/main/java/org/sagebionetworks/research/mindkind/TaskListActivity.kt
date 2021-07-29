@@ -59,6 +59,7 @@ import org.sagebionetworks.research.mindkind.MindKindApplication.*
 import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService
 import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService.Companion.SHOW_ENGAGEMENT_NOTIFICATION_ACTION
 import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService.Companion.hasShownRecruitmentNotifKey
+import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService.Companion.studyDurationInWeeks
 import org.sagebionetworks.research.mindkind.backgrounddata.ProgressInStudy
 import org.sagebionetworks.research.mindkind.conversation.*
 import org.sagebionetworks.research.mindkind.researchstack.framework.SageResearchStack
@@ -189,6 +190,16 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
 
             viewModel.saveAiState(sharedPrefs, it.aiState)
 
+            // Check for end of study state
+            if ((it.aiState.progressInStudy?.week ?: 0) > studyDurationInWeeks) {
+                adapter.dataSet.clear()
+                adapter.notifyDataSetChanged()
+                task_list_no_items_todo.visibility = View.VISIBLE
+                task_list_no_items_todo.text = getString(R.string.task_list_finished_study_msg)
+                uploadBackgroundData() // try to upload background data just in case
+                return@Observer
+            }
+
             // Process if we should show alerts to the user
             val shouldShowRoiAlert = (it.returnOfInfo?.shouldShowAlert == true)
             val shouldShowAiAlert = it.aiState.shouldPromptUserForAi
@@ -205,10 +216,11 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
             adapter.dataSet.addAll(it.taskListItems)
             adapter.notifyDataSetChanged()
 
-            task_list_no_items_todo.visibility = if (it.taskListItems.isEmpty()) {
-                View.VISIBLE
+            if (it.taskListItems.isEmpty()) {
+                task_list_no_items_todo.text = getString(R.string.task_list_no_items_msg)
+                task_list_no_items_todo.visibility = View.VISIBLE
             } else {
-                View.GONE
+                task_list_no_items_todo.visibility = View.GONE
             }
         })
 
@@ -221,12 +233,19 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
                 showBaselineIntroAlertIfNecessary()
                 return@Observer
             }
+
             task_progress_container.visibility = View.VISIBLE
-            task_progress_bar.max = BackgroundDataService.studyDurationInWeeks * 7
+            task_progress_bar.max = studyDurationInWeeks * 7
             task_progress_bar.progress = progressInStudy.daysFromStart
-            val weekStr = getString(R.string.week_x, progressInStudy.week.toString())
-            val dayStr = getString(R.string.day_x, progressInStudy.dayOfWeek.toString())
-            week_textview.text = "$weekStr | $dayStr"
+
+            // Check for end of study state
+            if (progressInStudy.week > studyDurationInWeeks) {
+                week_textview.text = getString(R.string.week_x, studyDurationInWeeks.toString())
+            } else {
+                val weekStr = getString(R.string.week_x, progressInStudy.week.toString())
+                val dayStr = getString(R.string.day_x, progressInStudy.dayOfWeek.toString())
+                week_textview.text = "$weekStr | $dayStr"
+            }
 
             // Cache the study start date if we haven't yet
             if (!sharedPrefs.contains(studyStartDateKey)) {
