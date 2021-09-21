@@ -1,0 +1,22 @@
+{
+  "identifier": "FW7_Outtro",
+  "type": "conversationSurvey",
+  "taskIdentifier": "FW7_Outtro",
+  "schemaIdentifier": "FW7_Outtro",
+  "steps": [
+    {
+      "identifier": "WK12_D7_outtro",
+      "type": "instruction",
+      "title": "Well, thank you so much and congratulations! You have completed this study and we are so grateful to you for helping us. If you want to learn more about the study and our findings, please reach out to us at MindKindSupport@sagebionetworks.org. THANK YOU AND BE WELL!",
+      "buttonTitle": "Done",
+      "optional": false
+    },
+    {
+      "identifier": "reward",
+      "type": "gif",
+      "title": "Goodbye!",
+      "gifUrl": 		"https://media.giphy.com/media/VelWewgR6CpNK/giphy.gif",
+      "buttonTitle": "Done"
+    }
+  ]
+}

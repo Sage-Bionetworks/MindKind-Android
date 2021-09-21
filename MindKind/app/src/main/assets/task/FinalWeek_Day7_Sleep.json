@@ -1,0 +1,23 @@
+{
+  "identifier": "FinalWeek_Day7_Sleep",
+  "type": "conversationSurvey",
+  "taskIdentifier": "FinalWeek_Day7_Sleep",
+  "schemaIdentifier": "FinalWeek_Day7_Sleep",
+  "isSchedule": true,
+  "steps": [
+    {
+      "identifier": "Daily",
+      "schemaIdentifier": "Daily",
+      "type": "nestedGroup",
+      "frequency": "daily",
+      "startDay": 1,
+      "filenames": [
+        "FW7_Intro",
+        "1S_ISI",
+        "BL_PHQ9_FULL",
+        "BL_GAD7_Full",
+        "FW7_Outtro"
+      ]
+    }
+  ]
+}

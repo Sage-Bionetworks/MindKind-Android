@@ -49,10 +49,33 @@ class ConversationGsonHelper {
         fun createSurvey(context: Context, sharedPrefs: SharedPreferences,
                          jsonFilename: String, progress: ProgressInStudy?): ConversationSurvey? {
             val gson = createGson()
-            val json = stringFromJsonAsset(context, jsonFilename)
             val dataGroups = SageResearchStack.SageDataProvider.getInstance().userDataGroups
-
+            var json = stringFromJsonAsset(context, jsonFilename)
             val conversation: ConversationSurvey?
+
+            if (progress?.week == 12) {
+                // We are in week 12, so we override the normal survey to provide special end
+                // of the study surveys
+                var week12FileName = ""
+                when (progress?.dayOfWeek) {
+                    1 -> week12FileName = "FinalWeek_Day1"
+                    2 -> week12FileName = "FinalWeek_Day2"
+                    3 -> week12FileName = "FinalWeek_Day3"
+                    4 -> week12FileName = "FinalWeek_Day4"
+                    5 -> week12FileName = "FinalWeek_Day5"
+                    6 -> week12FileName = "FinalWeek_Day6"
+                    7 -> {
+                        when (jsonFilename) {
+                            "Sleep" -> week12FileName = "FinalWeek_Day7_Sleep"
+                            "Social" -> week12FileName = "FinalWeek_Day7_Social"
+                            "PositiveExperiences" -> week12FileName = "FinalWeek_Day7_PositiveExperiences"
+                            "BodyMovement" -> week12FileName = "FinalWeek_Day7_BodyMovement"
+                        }
+                    }
+                }
+                json = stringFromJsonAsset(context, week12FileName)
+            }
+
             try {
                 conversation = gson.fromJson(json, ConversationSurvey::class.java)
             } catch (e: Exception) {

@@ -1,0 +1,23 @@
+{
+  "identifier": "FinalWeek_Day7_PositiveExperiences",
+  "type": "conversationSurvey",
+  "taskIdentifier": "FinalWeek_Day7_PositiveExperiences",
+  "schemaIdentifier": "FinalWeek_Day7_PositiveExperiences",
+  "isSchedule": true,
+  "steps": [
+    {
+      "identifier": "Daily",
+      "schemaIdentifier": "Daily",
+      "type": "nestedGroup",
+      "frequency": "daily",
+      "startDay": 1,
+      "filenames": [
+        "FW7_Intro",
+        "4P_W_BADS",
+        "BL_PHQ9_FULL",
+        "BL_GAD7_Full",
+        "FW7_Outtro"
+      ]
+    }
+  ]
+}

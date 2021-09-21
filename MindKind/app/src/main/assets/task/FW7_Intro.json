@@ -1,0 +1,16 @@
+{
+  "identifier": "FW7_Intro",
+  "type": "conversationSurvey",
+  "taskIdentifier": "FW7_Intro",
+  "schemaIdentifier": "FW7_Intro",
+  "steps": [
+    {
+      "identifier": "WK12_D7_intro",
+      "type": "instruction",
+      "title": "Last Day! End of Study! We have your final survey, and it's really important that we get this information from you.",
+      "continueafterdelay": true,
+      "buttonTitle": "Ok",
+      "optional": false
+    }
+  ]
+}

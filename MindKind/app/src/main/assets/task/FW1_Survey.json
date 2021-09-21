@@ -1,0 +1,69 @@
+{
+  "identifier": "FW1_Survey",
+  "type": "conversationSurvey",
+  "taskIdentifier": "FW1_Survey",
+  "schemaIdentifier": "FW1_Survey",
+  "steps": [
+    {
+      "identifier": "WK12_intro",
+      "type": "instruction",
+      "title": "This is week 12! You made it through the study! Because you are so awesome, we will be changing up some questions. We will mostly be asking you about the research experience now. We will still check in on your mood, but now we will be asking you to give us insights into what it has been like to be a participant in this study. Ready?",
+      "continueafterdelay": true,
+      "buttonTitle": "Ok",
+      "optional": false
+    },
+    {
+      "identifier": "Mood_Daily",
+      "type": "singleChoice.integer",
+      "title": "Pick the response that describes how you felt today",
+      "choices": [
+        { "text": "Worst Ever"  ,               "value": 1 },
+        { "text": "Bad Mood"    ,               "value": 2 },
+        { "text": "Average"     ,               "value": 3 },
+        { "text": "Good Mood"   ,               "value": 4 },
+        { "text": "Best Ever"   ,               "value": 5 }
+      ]
+    },
+    {
+      "identifier": "WK12_Difficulty",
+      "type": "singleChoice.integer",
+      "title": "About this study, looking back over these 12 weeks, how hard was it to answer questions every day?",
+      "choices": [
+        { "text": "Very Hard"  ,               "value": 5 },
+        { "text": "Hard"       ,               "value": 4 },
+        { "text": "Neutral"     ,              "value": 3 },
+        { "text": "Easy"    ,                  "value": 2 },
+        { "text": "Very Easy"   ,              "value": 1 }
+      ]
+    },
+    {
+      "identifier": "WK12_Reflect",
+      "type": "singleChoice.integer",
+      "title": "How helpful was it for you to reflect on your mood?",
+      "choices": [
+        { "text": "Very Un-helpful"  ,               "value": 1 },
+        { "text": "Un-helpful"       ,               "value": 2 },
+        { "text": "Neutral"         ,               "value": 3 },
+        { "text": "Helpful"         ,               "value": 4 },
+        { "text": "Very Helpful"    ,               "value": 5 }
+      ]
+    },
+    {
+      "identifier": "WK_12_QUAL_Engagement",
+      "type": "text",
+      "title": "Finally, if there was a way for us to make the experience more engaging, what do you recommend?",
+      "buttonTitle": "Submit",
+      "maxCharacters": "750",
+      "placeholderText": "To protect your privacy, please do not include your name or any information that could be used to identify you."
+
+    },
+    {
+      "identifier": "WK12_D1_Outro",
+      "type": "instruction",
+      "title": "Thank you so much! We really appreciate your feedback.",
+      "buttonTitle": "Done",
+      "optional": false
+
+    }
+  ]
+}

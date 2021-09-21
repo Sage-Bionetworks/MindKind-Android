@@ -1,0 +1,37 @@
+{
+  "identifier": "FW5_Survey",
+  "type": "conversationSurvey",
+  "taskIdentifier": "FW5_Survey",
+  "schemaIdentifier": "FW5_Survey",
+  "steps": [
+    {
+      "identifier": "WK12_D5_intro",
+      "type": "instruction",
+      "title": "Hello, another really light day. All we are going to ask about is your mood, then you can have the rest of the day off from answering questions. You ready?",
+      "continueafterdelay": true,
+      "buttonTitle": "Ok",
+      "optional": false
+    },
+
+    {
+      "identifier": "Mood_Daily",
+      "type": "singleChoice.integer",
+      "title": "Pick the response that describes how you felt today",
+      "choices": [
+        { "text": "Worst Ever"  ,               "value": 1 },
+        { "text": "Bad Mood"    ,               "value": 2 },
+        { "text": "Average"     ,               "value": 3 },
+        { "text": "Good Mood"   ,               "value": 4 },
+        { "text": "Best Ever"   ,               "value": 5 }
+      ]
+    },
+    {
+
+      "identifier": "WK12_D5_Outro",
+      "type": "instruction",
+      "title": "Great, thank you for your answers, see you tomorrow!",
+      "buttonTitle": "Done",
+      "optional": false
+    }
+  ]
+}
