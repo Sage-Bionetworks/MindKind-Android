@@ -190,6 +190,7 @@
     <string name="arm2_other_weeks_ai_title">Great job completing the first section!</string>
     <string name="arm2_other_weeks_ai_text">For the next section, your topic is %s.</string>
     <string name="task_list_no_items_msg">Great job finishing all your surveys! Come back tomorrow for more!</string>
+    <string name="task_list_finished_study_msg">Thank you for completing the MindKind Study! You can now delete the app from your phone.</string>
 
     <string name="positive_experiences">Positive Experiences</string>
     <string name="social">Social Connections</string>
