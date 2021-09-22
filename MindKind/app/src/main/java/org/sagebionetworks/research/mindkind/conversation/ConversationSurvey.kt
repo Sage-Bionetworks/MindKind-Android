@@ -10,6 +10,7 @@ import org.joda.time.DateTime
 import org.joda.time.Days
 import org.sagebionetworks.research.domain.RuntimeTypeAdapterFactory
 import org.sagebionetworks.research.mindkind.backgrounddata.ProgressInStudy
+import org.sagebionetworks.research.mindkind.research.SageTaskIdentifier
 import org.sagebionetworks.research.mindkind.researchstack.framework.SageResearchStack
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -50,30 +51,32 @@ class ConversationGsonHelper {
                          jsonFilename: String, progress: ProgressInStudy?): ConversationSurvey? {
             val gson = createGson()
             val dataGroups = SageResearchStack.SageDataProvider.getInstance().userDataGroups
-            var json = stringFromJsonAsset(context, jsonFilename)
             val conversation: ConversationSurvey?
 
-            if (progress?.week == 12) {
+            val json = if (progress?.week == 12) {
                 // We are in week 12, so we override the normal survey to provide special end
                 // of the study surveys
                 var week12FileName = ""
                 when (progress?.dayOfWeek) {
-                    1 -> week12FileName = "FinalWeek_Day1"
-                    2 -> week12FileName = "FinalWeek_Day2"
-                    3 -> week12FileName = "FinalWeek_Day3"
-                    4 -> week12FileName = "FinalWeek_Day4"
-                    5 -> week12FileName = "FinalWeek_Day5"
-                    6 -> week12FileName = "FinalWeek_Day6"
+                    1 -> week12FileName = SageTaskIdentifier.FinalWeek_Day1
+                    2 -> week12FileName = SageTaskIdentifier.FinalWeek_Day2
+                    3 -> week12FileName = SageTaskIdentifier.FinalWeek_Day3
+                    4 -> week12FileName = SageTaskIdentifier.FinalWeek_Day4
+                    5 -> week12FileName = SageTaskIdentifier.FinalWeek_Day5
+                    6 -> week12FileName = SageTaskIdentifier.FinalWeek_Day6
                     7 -> {
-                        when (jsonFilename) {
-                            "Sleep" -> week12FileName = "FinalWeek_Day7_Sleep"
-                            "Social" -> week12FileName = "FinalWeek_Day7_Social"
-                            "PositiveExperiences" -> week12FileName = "FinalWeek_Day7_PositiveExperiences"
-                            "BodyMovement" -> week12FileName = "FinalWeek_Day7_BodyMovement"
+                        week12FileName = when (jsonFilename) {
+                            "Sleep" ->  SageTaskIdentifier.FinalWeek_Day7_Sleep
+                            "Social" -> SageTaskIdentifier.FinalWeek_Day7_Social
+                            "PositiveExperiences" -> SageTaskIdentifier.FinalWeek_Day7_PositiveExperiences
+                            "BodyMovement" -> SageTaskIdentifier.FinalWeek_Day7_BodyMovement
+                            else -> ""
                         }
                     }
                 }
-                json = stringFromJsonAsset(context, week12FileName)
+                stringFromJsonAsset(context, week12FileName)
+            } else {
+                stringFromJsonAsset(context, jsonFilename)
             }
 
             try {
