@@ -1,0 +1,19 @@
+{
+  "identifier": "FinalWeek_Day3",
+  "type": "conversationSurvey",
+  "taskIdentifier": "FinalWeek_Day3",
+  "schemaIdentifier": "FinalWeek_Day3",
+  "isSchedule": true,
+  "steps": [
+    {
+      "identifier": "Daily",
+      "schemaIdentifier": "Daily",
+      "type": "nestedGroup",
+      "frequency": "daily",
+      "startDay": 1,
+      "filenames": [
+        "FW3_Survey"
+      ]
+    }
+  ]
+}

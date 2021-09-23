@@ -32,10 +32,10 @@
 
 package org.sagebionetworks.research.mindkind.research;
 
-import androidx.annotation.StringDef;
-
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+
+import androidx.annotation.StringDef;
 
 @Retention(RetentionPolicy.SOURCE)
 @StringDef({
@@ -55,4 +55,14 @@ public @interface SageTaskIdentifier {
     String Surveys = "Surveys";
     String AI = "AI";
     String Baseline = "Baseline";
+    String FinalWeek_Day1 = "FinalWeek_Day1";
+    String FinalWeek_Day2 = "FinalWeek_Day2";
+    String FinalWeek_Day3 = "FinalWeek_Day3";
+    String FinalWeek_Day4 = "FinalWeek_Day4";
+    String FinalWeek_Day5 = "FinalWeek_Day5";
+    String FinalWeek_Day6 = "FinalWeek_Day6";
+    String FinalWeek_Day7_Sleep = "FinalWeek_Day7_Sleep";
+    String FinalWeek_Day7_Social = "FinalWeek_Day7_Social";
+    String FinalWeek_Day7_PositiveExperiences = "FinalWeek_Day7_PositiveExperiences";
+    String FinalWeek_Day7_BodyMovement = "FinalWeek_Day7_BodyMovement";
 }
