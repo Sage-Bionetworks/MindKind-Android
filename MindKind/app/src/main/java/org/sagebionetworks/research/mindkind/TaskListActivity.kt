@@ -44,6 +44,7 @@ import android.view.View
 import android.view.Window
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat.OnRequestPermissionsResultCallback
 import androidx.fragment.app.Fragment
@@ -352,7 +353,11 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
         posButton?.text = getString(R.string.rsb_BOOL_YES)
         posButton?.setOnClickListener {
             dialog.dismiss()
-            goToWebpage(recruitment.url)
+            if (!recruitment.url.isEmpty()) {
+                goToWebpage(recruitment.url)
+            } else if (!recruitment.emailAddress.isEmpty()) {
+                sendEmail(recruitment.emailAddress, recruitment.emailSubject)
+            }
         }
 
         dialog.show()
@@ -361,6 +366,19 @@ class TaskListActivity : AppCompatActivity(), OnRequestPermissionsResultCallback
     fun goToWebpage(uriString: String) {
         val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(uriString))
         startActivity(browserIntent)
+    }
+
+    fun sendEmail(emailAddress: String, subject: String) {
+        val intent = Intent(Intent.ACTION_SENDTO)
+        intent.data = Uri.parse("mailto:") // only email apps should handle this
+        intent.putExtra(Intent.EXTRA_EMAIL, arrayOf(emailAddress))
+        intent.putExtra(Intent.EXTRA_SUBJECT, subject)
+        if (intent.resolveActivity(packageManager) != null) {
+            startActivity(intent)
+        } else {
+            Toast.makeText(this, emailAddress +
+                    " cannot send email", Toast.LENGTH_LONG)
+        }
     }
 
     fun showEngagementMessage() {
@@ -554,6 +572,8 @@ data class AiClientData(
 
 data class RecruitmentAppConfig(
         val url: String,
+        val emailAddress: String,
+        val emailSubject: String,
         val notifyAtStartOfWeek: Int,
         val startDate: LocalDateTime,
         val endDate: LocalDateTime,
