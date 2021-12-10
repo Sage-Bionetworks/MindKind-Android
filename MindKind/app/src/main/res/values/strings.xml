@@ -145,6 +145,8 @@
     <string name="registration_header_subtext">Study</string>
     <string name="registration_title">Let\'s get started</string>
     <string name="registration_message">Please enter the phone number you used to sign up. We ask so we can verify it\'s you and get you started!\n\nGo to the link below to join the MindKind Study.</string>
+    <string name="india_registration_message">Please enter your 10 or 11-digit mobile phone number and 6-digit personal code you used to sign up.\n\nGo to the link below to join the MindKind Study.</string>
+    <string name="india_registration_detail">Your number and personal security code will be stored securely and separate from your data. They will not be shared with anyone.</string>
     <string name="registration_join_study">Join Study</string>
     <string name="registration_join_study_link"><u>Join Study</u></string>
     <string name="registration_continue_to_login"><u>Continue to Login</u></string>
@@ -152,6 +154,7 @@
     <string name="registration_link"><u>JOIN</u></string>
     <string name="registration_learn_link"><u>Learn More</u></string>
     <string name="registration_hint">Phone Number</string>
+    <string name="india_password_registration_hint">Personal code</string>
     <string name="registration_link_sent">Your link is on its way!</string>
     <string name="registration_welcome_title">Have You Joined the\nMindKind Study?</string>
     <string name="registration_welcome_message">Be sure to join before you continue to login.</string>
@@ -159,6 +162,7 @@
     <string name="button_resend_link"><u>(Resend link)</u></string>
     <string name="registration_sms_message">We sent you a link to verify your identity via SMS text message to</string>
     <string name="registration_phone_error">The phone number you entered is not valid. Please enter a valid phone number.</string>
+    <string name="registration_phone_code_error">The phone number or personal code you entered is not valid.</string>
 
     <!-- Welcome onboarding strings -->
 

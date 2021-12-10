@@ -72,9 +72,17 @@ class ExternalIdSignInViewModel @MainThread constructor(
     var externalId: String? = ""
     set(value) {
         field = value
-        isExternalIdValidLiveData.postValue(!Strings.isNullOrEmpty(value))
+        isExternalIdValidLiveData.postValue(
+                !Strings.isNullOrEmpty(value) &&
+                        !customPassword.isNullOrEmpty())
     }
     var customPassword: String? = null
+        set(value) {
+            field = value
+            isExternalIdValidLiveData.postValue(
+                    !Strings.isNullOrEmpty(value) &&
+                            !externalId.isNullOrEmpty())
+        }
 
     val isExternalIdValidLiveData: MutableLiveData<Boolean>
     val isLoadingMutableLiveData: MutableLiveData<Boolean>
@@ -100,14 +108,22 @@ class ExternalIdSignInViewModel @MainThread constructor(
             return
         }
 
-        // Enter a custom password, or use the auto-format
-        val password = customPassword ?: (externalIdNotNull + "foo#\$H0")
+        val passwordNotNull = customPassword ?: run {
+            Log.w(LOG_TAG, "Cannot sign in with null or empty password")
+            isSignedInLiveData.postValue(null)
+            errorMessageMutableLiveData.postValue("Cannot sign in with null or empty password")
+            return
+        }
+
+        val fullPersonalCode = "M!ndKind${passwordNotNull}"
 
         compositeSubscription.add(
-                authenticationManager.signInWithExternalId(externalIdNotNull, password)
+                authenticationManager.signInWithExternalId(externalIdNotNull, fullPersonalCode)
                         .doOnSubscribe { isLoadingMutableLiveData.postValue(true) }
                         .doAfterTerminate { isLoadingMutableLiveData.postValue(false) }
-                        .subscribe({ s: UserSessionInfo? -> isSignedInLiveData.postValue(s) }
+                        .subscribe({
+                            s: UserSessionInfo? -> isSignedInLiveData.postValue(s)
+                        }
                         ) { t: Throwable ->
                             isSignedInLiveData.postValue(null)
                             errorMessageMutableLiveData.postValue(t.message)

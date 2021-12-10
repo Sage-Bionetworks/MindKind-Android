@@ -1,11 +1,8 @@
 package org.sagebionetworks.research.mindkind
 
-import android.R.attr.button
-import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.graphics.Paint
 import android.net.Uri
 import android.os.Bundle
@@ -18,10 +15,9 @@ import android.view.Window
 import android.view.animation.AccelerateInterpolator
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.ToggleButton
 import androidx.annotation.MainThread
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -31,26 +27,31 @@ import com.google.android.material.button.MaterialButton
 import com.google.common.base.Strings
 import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.activity_external_id_sign_in.*
-import kotlinx.android.synthetic.main.activity_external_id_sign_in.progressBar
 import kotlinx.android.synthetic.main.activity_registration.*
+import kotlinx.android.synthetic.main.activity_registration.header_layout
+import kotlinx.android.synthetic.main.activity_registration.password_text_input
+import kotlinx.android.synthetic.main.activity_registration.primary_button
+import kotlinx.android.synthetic.main.activity_registration.progressBar
+import kotlinx.android.synthetic.main.activity_registration.registration_message
+import kotlinx.android.synthetic.main.activity_registration.registration_title
+import kotlinx.android.synthetic.main.activity_registration.secondary_button
 import kotlinx.android.synthetic.main.activity_registration.web_consent_container
-import kotlinx.android.synthetic.main.activity_sms_code.*
-import org.joda.time.DateTime
+import kotlinx.android.synthetic.main.activity_registration.welcome_butterflies
 import org.sagebionetworks.bridge.android.manager.AuthenticationManager
+import org.sagebionetworks.bridge.android.viewmodel.PhoneAuthViewModel
 import org.sagebionetworks.bridge.researchstack.ApiUtils
+import org.sagebionetworks.bridge.rest.exceptions.EntityNotFoundException
 import org.sagebionetworks.bridge.rest.exceptions.InvalidEntityException
+import org.sagebionetworks.bridge.rest.model.PhoneSignIn
+import org.sagebionetworks.bridge.rest.model.PhoneSignInRequest
 import org.sagebionetworks.bridge.rest.model.UserSessionInfo
 import org.sagebionetworks.research.mindkind.authentication.ExternalIdSignInActivity
 import org.sagebionetworks.research.mindkind.authentication.ExternalIdSignInViewModel
-import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService
 import org.sagebionetworks.researchstack.backbone.DataResponse
 import org.slf4j.LoggerFactory
 import rx.subscriptions.CompositeSubscription
 import java.util.*
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.activity_registration.registration_message as registration_message1
-import kotlinx.android.synthetic.main.activity_sms_code.registration_title as registration_title1
-
 
 open class RegistrationActivity: AppCompatActivity() {
 
@@ -86,9 +87,13 @@ open class RegistrationActivity: AppCompatActivity() {
 
         viewModel.getIsSignedUpLiveData().observe(this, { signInSuccess: Boolean ->
             if (signInSuccess) {
-                val phoneNumber = viewModel.phoneNumber
-                startActivity(SmsCodeActivity.create(this, phoneNumber))
-                overridePendingTransition(R.anim.enter, R.anim.exit)
+                if (isUserInIndia()) {
+                    returnToEntryActivity() // This will send user to onboarding
+                } else {
+                    val phoneNumber = viewModel.phoneNumber
+                    startActivity(SmsCodeActivity.create(this, phoneNumber))
+                    overridePendingTransition(R.anim.enter, R.anim.exit)
+                }
             }
         })
 
@@ -115,6 +120,8 @@ open class RegistrationActivity: AppCompatActivity() {
         primary_button.setOnClickListener {
             if (phoneSignUpViewModel?.showingWelcomeView == true) {
                 joinStudy()
+            } else if (isUserInIndia()) {
+                viewModel.doSignInViaExternalId(this)
             } else {
                 if (isSecretTestUserPhoneNumber()) {
                     startTestUserSignInProcess()
@@ -123,6 +130,14 @@ open class RegistrationActivity: AppCompatActivity() {
                 viewModel.signInPhone(this)
             }
         }
+
+        password_text_input.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(personalCode: Editable?) {
+                phoneSignUpViewModel?.personalCode = personalCode?.toString() ?: ""
+            }
+        })
 
         phone_number_text_input.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -138,7 +153,12 @@ open class RegistrationActivity: AppCompatActivity() {
         secondary_button.setOnClickListener {
             if (phoneSignUpViewModel?.showingWelcomeView == true) {
                 phoneSignUpViewModel?.showingWelcomeView = false
-                showRegistrationView()
+
+                if (isUserInIndia()) {
+                    showExternalIdRegistrationView()
+                } else {
+                    showRegistrationView()
+                }
             } else {
                 joinStudy()
             }
@@ -146,6 +166,11 @@ open class RegistrationActivity: AppCompatActivity() {
         secondary_button.paintFlags = secondary_button.paintFlags or Paint.UNDERLINE_TEXT_FLAG
 
         phoneSignUpViewModel = viewModel
+    }
+
+    fun isUserInIndia(): Boolean {
+        return PhoneSignUpViewModel.phoneRegion(this) ==
+                PhoneSignUpViewModel.INDIA_REGION_CODE
     }
 
     fun refreshPrimaryButtonVisibilty(isValid: Boolean?) {
@@ -160,15 +185,6 @@ open class RegistrationActivity: AppCompatActivity() {
         } else {
             0.33f
         }
-    }
-
-    private fun sendToExternalIdActivity() {
-        val intent = Intent(this, ExternalIdSignInActivity::class.java)
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
-                Intent.FLAG_ACTIVITY_CLEAR_TASK or
-                Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        startActivity(intent)
-        finish()
     }
 
     fun joinStudy() {
@@ -204,6 +220,8 @@ open class RegistrationActivity: AppCompatActivity() {
 
         if (phoneSignUpViewModel?.showingWelcomeView == true) {
             showWelcomeView()
+        } else if (isUserInIndia()) {
+            showExternalIdRegistrationView()
         } else {
             showRegistrationView()
         }
@@ -211,6 +229,8 @@ open class RegistrationActivity: AppCompatActivity() {
 
     open fun showWelcomeView() {
         phoneSignUpViewModel?.showingWelcomeView = true
+        external_id_password_field_layout.visibility = View.GONE
+        external_id_detail_message.visibility = View.GONE
         registration_title.text = getString(R.string.registration_welcome_title)
         registration_message.text = getString(R.string.registration_welcome_message)
         primary_button.text = getString(R.string.registration_join_study)
@@ -222,6 +242,22 @@ open class RegistrationActivity: AppCompatActivity() {
         primary_button.isEnabled = true
         primary_button.alpha = 1.0f
         welcome_butterflies.alpha = 0.0f
+    }
+
+    open fun showExternalIdRegistrationView() {
+        phoneSignUpViewModel?.showingWelcomeView = false
+        external_id_password_field_layout.visibility = View.VISIBLE
+        external_id_detail_message.visibility = View.VISIBLE
+        registration_title.text = getString(R.string.registration_title)
+        registration_message.text = getString(R.string.india_registration_message)
+        primary_button.text = getString(R.string.registration_continue)
+        secondary_button.text = getString(R.string.registration_join_study_link)
+        header_layout.layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                resources.getDimensionPixelOffset(R.dimen.registration_header_height))
+        phone_text_field_layout.visibility = View.VISIBLE
+        welcome_butterflies.animate().alpha(1f).setDuration(333)
+                .setInterpolator(AccelerateInterpolator()).start()
     }
 
     open fun showRegistrationView() {
@@ -268,7 +304,7 @@ open class RegistrationActivity: AppCompatActivity() {
         posButton?.text = getString(R.string.rsb_BOOL_YES)
         posButton?.setOnClickListener {
             dialog.dismiss()
-            sendToExternalIdActivity()
+            showExternalIdRegistrationView()
         }
 
         val negButton = dialog.findViewById<MaterialButton>(R.id.cancel_button)
@@ -383,6 +419,9 @@ public class PhoneSignUpViewModel @MainThread constructor(
             isPhoneNumberValidLiveData.postValue(value.isNotEmpty())
         }
 
+    // Used for external ID sign in
+    var personalCode: String? = null
+
     var deepLinkeToken: String? = null
 
     fun getIsSignedUpLiveData(): LiveData<Boolean> {
@@ -449,6 +488,48 @@ public class PhoneSignUpViewModel @MainThread constructor(
                         }) { error: Throwable ->
                             // 400 is the response for an invalid phone number
                             if (error is InvalidEntityException) {
+                                errorMessageMutableLiveData.postValue(phoneErrorMsg)
+                                return@subscribe
+                            }
+                            isSignedUpLiveData.postValue(false)
+                            errorMessageMutableLiveData.postValue(error.message)
+                        })
+    }
+
+    fun doSignInViaExternalId(context: Context) {
+        LOGGER.debug("doSignInViaExternalId")
+
+        if (Strings.isNullOrEmpty(phoneNumber)) {
+            LOGGER.warn("Cannot sign in with null or empty phone number")
+            isSignedUpLiveData.postValue(false)
+            errorMessageMutableLiveData.postValue("Cannot sign in with null or empty phone number")
+            return
+        }
+        val externalIdNotNull = phoneNumber
+
+        val personalCodeNotNull = personalCode ?: run {
+            LOGGER.warn("Cannot sign in with null or empty personal code")
+            isSignedUpLiveData.postValue(false)
+            errorMessageMutableLiveData.postValue("Cannot sign in with null or empty personal code")
+            return
+        }
+
+        val phoneErrorMsg = context.getString(R.string.registration_phone_code_error)
+        val fullPersonalCode = "M!ndKind${personalCodeNotNull}"
+
+        compositeSubscription.add(
+                authenticationManager.signInWithExternalId(externalIdNotNull, fullPersonalCode)
+                        .doOnSubscribe {
+                            isLoadingMutableLiveData.postValue(true)
+                        }
+                        .doAfterTerminate {
+                            isLoadingMutableLiveData.postValue(false)
+                        }
+                        .subscribe({ response: UserSessionInfo? ->
+                            isSignedUpLiveData.postValue(true)
+                        }) { error: Throwable ->
+                            // 400 is the response for an invalid phone number
+                            if (error is EntityNotFoundException) {
                                 errorMessageMutableLiveData.postValue(phoneErrorMsg)
                                 return@subscribe
                             }

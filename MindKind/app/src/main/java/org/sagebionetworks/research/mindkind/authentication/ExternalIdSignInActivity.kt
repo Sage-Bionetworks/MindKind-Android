@@ -33,33 +33,30 @@
 package org.sagebionetworks.research.mindkind.authentication
 
 import android.annotation.SuppressLint
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.google.common.base.Strings
 import dagger.android.AndroidInjection
-import org.sagebionetworks.research.mindkind.authentication.ExternalIdSignInViewModel.Factory
-import kotlinx.android.synthetic.main.activity_external_id_sign_in.externalId
+import kotlinx.android.synthetic.main.activity_external_id_sign_in.*
+import kotlinx.android.synthetic.main.activity_external_id_sign_in.primary_button
 import kotlinx.android.synthetic.main.activity_external_id_sign_in.progressBar
-import kotlinx.android.synthetic.main.activity_external_id_sign_in.signIn
-import org.joda.time.DateTime
-import org.joda.time.LocalDate
+import kotlinx.android.synthetic.main.activity_external_id_sign_in.secondary_button
+import kotlinx.android.synthetic.main.activity_external_id_sign_in.password_text_input
+import kotlinx.android.synthetic.main.activity_registration.*
 import org.sagebionetworks.bridge.rest.model.UserSessionInfo
 import org.sagebionetworks.research.mindkind.R
-import org.sagebionetworks.research.mindkind.TaskListActivity
+import org.sagebionetworks.research.mindkind.authentication.ExternalIdSignInViewModel.Factory
 import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService
 import org.sagebionetworks.research.mindkind.returnToEntryActivity
-import org.sagebionetworks.researchstack.backbone.DataProvider
-import org.sagebionetworks.researchstack.backbone.model.ConsentSignatureBody
+import java.io.ByteArrayOutputStream
 import javax.inject.Inject
 
 class ExternalIdSignInActivity : AppCompatActivity() {
@@ -106,7 +103,13 @@ class ExternalIdSignInActivity : AppCompatActivity() {
         })
 
         externalIdViewModel.isLoadingMutableLiveData.observe(this, Observer { isLoading: Boolean? ->
-            progressBar?.isIndeterminate = isLoading ?: false
+            val isLoadingUnwrapped = isLoading ?: false
+            progressBar?.visibility = if (isLoading == true) {
+                View.VISIBLE
+            } else {
+                View.INVISIBLE
+            }
+            refreshPrimaryButtonVisibilty(!isLoadingUnwrapped)
         })
 
         externalIdViewModel.errorMessageMutableLiveData.observe(this, Observer { errorMessage: String? ->
@@ -114,20 +117,45 @@ class ExternalIdSignInActivity : AppCompatActivity() {
         })
 
         externalIdViewModel.isExternalIdValidLiveData.observe(this, Observer { isValid: Boolean? ->
-            signIn?.isEnabled = isValid ?: false
+            refreshPrimaryButtonVisibilty(isValid)
         })
 
         externalIdSignInViewModel = externalIdViewModel
     }
 
     private fun initView() {
-        externalId.doOnTextChanged { externalId, _, _, _ ->
+
+        external_id_text_input.doOnTextChanged { externalId, _, _, _ ->
             externalIdSignInViewModel?.externalId = externalId?.toString()
         }
 
-        signIn.setOnClickListener {
+        password_text_input.doOnTextChanged { password, _, _, _ ->
+            externalIdSignInViewModel?.customPassword = password?.toString()
+        }
+
+        primary_button.setOnClickListener {
+            refreshPrimaryButtonVisibilty(false)
             externalIdSignInViewModel?.doSignIn()
         }
+
+        secondary_button.setOnClickListener {
+            joinStudy()
+        }
+    }
+
+    fun refreshPrimaryButtonVisibilty(isEnabled: Boolean?) {
+        primary_button.isEnabled = isEnabled ?: false
+        primary_button.alpha = if (isEnabled == true) {
+            1.0f
+        } else {
+            0.33f
+        }
+    }
+
+    fun joinStudy() {
+        val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(
+                "https://mindkindstudy.org/hub/eligibility"))
+        startActivity(browserIntent)
     }
 
     private fun onErrorMessage(errorMessage: String?) {
