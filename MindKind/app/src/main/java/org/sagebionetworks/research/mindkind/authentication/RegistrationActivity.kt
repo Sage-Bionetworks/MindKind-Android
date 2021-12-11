@@ -246,6 +246,8 @@ open class RegistrationActivity: AppCompatActivity() {
 
     open fun showExternalIdRegistrationView() {
         phoneSignUpViewModel?.showingWelcomeView = false
+        phone_number_text_input.setText("")
+        phoneSignUpViewModel?.phoneNumber = ""
         external_id_password_field_layout.visibility = View.VISIBLE
         external_id_detail_message.visibility = View.VISIBLE
         registration_title.text = getString(R.string.registration_title)
