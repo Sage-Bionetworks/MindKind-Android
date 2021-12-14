@@ -6,12 +6,13 @@ apply plugin: 'kotlinx-serialization'
 apply plugin: 'com.jakewharton.butterknife'
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
     buildToolsVersion "28.0.3"
     defaultConfig {
         applicationId "org.sagebionetworks.research.mindkind"
         minSdkVersion 21
-        targetSdkVersion 29
+        targetSdkVersion 30
+        ndkVersion "22.1.7171670"
         // this is not the final version code, product flavors add to it
         versionCode 17
         versionName "1.1"
