@@ -31,71 +31,184 @@
   ~ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   -->
 
-<RelativeLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/confirmation_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/colorPrimary">
+    android:layout_margin="0dp">
 
-    <TextView
-        style="@style/TextAppearance.Sage.Header"
-        android:id="@+id/externalIdLabel"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="@dimen/margin_medium"
-        android:textColor="@color/white"
-        android:text="Enter your Tester ID"
-        tools:ignore="HardcodedText"
-        android:gravity="center"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="64dp"/>
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <androidx.appcompat.widget.AppCompatEditText
-        style="@style/TextAppearance.Sage.Header"
-        android:id="@+id/externalId"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/externalIdLabel"
-        android:layout_marginHorizontal="@dimen/margin_medium"
-        android:layout_marginTop="64dp"
-        android:importantForAutofill="no"
-        android:textColor="@color/white"
-        android:maxLines="1"
-        android:singleLine="true"
-        android:gravity="center"
-        android:backgroundTint="@color/white"
-        android:textSize="24sp"
-        android:textColorHint="@color/appLightGray"
-        tools:ignore="HardcodedText" />
+        <FrameLayout
+            android:id="@+id/header_layout"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:background="@color/white"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/registration_background"
+                android:contentDescription="@string/app_name"/>
+
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/ocean300"
+            android:paddingBottom="20dp"
+            android:animateLayoutChanges="true">
 
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-        android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/registration_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/registration_title"
+                android:layout_gravity="start"
+                style="@style/TextAppearance.Sage.Settings.Header"
+                android:layout_marginHorizontal="36dp"
+                android:layout_marginVertical="8dp"
+                android:paddingTop="16dp"
+                android:textColor="@color/dark_text"
+                android:textSize="24sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/registration_message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/india_registration_message"
+                android:layout_gravity="center_horizontal"
+                style="@style/TextAppearance.Sage.Settings.Header"
+                android:layout_marginHorizontal="40dp"
+                android:layout_marginVertical="8dp"
+                android:textColor="@color/dark_text"
+                android:textSize="18sp"/>
+
+        </LinearLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/external_id_field_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
+            android:hint="@string/registration_hint"
+            android:textColorHint="@color/appLightGray"
+            app:boxBackgroundMode="outline"
+            app:boxStrokeColor="@color/ocean300">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/external_id_text_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:inputType="phone" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/password_field_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
+            android:hint="@string/india_password_registration_hint"
+            android:textColorHint="@color/appLightGray"
+            app:boxBackgroundMode="outline"
+            app:boxStrokeColor="@color/ocean300">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/password_text_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:inputType="textPassword" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:id="@+id/detail_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/india_registration_detail"
+            android:layout_gravity="center_horizontal"
+            style="@style/TextAppearance.Sage.Settings.Subheader"
+            android:layout_marginHorizontal="40dp"
+            android:layout_marginVertical="24dp"
+            android:textColor="@color/dark_text"
+            android:textSize="12sp"/>
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
+            android:indeterminate="true"
+            android:visibility="invisible"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/white"
+            android:padding="32dp">
+
+            <com.google.android.material.button.MaterialButton
+                style="@style/Sage.MaterialButton.Rounded"
+                android:id="@+id/primary_button"
+                android:layout_width="match_parent"
+                android:layout_height="54dp"
+                android:textSize="16sp"
+                android:text="@string/rsb_submit"
+                android:layout_gravity="bottom"
+                android:layout_above="@+id/secondary_button"/>
+
+            <com.google.android.material.button.MaterialButton
+                style="@style/Sage.MaterialButton.UnderlinedBorderless"
+                android:id="@id/secondary_button"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:textSize="16sp"
+                android:textColor="@color/appTextDark"
+                android:text="@string/registration_link"
+                android:layout_alignParentBottom="true"/>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/welcome_butterflies"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/button_container"
-        android:indeterminate="true"/>
+        android:paddingLeft="12dp"
+        android:src="@drawable/ic_registration_butterflies"
+        android:contentDescription="@string/content_desc_butterflies"
+        android:layout_marginTop="40dp"/>
 
     <FrameLayout
-        android:id="@+id/button_container"
+        android:id="@+id/web_consent_container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="@dimen/margin_small"
-        android:layout_alignParentBottom="true"
-        android:background="@color/white">
+        android:layout_height="match_parent"
+        android:visibility="gone"/>
 
-        <com.google.android.material.button.MaterialButton
-            style="@style/Sage.MaterialButton.Rounded"
-            android:id="@+id/signIn"
-            android:layout_width="match_parent"
-            android:layout_height="64dp"
-            android:text="Done"
-            tools:ignore="HardcodedText" />
-
-    </FrameLayout>
-
-</RelativeLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

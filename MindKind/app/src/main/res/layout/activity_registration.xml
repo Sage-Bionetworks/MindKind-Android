@@ -109,8 +109,8 @@
             android:layout_marginEnd="32dp"
             android:hint="@string/registration_hint"
             android:textColorHint="@color/appLightGray"
-            app:boxBackgroundMode="filled"
-            app:boxBackgroundColor="@color/white">
+            app:boxBackgroundMode="outline"
+            app:boxStrokeColor="@color/ocean300">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/phone_number_text_input"
@@ -121,6 +121,40 @@
                 android:inputType="phone" />
 
         </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/external_id_password_field_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
+            android:hint="@string/india_password_registration_hint"
+            android:textColorHint="@color/appLightGray"
+            app:boxBackgroundMode="outline"
+            app:boxStrokeColor="@color/ocean300">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/password_text_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:inputType="numberPassword" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:id="@+id/external_id_detail_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/india_registration_detail"
+            android:layout_gravity="center_horizontal"
+            style="@style/TextAppearance.Sage.Settings.Subheader"
+            android:layout_marginHorizontal="40dp"
+            android:layout_marginVertical="24dp"
+            android:textColor="@color/dark_text"
+            android:textSize="12sp"/>
 
         <ProgressBar
             android:id="@+id/progressBar"
