@@ -57,6 +57,8 @@ open class RegistrationActivity: AppCompatActivity() {
 
     companion object {
         private val TAG = RegistrationActivity::class.java.simpleName
+        public val stagingSignUpUrl = "https://staging.mindkindstudy.org/"
+        public val signUpUrl = stagingSignUpUrl//"https://mindkindstudy.org/hub/eligibility"
     }
 
     var phoneSignUpViewModel: PhoneSignUpViewModel? = null
@@ -166,11 +168,18 @@ open class RegistrationActivity: AppCompatActivity() {
         secondary_button.paintFlags = secondary_button.paintFlags or Paint.UNDERLINE_TEXT_FLAG
 
         phoneSignUpViewModel = viewModel
+
+        registration_title.setOnLongClickListener {
+            startSmsIndianUserSignInProcess()
+            return@setOnLongClickListener true
+        }
     }
 
     fun isUserInIndia(): Boolean {
-        return PhoneSignUpViewModel.phoneRegion(this) ==
-                PhoneSignUpViewModel.INDIA_REGION_CODE
+        return (PhoneSignUpViewModel.phoneRegion(this) ==
+                PhoneSignUpViewModel.INDIA_REGION_CODE ||
+                phoneSignUpViewModel?.isATester == true) &&
+                phoneSignUpViewModel?.smsCodeIndianUser != true
     }
 
     fun refreshPrimaryButtonVisibilty(isValid: Boolean?) {
@@ -188,8 +197,7 @@ open class RegistrationActivity: AppCompatActivity() {
     }
 
     fun joinStudy() {
-        val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(
-                "https://mindkindstudy.org/hub/eligibility"))
+        val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(signUpUrl))
         startActivity(browserIntent)
     }
 
@@ -264,6 +272,11 @@ open class RegistrationActivity: AppCompatActivity() {
 
     open fun showRegistrationView() {
         phoneSignUpViewModel?.showingWelcomeView = false
+        val countryCode = PhoneSignUpViewModel.countryCode(this)
+        phone_number_text_input.setText(countryCode)
+        phoneSignUpViewModel?.phoneNumber = countryCode
+        external_id_password_field_layout.visibility = View.GONE
+        external_id_detail_message.visibility = View.GONE
         registration_title.text = getString(R.string.registration_title)
         registration_message.text = getString(R.string.registration_message)
         primary_button.text = getString(R.string.registration_continue)
@@ -306,7 +319,36 @@ open class RegistrationActivity: AppCompatActivity() {
         posButton?.text = getString(R.string.rsb_BOOL_YES)
         posButton?.setOnClickListener {
             dialog.dismiss()
+            phoneSignUpViewModel?.isATester = true
             showExternalIdRegistrationView()
+        }
+
+        val negButton = dialog.findViewById<MaterialButton>(R.id.cancel_button)
+        negButton?.text = getString(R.string.rsb_BOOL_NO)
+        negButton?.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
+    }
+
+    private fun startSmsIndianUserSignInProcess() {
+        val dialog = Dialog(this)
+
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setCancelable(true)
+        dialog.setContentView(R.layout.dialog_2_button_message)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.white)
+
+        val msg = dialog.findViewById<TextView>(R.id.dialog_message)
+        msg?.text = getString(R.string.sms_india_message)
+
+        val posButton = dialog.findViewById<MaterialButton>(R.id.confirm_button)
+        posButton?.text = getString(R.string.rsb_BOOL_YES)
+        posButton?.setOnClickListener {
+            dialog.dismiss()
+            phoneSignUpViewModel?.smsCodeIndianUser = true
+            showRegistrationView()
         }
 
         val negButton = dialog.findViewById<MaterialButton>(R.id.cancel_button)
@@ -401,6 +443,8 @@ public class PhoneSignUpViewModel @MainThread constructor(
     }
 
     public var showingWelcomeView = true
+    public var isATester = false
+    public var smsCodeIndianUser = false
 
     private val compositeSubscription = CompositeSubscription()
     private val errorMessageMutableLiveData: MutableLiveData<String?> = MutableLiveData()
