@@ -146,7 +146,7 @@ open class SmsCodeActivity : AppCompatActivity() {
         viewModel.isConsentRequired.observe(this, Observer { isConsentRequired: Boolean? ->
             if (isConsentRequired == true) {
                 val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(
-                        "https://mindkindstudy.org/hub/eligibility"))
+                        RegistrationActivity.signUpUrl))
                 startActivity(browserIntent)
             } else {
                 web_consent_container.visibility = View.GONE

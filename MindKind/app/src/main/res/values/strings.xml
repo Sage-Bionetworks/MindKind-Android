@@ -141,6 +141,7 @@
     <!-- Phone registration -->
     <string name="close">Close</string>
     <string name="tester_message">Do you want to be a tester?</string>
+    <string name="sms_india_message">Did you sign up by receiving and entering an SMS text message code?</string>
     <string name="registration_error_msg">Please check for errors in SMS confirmation code. You may need to wait 5 minutes and request a new code.</string>
     <string name="registration_header_subtext">Study</string>
     <string name="registration_title">Let\'s get started</string>

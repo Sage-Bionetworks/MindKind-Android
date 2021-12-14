@@ -53,6 +53,7 @@ import kotlinx.android.synthetic.main.activity_external_id_sign_in.password_text
 import kotlinx.android.synthetic.main.activity_registration.*
 import org.sagebionetworks.bridge.rest.model.UserSessionInfo
 import org.sagebionetworks.research.mindkind.R
+import org.sagebionetworks.research.mindkind.RegistrationActivity
 import org.sagebionetworks.research.mindkind.authentication.ExternalIdSignInViewModel.Factory
 import org.sagebionetworks.research.mindkind.backgrounddata.BackgroundDataService
 import org.sagebionetworks.research.mindkind.returnToEntryActivity
@@ -154,7 +155,7 @@ class ExternalIdSignInActivity : AppCompatActivity() {
 
     fun joinStudy() {
         val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(
-                "https://mindkindstudy.org/hub/eligibility"))
+                RegistrationActivity.signUpUrl))
         startActivity(browserIntent)
     }
 
