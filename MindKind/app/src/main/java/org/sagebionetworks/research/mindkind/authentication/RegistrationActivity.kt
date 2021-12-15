@@ -169,6 +169,10 @@ open class RegistrationActivity: AppCompatActivity() {
 
         phoneSignUpViewModel = viewModel
 
+        // Per GHMD-240 before we switched over to use External ID sign-in for users in India,
+        // Some were able to successfully sign-in using SMS verfication.
+        // To allow these users to sign-in again if they deleted their app and re-installed,
+        // they can long-hold the "Let's get started!" text.
         registration_title.setOnLongClickListener {
             startSmsIndianUserSignInProcess()
             return@setOnLongClickListener true
