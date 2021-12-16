@@ -58,7 +58,7 @@ open class RegistrationActivity: AppCompatActivity() {
     companion object {
         private val TAG = RegistrationActivity::class.java.simpleName
         public val stagingSignUpUrl = "https://staging.mindkindstudy.org/"
-        public val signUpUrl = "https://mindkindstudy.org/hub?SkipWelcomeScreen=true"
+        public val signUpUrl = "https://mindkindstudy.org/hub/eligibility"
     }
 
     var phoneSignUpViewModel: PhoneSignUpViewModel? = null
