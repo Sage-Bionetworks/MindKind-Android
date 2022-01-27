@@ -31,7 +31,7 @@
   ~ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   -->
 
-<androidx.coordinatorlayout.widget.CoordinatorLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -44,7 +44,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_alignParentTop="true">
 
         <FrameLayout
             android:id="@+id/header_layout"
@@ -166,33 +167,31 @@
             android:indeterminate="true"
             android:visibility="invisible"/>
 
-        <RelativeLayout
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="32dp"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical">
+
+        <com.google.android.material.button.MaterialButton
+            style="@style/Sage.MaterialButton.Rounded"
+            android:id="@+id/primary_button"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/white"
-            android:padding="32dp">
+            android:layout_height="54dp"
+            android:textSize="16sp"
+            android:text="@string/rsb_submit" />
 
-            <com.google.android.material.button.MaterialButton
-                style="@style/Sage.MaterialButton.Rounded"
-                android:id="@+id/primary_button"
-                android:layout_width="match_parent"
-                android:layout_height="54dp"
-                android:textSize="16sp"
-                android:text="@string/rsb_submit"
-                android:layout_gravity="bottom"
-                android:layout_above="@+id/secondary_button"/>
-
-            <com.google.android.material.button.MaterialButton
-                style="@style/Sage.MaterialButton.UnderlinedBorderless"
-                android:id="@id/secondary_button"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:textSize="16sp"
-                android:textColor="@color/appTextDark"
-                android:text="@string/registration_link"
-                android:layout_alignParentBottom="true"/>
-
-        </RelativeLayout>
+        <com.google.android.material.button.MaterialButton
+            style="@style/Sage.MaterialButton.UnderlinedBorderless"
+            android:id="@id/secondary_button"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:textSize="16sp"
+            android:textColor="@color/appTextDark"
+            android:text="@string/registration_link"/>
 
     </LinearLayout>
 
@@ -203,7 +202,8 @@
         android:paddingLeft="12dp"
         android:src="@drawable/ic_registration_butterflies"
         android:contentDescription="@string/content_desc_butterflies"
-        android:layout_marginTop="40dp"/>
+        android:layout_marginTop="40dp"
+        android:layout_alignParentTop="true"/>
 
     <FrameLayout
         android:id="@+id/web_consent_container"
@@ -211,4 +211,4 @@
         android:layout_height="match_parent"
         android:visibility="gone"/>
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</RelativeLayout>
